@@ -13,7 +13,14 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
-// Helper function for delays
+// Store results in memory
+let scanResults = {
+    status: 'processing',
+    listings: [],
+    lastUpdated: null,
+    error: null
+};
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function fetchWithTimeout(url, options, timeout = 5000) {
@@ -54,7 +61,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
 
             if (response.status === 429) {
                 console.log('Rate limit reached, waiting 30 seconds before retry...');
-                await delay(30000); // Wait 30 seconds
+                await delay(30000);
                 continue;
             }
 
@@ -64,10 +71,8 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
                 console.error('Error details:', errorData);
                 
                 if (i === retryCount) {
-                    console.error(`All ${retryCount + 1} attempts failed for seller ${sellerUsername}`);
                     return { error: true, listings: [], total: 0 };
                 }
-                // Wait before retrying
                 await delay(2000 * (i + 1));
                 continue;
             }
@@ -168,7 +173,6 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 
         const filteredListings = [];
         
-        // Process sellers sequentially instead of in parallel
         for (const item of data.itemSummaries || []) {
             const feedbackScore = item.seller?.feedbackScore || 0;
 
@@ -191,7 +195,6 @@ async function fetchListingsForPhrase(phrase, accessToken) {
                     console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
                 }
 
-                // Add delay between seller checks
                 await delay(1000);
                 
             } catch (error) {
@@ -214,15 +217,12 @@ async function fetchAllListings() {
 
         const allListings = [];
         
-        // Process phrases sequentially
         for (const phrase of searchPhrases) {
             const listings = await fetchListingsForPhrase(phrase, accessToken);
             allListings.push(...listings);
-            // Wait between phrases
             await delay(2000);
         }
 
-        console.log(`\nTotal combined listings: ${allListings.length}`);
         return allListings;
     } catch (error) {
         console.error('Error in fetchAllListings:', error);
@@ -230,80 +230,150 @@ async function fetchAllListings() {
     }
 }
 
-app.get('/', async (req, res) => {
-    res.setTimeout(25000, () => {
-        res.status(503).send(`
-            <html>
-                <body>
-                    <h1>Request Timeout</h1>
-                    <p>The request took too long to process. Please try again.</p>
-                    <script>
-                        setTimeout(() => window.location.reload(), 5000);
-                    </script>
-                </body>
-            </html>
-        `);
-    });
-
+// Background scanning process
+async function startScan() {
     try {
+        scanResults.status = 'processing';
+        scanResults.error = null;
         const listings = await fetchAllListings();
-
-        const html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>eBay Listings</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-                    th { background-color: #f4f4f4; }
-                    tr:nth-child(even) { background-color: #f9f9f9; }
-                    .auto-refresh { color: #666; margin-bottom: 20px; }
-                </style>
-            </head>
-            <body>
-                <h1>eBay Listings</h1>
-                <p class="auto-refresh">Page auto-refreshes every 5 minutes</p>
-                <p>Total Listings Found: ${listings.length}</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Price</th>
-                            <th>Currency</th>
-                            <th>Seller</th>
-                            <th>Feedback Score</th>
-                            <th>Link</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${listings.map(item => `
-                            <tr>
-                                <td>${item.title}</td>
-                                <td>${item.price?.value || 'N/A'}</td>
-                                <td>${item.price?.currency || 'N/A'}</td>
-                                <td>${item.seller?.username || 'N/A'}</td>
-                                <td>${item.seller?.feedbackScore || 'N/A'}</td>
-                                <td><a href="${item.itemWebUrl}" target="_blank">View Listing</a></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <script>
-                    setTimeout(() => window.location.reload(), 300000);
-                </script>
-            </body>
-            </html>
-        `;
-
-        res.send(html);
+        
+        scanResults = {
+            status: 'complete',
+            listings: listings,
+            lastUpdated: new Date(),
+            error: null
+        };
+        
+        console.log(`Scan complete. Found ${listings.length} listings`);
+        setTimeout(startScan, 300000); // Start new scan after 5 minutes
     } catch (error) {
-        console.error('Error in root route:', error);
-        res.status(500).send(`<h1>Error</h1><p>${error.message}</p>`);
+        console.error('Scan error:', error);
+        scanResults = {
+            ...scanResults,
+            status: 'error',
+            error: error.message
+        };
+        setTimeout(startScan, 60000); // Retry after 1 minute on error
+    }
+}
+
+// Routes
+app.get('/status', (req, res) => {
+    res.json({ status: 'Server is running' });
+});
+
+app.get('/', async (req, res) => {
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>eBay Listings Scanner</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+                th { background-color: #f4f4f4; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .auto-refresh { color: #666; margin-bottom: 20px; }
+                #loading { text-align: center; padding: 20px; }
+                .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; 
+                          border-top: 5px solid #3498db; border-radius: 50%;
+                          animation: spin 1s linear infinite; margin: 20px auto; }
+                @keyframes spin { 0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); } }
+                .error { color: red; padding: 20px; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <h1>eBay Listings Scanner</h1>
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>Scanning listings... This may take a few minutes.</p>
+                <p>The page will automatically update when complete.</p>
+            </div>
+            <div id="error" style="display: none;" class="error"></div>
+            <div id="results" style="display: none;"></div>
+
+            <script>
+                function checkResults() {
+                    fetch('/results')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'complete') {
+                                document.getElementById('loading').style.display = 'none';
+                                document.getElementById('error').style.display = 'none';
+                                document.getElementById('results').style.display = 'block';
+                                document.getElementById('results').innerHTML = data.html;
+                            } else if (data.status === 'error') {
+                                document.getElementById('loading').style.display = 'none';
+                                document.getElementById('results').style.display = 'none';
+                                document.getElementById('error').style.display = 'block';
+                                document.getElementById('error').innerHTML = 'Error: ' + data.error;
+                            }
+                            setTimeout(checkResults, 5000);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            setTimeout(checkResults, 5000);
+                        });
+                }
+
+                checkResults();
+            </script>
+        </body>
+        </html>
+    `;
+
+    res.send(html);
+});
+
+app.get('/results', (req, res) => {
+    if (scanResults.status === 'complete') {
+        const html = `
+            <p class="auto-refresh">Last updated: ${scanResults.lastUpdated.toLocaleString()}</p>
+            <p>Total Listings Found: ${scanResults.listings.length}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Currency</th>
+                        <th>Seller</th>
+                        <th>Feedback Score</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${scanResults.listings.map(item => `
+                        <tr>
+                            <td>${item.title}</td>
+                            <td>${item.price?.value || 'N/A'}</td>
+                            <td>${item.price?.currency || 'N/A'}</td>
+                            <td>${item.seller?.username || 'N/A'}</td>
+                            <td>${item.seller?.feedbackScore || 'N/A'}</td>
+                            <td><a href="${item.itemWebUrl}" target="_blank">View Listing</a></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        res.json({
+            status: 'complete',
+            html: html
+        });
+    } else {
+        res.json({
+            status: scanResults.status,
+            error: scanResults.error
+        });
     }
 });
 
+// Start background scanning when server starts
+startScan();
+
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
