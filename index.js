@@ -80,7 +80,9 @@ async function fetchSellerListings(sellerUsername, accessToken) {
         });
 
         if (!response.ok) {
+            const errorData = await response.text();
             console.error(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
+            console.error('Error details:', errorData);
             return [];
         }
 
