@@ -13,13 +13,25 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
-// Store results in memory
+// Store results and logs in memory
 let scanResults = {
     status: 'processing',
     listings: [],
     lastUpdated: null,
-    error: null
+    error: null,
+    logMessages: []
 };
+
+function addLog(message) {
+    const timestamp = new Date().toLocaleTimeString();
+    const logMessage = `${timestamp}: ${message}`;
+    scanResults.logMessages.push(logMessage);
+    // Keep only the last 50 messages
+    if (scanResults.logMessages.length > 50) {
+        scanResults.logMessages.shift();
+    }
+    console.log(logMessage);
+}
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -46,9 +58,11 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
         `&limit=100` +
         `&offset=0`;
 
+    addLog(`Fetching listings for seller: ${sellerUsername}`);
+
     for (let i = 0; i <= retryCount; i++) {
         try {
-            console.log(`Attempt ${i + 1}: Fetching listings for seller ${sellerUsername}`);
+            addLog(`Attempt ${i + 1} for seller ${sellerUsername}`);
             
             const response = await fetchWithTimeout(url, {
                 method: 'GET',
@@ -60,15 +74,14 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             }, 8000);
 
             if (response.status === 429) {
-                console.log('Rate limit reached, waiting 30 seconds before retry...');
+                addLog(`Rate limit reached for seller ${sellerUsername}, waiting 30 seconds...`);
                 await delay(30000);
                 continue;
             }
 
             if (!response.ok) {
                 const errorData = await response.text();
-                console.error(`Attempt ${i + 1}: Error fetching listings for seller ${sellerUsername}: ${response.status}`);
-                console.error('Error details:', errorData);
+                addLog(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
                 
                 if (i === retryCount) {
                     return { error: true, listings: [], total: 0 };
@@ -78,8 +91,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             }
 
             const data = await response.json();
-            console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
-            console.log(`Total listings available: ${data.total || 0}`);
+            addLog(`Found ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
             
             return {
                 error: false,
@@ -87,7 +99,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
                 total: data.total || 0
             };
         } catch (error) {
-            console.error(`Attempt ${i + 1}: Error fetching seller's listings for ${sellerUsername}:`, error.message);
+            addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
             if (i === retryCount) {
                 return { error: true, listings: [], total: 0 };
             }
@@ -97,19 +109,19 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
     return { error: true, listings: [], total: 0 };
 }
 
-async function analyzeSellerListings(sellerData) {
+async function analyzeSellerListings(sellerData, username) {
     if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
-        console.log('Error or no listings fetched for seller analysis, excluding seller');
+        addLog(`No valid listings found for seller ${username}, excluding`);
         return true;
     }
 
     const fetchedListings = sellerData.listings;
     const totalAvailable = sellerData.total;
     
-    console.log(`Analyzing seller - Total available listings: ${totalAvailable}, Fetched for analysis: ${fetchedListings.length}`);
+    addLog(`Analyzing ${fetchedListings.length} listings for seller ${username}`);
 
     if (totalAvailable <= 15) {
-        console.log('Small seller (<=15 listings), including');
+        addLog(`Small seller ${username} (${totalAvailable} listings), including`);
         return false;
     }
 
@@ -124,22 +136,18 @@ async function analyzeSellerListings(sellerData) {
     }
 
     const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
-    console.log(`Seller analysis results:` +
-                `\nTotal available listings: ${totalAvailable}` +
-                `\nFetched listings: ${fetchedListings.length}` +
-                `\nJewelry listings in sample: ${jewelryListings}` +
-                `\nJewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
+    addLog(`Seller ${username}: ${jewelryPercentage.toFixed(2)}% jewelry listings`);
 
     const shouldExclude = jewelryPercentage >= 80;
-    console.log(shouldExclude ? 
-        `EXCLUDING seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry` : 
-        `INCLUDING seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry`);
+    addLog(shouldExclude ? 
+        `Excluding seller ${username} (${jewelryPercentage.toFixed(2)}% jewelry)` : 
+        `Including seller ${username} (${jewelryPercentage.toFixed(2)}% jewelry)`);
     return shouldExclude;
 }
 
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
-    console.log(`\nFetching listings for phrase: ${phrase}`);
+    addLog(`Searching for phrase: ${phrase}`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -152,20 +160,19 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         });
 
         if (response.status === 429) {
-            console.log('Rate limit reached, waiting 30 seconds before retry...');
+            addLog('Rate limit reached, waiting 30 seconds...');
             await delay(30000);
             return fetchListingsForPhrase(phrase, accessToken);
         }
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error fetching listings for ${phrase}: ${response.status}`);
-            console.error('Error details:', errorText);
+            addLog(`Error fetching listings for ${phrase}: ${response.status}`);
             return [];
         }
 
         const data = await response.json();
-        console.log(`Number of items found for ${phrase}: ${data.itemSummaries?.length || 0}`);
+        addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${phrase}`);
 
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
             return [];
@@ -177,43 +184,40 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             const feedbackScore = item.seller?.feedbackScore || 0;
 
             if (feedbackScore >= feedbackThreshold) {
-                console.log(`Skipping item due to feedback score: ${feedbackScore}`);
+                addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
                 continue;
             }
 
             try {
-                console.log(`\nAnalyzing seller: ${item.seller?.username}`);
-                console.log(`Item title: ${item.title}`);
-                
                 const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
-                const shouldExclude = await analyzeSellerListings(sellerData);
+                const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                 
                 if (!shouldExclude) {
-                    console.log(`Including listing from seller ${item.seller?.username}`);
+                    addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
                     filteredListings.push(item);
-                } else {
-                    console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
                 }
 
                 await delay(1000);
                 
             } catch (error) {
-                console.error(`Error processing seller ${item.seller?.username}:`, error);
+                addLog(`Error processing ${item.seller?.username}: ${error.message}`);
             }
         }
 
+        addLog(`Found ${filteredListings.length} matching listings for ${phrase}`);
         return filteredListings;
     } catch (error) {
-        console.error(`Complete error for phrase ${phrase}:`, error);
+        addLog(`Error processing ${phrase}: ${error.message}`);
         return [];
     }
 }
 
 async function fetchAllListings() {
     try {
-        console.log('Fetching access token...');
+        addLog('Starting new scan...');
+        addLog('Fetching access token...');
         const accessToken = await fetchAccessToken();
-        console.log('Access token obtained. First 10 characters:', accessToken.substring(0, 10) + '...');
+        addLog('Access token obtained successfully');
 
         const allListings = [];
         
@@ -223,41 +227,41 @@ async function fetchAllListings() {
             await delay(2000);
         }
 
+        addLog(`Scan complete. Found ${allListings.length} total listings`);
         return allListings;
     } catch (error) {
-        console.error('Error in fetchAllListings:', error);
+        addLog(`Scan error: ${error.message}`);
         throw error;
     }
 }
 
-// Background scanning process
 async function startScan() {
     try {
         scanResults.status = 'processing';
         scanResults.error = null;
+        scanResults.logMessages = [];
         const listings = await fetchAllListings();
         
         scanResults = {
             status: 'complete',
             listings: listings,
             lastUpdated: new Date(),
-            error: null
+            error: null,
+            logMessages: scanResults.logMessages
         };
         
-        console.log(`Scan complete. Found ${listings.length} listings`);
         setTimeout(startScan, 300000); // Start new scan after 5 minutes
     } catch (error) {
-        console.error('Scan error:', error);
+        addLog(`Error during scan: ${error.message}`);
         scanResults = {
             ...scanResults,
             status: 'error',
             error: error.message
         };
-        setTimeout(startScan, 60000); // Retry after 1 minute on error
+        setTimeout(startScan, 60000);
     }
 }
 
-// Routes
 app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
 });
@@ -282,6 +286,23 @@ app.get('/', async (req, res) => {
                 @keyframes spin { 0% { transform: rotate(0deg); }
                                 100% { transform: rotate(360deg); } }
                 .error { color: red; padding: 20px; text-align: center; }
+                #logArea {
+                    max-height: 400px;
+                    overflow-y: auto;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin: 10px auto;
+                    background-color: #f9f9f9;
+                    font-family: monospace;
+                    width: 90%;
+                    text-align: left;
+                }
+                .log-message {
+                    margin: 2px 0;
+                    padding: 2px 0;
+                    border-bottom: 1px solid #eee;
+                }
             </style>
         </head>
         <body>
@@ -289,7 +310,8 @@ app.get('/', async (req, res) => {
             <div id="loading">
                 <div class="spinner"></div>
                 <p>Scanning listings... This may take a few minutes.</p>
-                <p>The page will automatically update when complete.</p>
+                <p>Recent activity:</p>
+                <div id="logArea"></div>
             </div>
             <div id="error" style="display: none;" class="error"></div>
             <div id="results" style="display: none;"></div>
@@ -299,6 +321,15 @@ app.get('/', async (req, res) => {
                     fetch('/results')
                         .then(response => response.json())
                         .then(data => {
+                            // Update logs
+                            const logArea = document.getElementById('logArea');
+                            if (data.logMessages) {
+                                logArea.innerHTML = data.logMessages
+                                    .map(msg => '<div class="log-message">' + msg + '</div>')
+                                    .join('');
+                                logArea.scrollTop = logArea.scrollHeight;
+                            }
+
                             if (data.status === 'complete') {
                                 document.getElementById('loading').style.display = 'none';
                                 document.getElementById('error').style.display = 'none';
@@ -310,11 +341,11 @@ app.get('/', async (req, res) => {
                                 document.getElementById('error').style.display = 'block';
                                 document.getElementById('error').innerHTML = 'Error: ' + data.error;
                             }
-                            setTimeout(checkResults, 5000);
+                            setTimeout(checkResults, 2000);
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            setTimeout(checkResults, 5000);
+                            setTimeout(checkResults, 2000);
                         });
                 }
 
@@ -360,20 +391,20 @@ app.get('/results', (req, res) => {
         
         res.json({
             status: 'complete',
-            html: html
+            html: html,
+            logMessages: scanResults.logMessages
         });
     } else {
         res.json({
             status: scanResults.status,
-            error: scanResults.error
+            error: scanResults.error,
+            logMessages: scanResults.logMessages
         });
     }
 });
 
-// Start background scanning when server starts
 startScan();
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
