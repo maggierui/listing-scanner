@@ -30,49 +30,63 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 
-async function fetchSellerListings(sellerUsername, accessToken) {
+async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
         `q=seller:${encodeURIComponent(sellerUsername)}` +
         `&limit=100` +
         `&offset=0`;
 
-    console.log(`Fetching seller listings URL: ${url}`);
+    for (let i = 0; i <= retryCount; i++) {
+        try {
+            console.log(`Attempt ${i + 1}: Fetching listings for seller ${sellerUsername}`);
+            
+            const response = await fetchWithTimeout(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+                },
+            }, 8000);
 
-    try {
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            },
-        }, 8000);
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error(`Attempt ${i + 1}: Error fetching listings for seller ${sellerUsername}: ${response.status}`);
+                console.error('Error details:', errorData);
+                
+                if (i === retryCount) {
+                    console.error(`All ${retryCount + 1} attempts failed for seller ${sellerUsername}`);
+                    return { error: true, listings: [], total: 0 };
+                }
+                // Wait before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                continue;
+            }
 
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
-            console.error('Error details:', errorData);
-            return { error: true, listings: [] };
+            const data = await response.json();
+            console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
+            console.log(`Total listings available: ${data.total || 0}`);
+            
+            return {
+                error: false,
+                listings: data.itemSummaries || [],
+                total: data.total || 0
+            };
+        } catch (error) {
+            console.error(`Attempt ${i + 1}: Error fetching seller's listings for ${sellerUsername}:`, error.message);
+            if (i === retryCount) {
+                return { error: true, listings: [], total: 0 };
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
         }
-
-        const data = await response.json();
-        console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
-        console.log(`Total listings available for seller: ${data.total || 0}`);
-        
-        return {
-            error: false,
-            listings: data.itemSummaries || [],
-            total: data.total || 0
-        };
-    } catch (error) {
-        console.error(`Error fetching seller's listings for ${sellerUsername}:`, error.message);
-        return { error: true, listings: [] };
     }
+    return { error: true, listings: [], total: 0 }; // Fallback return if all retries fail
 }
 
 async function analyzeSellerListings(sellerData) {
-    if (sellerData.error) {
-        console.log('Error fetching seller data, excluding seller to be safe');
+    // If there was an error or no listings fetched, exclude the seller
+    if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
+        console.log('Error or no listings fetched for seller analysis, excluding seller');
         return true;
     }
 
@@ -81,16 +95,13 @@ async function analyzeSellerListings(sellerData) {
     
     console.log(`Analyzing seller - Total available listings: ${totalAvailable}, Fetched for analysis: ${fetchedListings.length}`);
 
-    if (fetchedListings.length === 0) {
-        console.log('No listings fetched for analysis, excluding seller to be safe');
-        return true;
-    }
-
+    // If the seller has <= 15 total listings, include them
     if (totalAvailable <= 15) {
         console.log('Small seller (<=15 listings), including');
         return false;
     }
 
+    // Count jewelry listings
     let jewelryListings = 0;
     for (const item of fetchedListings) {
         const isJewelryListing = jewelryPhrases.some(phrase => 
@@ -102,21 +113,23 @@ async function analyzeSellerListings(sellerData) {
     }
 
     const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
-    console.log(`Analyzed ${fetchedListings.length} listings:` +
-                `\nJewelry listings: ${jewelryListings}` +
-                `\nJewelry percentage: ${jewelryPercentage.toFixed(2)}%` +
-                `\nTotal available listings: ${totalAvailable}`);
+    console.log(`Seller analysis results:` +
+                `\nTotal available listings: ${totalAvailable}` +
+                `\nFetched listings: ${fetchedListings.length}` +
+                `\nJewelry listings in sample: ${jewelryListings}` +
+                `\nJewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
 
     const shouldExclude = jewelryPercentage >= 80;
     console.log(shouldExclude ? 
-        `Excluding seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry` : 
-        `Including seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry`);
+        `EXCLUDING seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry` : 
+        `INCLUDING seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry`);
     return shouldExclude;
 }
 
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
-    console.log(`Fetching URL: ${url}`);
+    console.log(`\nFetching listings for phrase: ${phrase}`);
+    console.log(`URL: ${url}`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -154,6 +167,9 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             }
 
             try {
+                console.log(`\nAnalyzing seller: ${item.seller?.username}`);
+                console.log(`Item title: ${item.title}`);
+                
                 const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
                 const shouldExclude = await analyzeSellerListings(sellerData);
                 
@@ -168,7 +184,7 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             }
         }));
 
-        console.log(`Filtered listings count for ${phrase}: ${filteredListings.length}`);
+        console.log(`\nFiltered listings count for ${phrase}: ${filteredListings.length}`);
         return filteredListings;
     } catch (error) {
         console.error(`Complete error for phrase ${phrase}:`, error);
@@ -187,7 +203,7 @@ async function fetchAllListings() {
         );
 
         const allListings = listingsArrays.flat();
-        console.log(`Total combined listings: ${allListings.length}`);
+        console.log(`\nTotal combined listings: ${allListings.length}`);
         return allListings;
     } catch (error) {
         console.error('Error in fetchAllListings:', error);
