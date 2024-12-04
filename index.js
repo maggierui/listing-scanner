@@ -13,7 +13,6 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
-// Add timeout to fetch calls
 async function fetchWithTimeout(url, options, timeout = 5000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -33,56 +32,8 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
 
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
-
-    try {
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            console.error(`Error fetching listings for ${phrase}: ${response.status}`);
-            return [];
-        }
-
-        const data = await response.json();
-        const filteredListings = [];
-        
-        // Process sellers in parallel using Promise.all
-        await Promise.all((data.itemSummaries || []).map(async (item) => {
-            const feedbackScore = item.seller?.feedbackScore || 0;
-            const availableQuantity = item.availableQuantity || 1;
-
-            if (feedbackScore >= feedbackThreshold || availableQuantity > 1) {
-                return;
-            }
-
-            try {
-                const sellerListings = await fetchSellerListings(item.seller?.username, accessToken);
-                const shouldExclude = await analyzeSellerListings(sellerListings);
-                
-                if (!shouldExclude) {
-                    filteredListings.push(item);
-                } else {
-                    console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
-                }
-            } catch (error) {
-                console.error(`Error processing seller ${item.seller?.username}:`, error);
-            }
-        }));
-
-        return filteredListings;
-    } catch (error) {
-        console.error('Error fetching or processing the API response:', error.message);
-        return [];
-    }
-}
-
-async function fetchSellerListings(sellerUsername, accessToken) {
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=seller:${encodeURIComponent(sellerUsername)}&limit=50`;
+    console.log(`Fetching URL: ${url}`);
+    console.log(`Using access token (first 10 chars): ${accessToken.substring(0, 10)}...`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -92,7 +43,72 @@ async function fetchSellerListings(sellerUsername, accessToken) {
                 'Content-Type': 'application/json',
                 'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
             },
-        }, 8000); // 8 second timeout for seller listings
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Error fetching listings for ${phrase}: ${response.status}`);
+            console.error('Error details:', errorText);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log(`Raw API response for ${phrase}:`, JSON.stringify(data, null, 2));
+        console.log(`Number of items found for ${phrase}: ${data.itemSummaries?.length || 0}`);
+
+        if (!data.itemSummaries || data.itemSummaries.length === 0) {
+            console.log(`No items found for phrase: ${phrase}`);
+            return [];
+        }
+
+        const filteredListings = [];
+        
+        // Process sellers in parallel using Promise.all
+        await Promise.all((data.itemSummaries || []).map(async (item) => {
+            const feedbackScore = item.seller?.feedbackScore || 0;
+            const availableQuantity = item.availableQuantity || 1;
+
+            if (feedbackScore >= feedbackThreshold || availableQuantity > 1) {
+                console.log(`Skipping item due to criteria - Feedback: ${feedbackScore}, Quantity: ${availableQuantity}`);
+                return;
+            }
+
+            try {
+                const sellerListings = await fetchSellerListings(item.seller?.username, accessToken);
+                const shouldExclude = await analyzeSellerListings(sellerListings);
+                
+                if (!shouldExclude) {
+                    console.log(`Including listing from seller ${item.seller?.username}`);
+                    filteredListings.push(item);
+                } else {
+                    console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
+                }
+            } catch (error) {
+                console.error(`Error processing seller ${item.seller?.username}:`, error);
+            }
+        }));
+
+        console.log(`Filtered listings count for ${phrase}: ${filteredListings.length}`);
+        return filteredListings;
+    } catch (error) {
+        console.error(`Complete error for phrase ${phrase}:`, error);
+        return [];
+    }
+}
+
+async function fetchSellerListings(sellerUsername, accessToken) {
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=seller:${encodeURIComponent(sellerUsername)}&limit=50`;
+    console.log(`Fetching seller listings URL: ${url}`);
+
+    try {
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            },
+        }, 8000);
 
         if (!response.ok) {
             const errorData = await response.text();
@@ -102,6 +118,7 @@ async function fetchSellerListings(sellerUsername, accessToken) {
         }
 
         const data = await response.json();
+        console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
         return data.itemSummaries || [];
     } catch (error) {
         console.error(`Error fetching seller's listings for ${sellerUsername}:`, error.message);
@@ -109,15 +126,39 @@ async function fetchSellerListings(sellerUsername, accessToken) {
     }
 }
 
-// Rest of your existing analyzeSellerListings function remains the same...
+async function analyzeSellerListings(listings) {
+    const totalListings = listings.length;
+    console.log(`Analyzing ${totalListings} listings`);
+
+    if (totalListings <= 15) {
+        console.log('Not enough listings to analyze (<=15)');
+        return false;
+    }
+
+    let jewelryListings = 0;
+
+    for (const item of listings) {
+        const isJewelryListing = jewelryPhrases.some(phrase => 
+            item.title.toLowerCase().includes(phrase.replace(/"/g, ''))
+        );
+
+        if (isJewelryListing) {
+            jewelryListings++;
+        }
+    }
+
+    const jewelryPercentage = (jewelryListings / totalListings) * 100;
+    console.log(`Jewelry listings: ${jewelryListings}, Total: ${totalListings}, Percentage: ${jewelryPercentage}%`);
+
+    return jewelryPercentage >= 80;
+}
 
 async function fetchAllListings() {
     try {
         console.log('Fetching access token...');
         const accessToken = await fetchAccessToken();
-        console.log('Access token obtained successfully');
+        console.log('Access token obtained. First 10 characters:', accessToken.substring(0, 10) + '...');
 
-        // Process search phrases in parallel
         const listingsArrays = await Promise.all(
             searchPhrases.map(phrase => fetchListingsForPhrase(phrase, accessToken))
         );
@@ -132,7 +173,6 @@ async function fetchAllListings() {
 }
 
 app.get('/', async (req, res) => {
-    // Set a longer timeout for the response
     res.setTimeout(25000, () => {
         res.status(503).send(`
             <html>
@@ -193,7 +233,6 @@ app.get('/', async (req, res) => {
                     </tbody>
                 </table>
                 <script>
-                    // Auto-refresh every 5 minutes
                     setTimeout(() => window.location.reload(), 300000);
                 </script>
             </body>
