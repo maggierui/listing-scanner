@@ -13,6 +13,9 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
+// Helper function for delays
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 async function fetchWithTimeout(url, options, timeout = 5000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -49,6 +52,12 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
                 },
             }, 8000);
 
+            if (response.status === 429) {
+                console.log('Rate limit reached, waiting 30 seconds before retry...');
+                await delay(30000); // Wait 30 seconds
+                continue;
+            }
+
             if (!response.ok) {
                 const errorData = await response.text();
                 console.error(`Attempt ${i + 1}: Error fetching listings for seller ${sellerUsername}: ${response.status}`);
@@ -59,7 +68,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
                     return { error: true, listings: [], total: 0 };
                 }
                 // Wait before retrying
-                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                await delay(2000 * (i + 1));
                 continue;
             }
 
@@ -77,14 +86,13 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             if (i === retryCount) {
                 return { error: true, listings: [], total: 0 };
             }
-            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            await delay(2000 * (i + 1));
         }
     }
-    return { error: true, listings: [], total: 0 }; // Fallback return if all retries fail
+    return { error: true, listings: [], total: 0 };
 }
 
 async function analyzeSellerListings(sellerData) {
-    // If there was an error or no listings fetched, exclude the seller
     if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
         console.log('Error or no listings fetched for seller analysis, excluding seller');
         return true;
@@ -95,13 +103,11 @@ async function analyzeSellerListings(sellerData) {
     
     console.log(`Analyzing seller - Total available listings: ${totalAvailable}, Fetched for analysis: ${fetchedListings.length}`);
 
-    // If the seller has <= 15 total listings, include them
     if (totalAvailable <= 15) {
         console.log('Small seller (<=15 listings), including');
         return false;
     }
 
-    // Count jewelry listings
     let jewelryListings = 0;
     for (const item of fetchedListings) {
         const isJewelryListing = jewelryPhrases.some(phrase => 
@@ -129,7 +135,6 @@ async function analyzeSellerListings(sellerData) {
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
     console.log(`\nFetching listings for phrase: ${phrase}`);
-    console.log(`URL: ${url}`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -140,6 +145,12 @@ async function fetchListingsForPhrase(phrase, accessToken) {
                 'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
             },
         });
+
+        if (response.status === 429) {
+            console.log('Rate limit reached, waiting 30 seconds before retry...');
+            await delay(30000);
+            return fetchListingsForPhrase(phrase, accessToken);
+        }
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -152,18 +163,18 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         console.log(`Number of items found for ${phrase}: ${data.itemSummaries?.length || 0}`);
 
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
-            console.log(`No items found for phrase: ${phrase}`);
             return [];
         }
 
         const filteredListings = [];
         
-        await Promise.all((data.itemSummaries || []).map(async (item) => {
+        // Process sellers sequentially instead of in parallel
+        for (const item of data.itemSummaries || []) {
             const feedbackScore = item.seller?.feedbackScore || 0;
 
             if (feedbackScore >= feedbackThreshold) {
                 console.log(`Skipping item due to feedback score: ${feedbackScore}`);
-                return;
+                continue;
             }
 
             try {
@@ -179,12 +190,15 @@ async function fetchListingsForPhrase(phrase, accessToken) {
                 } else {
                     console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
                 }
+
+                // Add delay between seller checks
+                await delay(1000);
+                
             } catch (error) {
                 console.error(`Error processing seller ${item.seller?.username}:`, error);
             }
-        }));
+        }
 
-        console.log(`\nFiltered listings count for ${phrase}: ${filteredListings.length}`);
         return filteredListings;
     } catch (error) {
         console.error(`Complete error for phrase ${phrase}:`, error);
@@ -198,11 +212,16 @@ async function fetchAllListings() {
         const accessToken = await fetchAccessToken();
         console.log('Access token obtained. First 10 characters:', accessToken.substring(0, 10) + '...');
 
-        const listingsArrays = await Promise.all(
-            searchPhrases.map(phrase => fetchListingsForPhrase(phrase, accessToken))
-        );
+        const allListings = [];
+        
+        // Process phrases sequentially
+        for (const phrase of searchPhrases) {
+            const listings = await fetchListingsForPhrase(phrase, accessToken);
+            allListings.push(...listings);
+            // Wait between phrases
+            await delay(2000);
+        }
 
-        const allListings = listingsArrays.flat();
         console.log(`\nTotal combined listings: ${allListings.length}`);
         return allListings;
     } catch (error) {
