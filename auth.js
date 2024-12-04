@@ -13,7 +13,7 @@ async function fetchAccessToken() {
         throw new Error('Missing eBay API credentials');
     }
 
-    const url = 'https://api.ebay.com/identity/v1/oauth2/token';
+    const tokenUrl = 'https://api.ebay.com/identity/v1/oauth2/token';
     try {
         const response = await fetch(tokenUrl, {
             method: 'POST',
