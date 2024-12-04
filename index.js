@@ -30,10 +30,93 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 
+async function fetchSellerListings(sellerUsername, accessToken) {
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+        `q=seller:${encodeURIComponent(sellerUsername)}` +
+        `&limit=100` +
+        `&offset=0`;
+
+    console.log(`Fetching seller listings URL: ${url}`);
+
+    try {
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            },
+        }, 8000);
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
+            console.error('Error details:', errorData);
+            return { error: true, listings: [] };
+        }
+
+        const data = await response.json();
+        console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
+        console.log(`Total listings available for seller: ${data.total || 0}`);
+        
+        return {
+            error: false,
+            listings: data.itemSummaries || [],
+            total: data.total || 0
+        };
+    } catch (error) {
+        console.error(`Error fetching seller's listings for ${sellerUsername}:`, error.message);
+        return { error: true, listings: [] };
+    }
+}
+
+async function analyzeSellerListings(sellerData) {
+    if (sellerData.error) {
+        console.log('Error fetching seller data, excluding seller to be safe');
+        return true;
+    }
+
+    const fetchedListings = sellerData.listings;
+    const totalAvailable = sellerData.total;
+    
+    console.log(`Analyzing seller - Total available listings: ${totalAvailable}, Fetched for analysis: ${fetchedListings.length}`);
+
+    if (fetchedListings.length === 0) {
+        console.log('No listings fetched for analysis, excluding seller to be safe');
+        return true;
+    }
+
+    if (totalAvailable <= 15) {
+        console.log('Small seller (<=15 listings), including');
+        return false;
+    }
+
+    let jewelryListings = 0;
+    for (const item of fetchedListings) {
+        const isJewelryListing = jewelryPhrases.some(phrase => 
+            item.title.toLowerCase().includes(phrase.replace(/"/g, '').toLowerCase())
+        );
+        if (isJewelryListing) {
+            jewelryListings++;
+        }
+    }
+
+    const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
+    console.log(`Analyzed ${fetchedListings.length} listings:` +
+                `\nJewelry listings: ${jewelryListings}` +
+                `\nJewelry percentage: ${jewelryPercentage.toFixed(2)}%` +
+                `\nTotal available listings: ${totalAvailable}`);
+
+    const shouldExclude = jewelryPercentage >= 80;
+    console.log(shouldExclude ? 
+        `Excluding seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry` : 
+        `Including seller - ${jewelryPercentage.toFixed(2)}% of listings are jewelry`);
+    return shouldExclude;
+}
+
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
     console.log(`Fetching URL: ${url}`);
-    console.log(`Using access token (first 10 chars): ${accessToken.substring(0, 10)}...`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -53,7 +136,6 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         }
 
         const data = await response.json();
-        console.log(`Raw API response for ${phrase}:`, JSON.stringify(data, null, 2));
         console.log(`Number of items found for ${phrase}: ${data.itemSummaries?.length || 0}`);
 
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
@@ -63,18 +145,17 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 
         const filteredListings = [];
         
-        // Process sellers in parallel using Promise.all
         await Promise.all((data.itemSummaries || []).map(async (item) => {
             const feedbackScore = item.seller?.feedbackScore || 0;
 
             if (feedbackScore >= feedbackThreshold) {
-                console.log(`Skipping item due to criteria - Feedback: ${feedbackScore}`);
+                console.log(`Skipping item due to feedback score: ${feedbackScore}`);
                 return;
             }
 
             try {
-                const sellerListings = await fetchSellerListings(item.seller?.username, accessToken);
-                const shouldExclude = await analyzeSellerListings(sellerListings);
+                const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
+                const shouldExclude = await analyzeSellerListings(sellerData);
                 
                 if (!shouldExclude) {
                     console.log(`Including listing from seller ${item.seller?.username}`);
@@ -93,63 +174,6 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         console.error(`Complete error for phrase ${phrase}:`, error);
         return [];
     }
-}
-
-async function fetchSellerListings(sellerUsername, accessToken) {
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=seller:${encodeURIComponent(sellerUsername)}&limit=50`;
-    console.log(`Fetching seller listings URL: ${url}`);
-
-    try {
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            },
-        }, 8000);
-
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
-            console.error('Error details:', errorData);
-            return [];
-        }
-
-        const data = await response.json();
-        console.log(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
-        return data.itemSummaries || [];
-    } catch (error) {
-        console.error(`Error fetching seller's listings for ${sellerUsername}:`, error.message);
-        return [];
-    }
-}
-
-async function analyzeSellerListings(listings) {
-    const totalListings = listings.length;
-    console.log(`Analyzing ${totalListings} listings`);
-
-    if (totalListings <= 15) {
-        console.log('Not enough listings to analyze (<=15)');
-        return false;
-    }
-
-    let jewelryListings = 0;
-
-    for (const item of listings) {
-        const isJewelryListing = jewelryPhrases.some(phrase => 
-            item.title.toLowerCase().includes(phrase.replace(/"/g, ''))
-        );
-
-        if (isJewelryListing) {
-            jewelryListings++;
-        }
-    }
-
-    const jewelryPercentage = (jewelryListings / totalListings) * 100;
-    console.log(`Jewelry listings: ${jewelryListings}, Total: ${totalListings}, Percentage: ${jewelryPercentage}%`);
-
-    return jewelryPercentage >= 80;
 }
 
 async function fetchAllListings() {
