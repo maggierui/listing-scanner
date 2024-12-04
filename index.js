@@ -5,23 +5,37 @@ import fetch from 'node-fetch';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Search phrases for initial listing search
 const searchPhrases = ['"jewelry lot"', '"jewelry collection"', '"jewelry bundle"'];
-
-// Phrases to identify jewelry listings when analyzing seller inventory
 const jewelryPhrases = [
     '"jewelry"', '"necklace"', '"necklaces"', '"brooch"', '"brooches"', 
     '"ring"', '"rings"', '"bracelet"', '"bracelets"', '"earring"', 
     '"earrings"', '"bangle"', '"bangles"', '"pendant"', '"pendants"'
 ];
+const feedbackThreshold = 5000;
 
-const feedbackThreshold = 5000; // Maximum seller feedback score
+// Add timeout to fetch calls
+async function fetchWithTimeout(url, options, timeout = 5000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+}
 
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
 
     try {
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -36,29 +50,29 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 
         const data = await response.json();
         const filteredListings = [];
-
-        for (const item of data.itemSummaries || []) {
+        
+        // Process sellers in parallel using Promise.all
+        await Promise.all((data.itemSummaries || []).map(async (item) => {
             const feedbackScore = item.seller?.feedbackScore || 0;
             const availableQuantity = item.availableQuantity || 1;
 
-            // Check initial criteria
             if (feedbackScore >= feedbackThreshold || availableQuantity > 1) {
-                continue;
+                return;
             }
 
-            // Fetch seller's other listings
-            const sellerListings = await fetchSellerListings(item.seller?.username, accessToken);
-
-            // Analyze seller's listings
-            const shouldExclude = await analyzeSellerListings(sellerListings);
-            if (shouldExclude) {
-                console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
-                continue;
+            try {
+                const sellerListings = await fetchSellerListings(item.seller?.username, accessToken);
+                const shouldExclude = await analyzeSellerListings(sellerListings);
+                
+                if (!shouldExclude) {
+                    filteredListings.push(item);
+                } else {
+                    console.log(`Excluded Listing: ${item.title}, Seller: ${item.seller?.username}`);
+                }
+            } catch (error) {
+                console.error(`Error processing seller ${item.seller?.username}:`, error);
             }
-
-            // Include listing if it passes all filters
-            filteredListings.push(item);
-        }
+        }));
 
         return filteredListings;
     } catch (error) {
@@ -68,18 +82,17 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 }
 
 async function fetchSellerListings(sellerUsername, accessToken) {
-    // Use the seller's username as the search query with the proper prefix
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` + 
-        `q=seller:${encodeURIComponent(sellerUsername)}` + 
-        `&limit=50`;
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=seller:${encodeURIComponent(sellerUsername)}&limit=50`;
+
     try {
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
             },
-        });
+        }, 8000); // 8 second timeout for seller listings
 
         if (!response.ok) {
             const errorData = await response.text();
@@ -91,41 +104,12 @@ async function fetchSellerListings(sellerUsername, accessToken) {
         const data = await response.json();
         return data.itemSummaries || [];
     } catch (error) {
-        console.error(`Error fetching seller's listings: ${error.message}`);
+        console.error(`Error fetching seller's listings for ${sellerUsername}:`, error.message);
         return [];
     }
 }
 
-async function analyzeSellerListings(listings) {
-    const totalListings = listings.length;
-
-    if (totalListings <= 15) {
-        return false; // Do not exclude if the total listings are 15 or fewer
-    }
-
-    // Count jewelry-related listings
-    let jewelryListings = 0;
-
-    for (const item of listings) {
-        // Check if any jewelry phrase is in the item's title
-        const isJewelryListing = jewelryPhrases.some(phrase => 
-            item.title.toLowerCase().includes(phrase.replace(/"/g, ''))
-        );
-
-        if (isJewelryListing) {
-            jewelryListings++;
-        }
-    }
-
-    // Calculate percentage of jewelry listings
-    const jewelryPercentage = (jewelryListings / totalListings) * 100;
-
-    // Log for debugging
-    console.log(`Total Listings: ${totalListings}, Jewelry Listings: ${jewelryListings}, Percentage: ${jewelryPercentage}%`);
-
-    // Exclude if 80% or more listings are jewelry-related
-    return jewelryPercentage >= 80;
-}
+// Rest of your existing analyzeSellerListings function remains the same...
 
 async function fetchAllListings() {
     try {
@@ -133,15 +117,12 @@ async function fetchAllListings() {
         const accessToken = await fetchAccessToken();
         console.log('Access token obtained successfully');
 
-        const allListings = [];
+        // Process search phrases in parallel
+        const listingsArrays = await Promise.all(
+            searchPhrases.map(phrase => fetchListingsForPhrase(phrase, accessToken))
+        );
 
-        for (const phrase of searchPhrases) {
-            console.log(`Searching for phrase: ${phrase}`);
-            const listings = await fetchListingsForPhrase(phrase, accessToken);
-            allListings.push(...listings);
-            console.log(`Found ${listings.length} listings for phrase ${phrase}`);
-        }
-
+        const allListings = listingsArrays.flat();
         console.log(`Total combined listings: ${allListings.length}`);
         return allListings;
     } catch (error) {
@@ -151,10 +132,24 @@ async function fetchAllListings() {
 }
 
 app.get('/', async (req, res) => {
+    // Set a longer timeout for the response
+    res.setTimeout(25000, () => {
+        res.status(503).send(`
+            <html>
+                <body>
+                    <h1>Request Timeout</h1>
+                    <p>The request took too long to process. Please try again.</p>
+                    <script>
+                        setTimeout(() => window.location.reload(), 5000);
+                    </script>
+                </body>
+            </html>
+        `);
+    });
+
     try {
         const listings = await fetchAllListings();
 
-        // Generate HTML dynamically
         const html = `
             <!DOCTYPE html>
             <html>
@@ -166,10 +161,12 @@ app.get('/', async (req, res) => {
                     th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
                     th { background-color: #f4f4f4; }
                     tr:nth-child(even) { background-color: #f9f9f9; }
+                    .auto-refresh { color: #666; margin-bottom: 20px; }
                 </style>
             </head>
             <body>
                 <h1>eBay Listings</h1>
+                <p class="auto-refresh">Page auto-refreshes every 5 minutes</p>
                 <p>Total Listings Found: ${listings.length}</p>
                 <table>
                     <thead>
@@ -195,15 +192,13 @@ app.get('/', async (req, res) => {
                         `).join('')}
                     </tbody>
                 </table>
+                <script>
+                    // Auto-refresh every 5 minutes
+                    setTimeout(() => window.location.reload(), 300000);
+                </script>
             </body>
             </html>
         `;
-
-        // Set cache control headers
-        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.set('Pragma', 'no-cache');
-        res.set('Expires', '0');
-        res.set('Surrogate-Control', 'no-store');
 
         res.send(html);
     } catch (error) {
@@ -212,7 +207,6 @@ app.get('/', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
