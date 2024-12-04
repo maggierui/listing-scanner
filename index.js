@@ -68,7 +68,9 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 }
 
 async function fetchSellerListings(sellerUsername, accessToken) {
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?seller=${encodeURIComponent(sellerUsername)}&limit=50`;
+    const searchQuery = '*';  // Wildcard search
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${searchQuery}&filter=seller:${encodeURIComponent(sellerUsername)}&limit=50`;
+    //const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?seller=${encodeURIComponent(sellerUsername)}&limit=50`;
 
     try {
         const response = await fetch(url, {
