@@ -66,10 +66,9 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         // Process sellers in parallel using Promise.all
         await Promise.all((data.itemSummaries || []).map(async (item) => {
             const feedbackScore = item.seller?.feedbackScore || 0;
-            const availableQuantity = item.availableQuantity || 1;
 
-            if (feedbackScore >= feedbackThreshold || availableQuantity > 1) {
-                console.log(`Skipping item due to criteria - Feedback: ${feedbackScore}, Quantity: ${availableQuantity}`);
+            if (feedbackScore >= feedbackThreshold) {
+                console.log(`Skipping item due to criteria - Feedback: ${feedbackScore}`);
                 return;
             }
 
