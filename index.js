@@ -26,7 +26,6 @@ function addLog(message) {
     const timestamp = new Date().toLocaleTimeString();
     const logMessage = `${timestamp}: ${message}`;
     scanResults.logMessages.push(logMessage);
-    // Keep only the last 50 messages
     if (scanResults.logMessages.length > 50) {
         scanResults.logMessages.shift();
     }
@@ -62,8 +61,6 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
 
     for (let i = 0; i <= retryCount; i++) {
         try {
-            addLog(`Attempt ${i + 1} for seller ${sellerUsername}`);
-            
             const response = await fetchWithTimeout(url, {
                 method: 'GET',
                 headers: {
@@ -74,24 +71,24 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             }, 8000);
 
             if (response.status === 429) {
-                addLog(`Rate limit reached for seller ${sellerUsername}, waiting 30 seconds...`);
-                await delay(30000);
+                addLog(`Rate limit reached for seller ${sellerUsername}, waiting 10 seconds...`);
+                await delay(10000); // Reduced from 30s to 10s
                 continue;
             }
 
             if (!response.ok) {
                 const errorData = await response.text();
-                addLog(`Error fetching listings for seller ${sellerUsername}: ${response.status}`);
+                addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
                 
                 if (i === retryCount) {
                     return { error: true, listings: [], total: 0 };
                 }
-                await delay(2000 * (i + 1));
+                await delay(1000 * (i + 1));
                 continue;
             }
 
             const data = await response.json();
-            addLog(`Found ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
+            addLog(`Retrieved ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
             
             return {
                 error: false,
@@ -103,7 +100,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             if (i === retryCount) {
                 return { error: true, listings: [], total: 0 };
             }
-            await delay(2000 * (i + 1));
+            await delay(1000 * (i + 1));
         }
     }
     return { error: true, listings: [], total: 0 };
@@ -118,7 +115,13 @@ async function analyzeSellerListings(sellerData, username) {
     const fetchedListings = sellerData.listings;
     const totalAvailable = sellerData.total;
     
-    addLog(`Analyzing ${fetchedListings.length} listings for seller ${username}`);
+    addLog(`Analyzing ${fetchedListings.length} listings for seller ${username} (${totalAvailable} total available)`);
+
+    // Debug: Print first few titles
+    addLog(`Sample listings for ${username}:`);
+    fetchedListings.slice(0, 3).forEach(item => {
+        addLog(`- ${item.title}`);
+    });
 
     if (totalAvailable <= 15) {
         addLog(`Small seller ${username} (${totalAvailable} listings), including`);
@@ -126,22 +129,42 @@ async function analyzeSellerListings(sellerData, username) {
     }
 
     let jewelryListings = 0;
+    const jewelryMatches = [];
+
     for (const item of fetchedListings) {
-        const isJewelryListing = jewelryPhrases.some(phrase => 
-            item.title.toLowerCase().includes(phrase.replace(/"/g, '').toLowerCase())
-        );
-        if (isJewelryListing) {
+        const matchedPhrases = jewelryPhrases.filter(phrase => {
+            const cleanPhrase = phrase.replace(/"/g, '').trim().toLowerCase();
+            return item.title.toLowerCase().includes(cleanPhrase);
+        });
+
+        if (matchedPhrases.length > 0) {
             jewelryListings++;
+            jewelryMatches.push({
+                title: item.title,
+                matches: matchedPhrases
+            });
         }
     }
 
     const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
-    addLog(`Seller ${username}: ${jewelryPercentage.toFixed(2)}% jewelry listings`);
+
+    // Detailed analysis logging
+    addLog(`Analysis for ${username}:`);
+    addLog(`- Total listings analyzed: ${fetchedListings.length}`);
+    addLog(`- Jewelry listings found: ${jewelryListings}`);
+    addLog(`- Jewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
+    if (jewelryMatches.length > 0) {
+        addLog('Sample matches:');
+        jewelryMatches.slice(0, 3).forEach(match => {
+            addLog(`- ${match.title} (matched: ${match.matches.join(', ')})`);
+        });
+    }
 
     const shouldExclude = jewelryPercentage >= 80;
     addLog(shouldExclude ? 
-        `Excluding seller ${username} (${jewelryPercentage.toFixed(2)}% jewelry)` : 
-        `Including seller ${username} (${jewelryPercentage.toFixed(2)}% jewelry)`);
+        `EXCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry` : 
+        `INCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry`);
+    
     return shouldExclude;
 }
 
@@ -160,8 +183,8 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         });
 
         if (response.status === 429) {
-            addLog('Rate limit reached, waiting 30 seconds...');
-            await delay(30000);
+            addLog('Rate limit reached, waiting 10 seconds...');
+            await delay(10000);
             return fetchListingsForPhrase(phrase, accessToken);
         }
 
@@ -179,29 +202,35 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         }
 
         const filteredListings = [];
+        const sellers = data.itemSummaries;
         
-        for (const item of data.itemSummaries || []) {
-            const feedbackScore = item.seller?.feedbackScore || 0;
-
-            if (feedbackScore >= feedbackThreshold) {
-                addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
-                continue;
-            }
-
-            try {
-                const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
-                const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
-                
-                if (!shouldExclude) {
-                    addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
-                    filteredListings.push(item);
+        // Process sellers in chunks of 3
+        for (let i = 0; i < sellers.length; i += 3) {
+            const chunk = sellers.slice(i, i + 3);
+            const results = await Promise.all(chunk.map(async (item) => {
+                const feedbackScore = item.seller?.feedbackScore || 0;
+                if (feedbackScore >= feedbackThreshold) {
+                    addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
+                    return null;
                 }
 
-                await delay(1000);
-                
-            } catch (error) {
-                addLog(`Error processing ${item.seller?.username}: ${error.message}`);
-            }
+                try {
+                    const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
+                    const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
+                    
+                    if (!shouldExclude) {
+                        addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
+                        return item;
+                    }
+                    return null;
+                } catch (error) {
+                    addLog(`Error processing ${item.seller?.username}: ${error.message}`);
+                    return null;
+                }
+            }));
+
+            filteredListings.push(...results.filter(item => item !== null));
+            await delay(500);
         }
 
         addLog(`Found ${filteredListings.length} matching listings for ${phrase}`);
@@ -215,7 +244,6 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 async function fetchAllListings() {
     try {
         addLog('Starting new scan...');
-        addLog('Fetching access token...');
         const accessToken = await fetchAccessToken();
         addLog('Access token obtained successfully');
 
@@ -224,7 +252,7 @@ async function fetchAllListings() {
         for (const phrase of searchPhrases) {
             const listings = await fetchListingsForPhrase(phrase, accessToken);
             allListings.push(...listings);
-            await delay(2000);
+            await delay(1000);
         }
 
         addLog(`Scan complete. Found ${allListings.length} total listings`);
@@ -250,7 +278,7 @@ async function startScan() {
             logMessages: scanResults.logMessages
         };
         
-        setTimeout(startScan, 300000); // Start new scan after 5 minutes
+        setTimeout(startScan, 300000);
     } catch (error) {
         addLog(`Error during scan: ${error.message}`);
         scanResults = {
@@ -261,6 +289,8 @@ async function startScan() {
         setTimeout(startScan, 60000);
     }
 }
+
+// Express routes and UI components
 
 app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
@@ -273,19 +303,56 @@ app.get('/', async (req, res) => {
         <head>
             <title>eBay Listings Scanner</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-                th { background-color: #f4f4f4; }
-                tr:nth-child(even) { background-color: #f9f9f9; }
-                .auto-refresh { color: #666; margin-bottom: 20px; }
-                #loading { text-align: center; padding: 20px; }
-                .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; 
-                          border-top: 5px solid #3498db; border-radius: 50%;
-                          animation: spin 1s linear infinite; margin: 20px auto; }
-                @keyframes spin { 0% { transform: rotate(0deg); }
-                                100% { transform: rotate(360deg); } }
-                .error { color: red; padding: 20px; text-align: center; }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px;
+                    line-height: 1.6;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 20px;
+                    font-size: 14px;
+                }
+                th, td { 
+                    border: 1px solid #ccc; 
+                    padding: 10px; 
+                    text-align: left;
+                }
+                th { 
+                    background-color: #f4f4f4;
+                    position: sticky;
+                    top: 0;
+                }
+                tr:nth-child(even) { 
+                    background-color: #f9f9f9;
+                }
+                .auto-refresh { 
+                    color: #666; 
+                    margin-bottom: 20px;
+                }
+                #loading { 
+                    text-align: center; 
+                    padding: 20px;
+                }
+                .spinner { 
+                    width: 50px; 
+                    height: 50px; 
+                    border: 5px solid #f3f3f3;
+                    border-top: 5px solid #3498db; 
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite; 
+                    margin: 20px auto;
+                }
+                @keyframes spin { 
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .error { 
+                    color: red; 
+                    padding: 20px; 
+                    text-align: center;
+                }
                 #logArea {
                     max-height: 400px;
                     overflow-y: auto;
@@ -295,13 +362,21 @@ app.get('/', async (req, res) => {
                     margin: 10px auto;
                     background-color: #f9f9f9;
                     font-family: monospace;
-                    width: 90%;
+                    width: 95%;
                     text-align: left;
+                    font-size: 13px;
                 }
                 .log-message {
                     margin: 2px 0;
                     padding: 2px 0;
                     border-bottom: 1px solid #eee;
+                }
+                .log-timestamp {
+                    color: #666;
+                    margin-right: 10px;
+                }
+                #results {
+                    margin-top: 20px;
                 }
             </style>
         </head>
@@ -310,7 +385,7 @@ app.get('/', async (req, res) => {
             <div id="loading">
                 <div class="spinner"></div>
                 <p>Scanning listings... This may take a few minutes.</p>
-                <p>Recent activity:</p>
+                <p>Live scanning activity:</p>
                 <div id="logArea"></div>
             </div>
             <div id="error" style="display: none;" class="error"></div>
@@ -403,8 +478,10 @@ app.get('/results', (req, res) => {
     }
 });
 
+// Start the background scanning process when server starts
 startScan();
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
