@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>eBay Listings Scanner</title>
+  <style>
+    /* Add any necessary CSS styles here */
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>eBay Listings Scanner</h1>
+
+    <form id="scanForm">
+      <label for="searchPhrases">Search Phrases (comma-separated):</label>
+      <input type="text" id="searchPhrases" name="searchPhrases" required>
+
+      <label for="feedbackThreshold">Feedback Threshold:</label>
+      <input type="number" id="feedbackThreshold" name="feedbackThreshold" required>
+
+      <button type="submit">Start Scan</button>
+    </form>
+
+    <div id="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Scanning listings... This may take a few minutes.</p>
+      <p>Recent activity:</p>
+      <div id="logArea"></div>
+    </div>
+
+    <div id="error" style="display: none;" class="error"></div>
+
+    <div id="results" style="display: none;">
+      <p class="auto-refresh">Last updated: <span id="lastUpdated"></span></p>
+      <p>Total Listings Found: <span id="totalListings"></span></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Currency</th>
+            <th>Seller</th>
+            <th>Feedback Score</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable"></tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      Full scanning logs are being written to a file for debugging purposes.
+      <button onclick="downloadLogs()" class="download-button">Download Logs</button>
+    </div>
+  </div>
+
+  <script src="/client.js"></script>
+</body>
+</html>

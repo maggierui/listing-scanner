@@ -15,14 +15,15 @@ async function trackApiCall() {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const path = require('path');
 
-const searchPhrases = ['"jewelry lot"', '"jewelry collection"', '"jewelry bundle"'];
+
+
 const jewelryPhrases = [
     '"jewelry"', '"necklace"', '"necklaces"', '"brooch"', '"brooches"', 
     '"ring"', '"rings"', '"bracelet"', '"bracelets"', '"earring"', 
     '"earrings"', '"bangle"', '"bangles"', '"pendant"', '"pendants"'
 ];
-const feedbackThreshold = 5000;
 
 // Store results and logs in memory
 let scanResults = {
@@ -32,9 +33,36 @@ let scanResults = {
     error: null,
     logMessages: []
 };
+app.get('/', async (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.post('/scan', async (req, res) => {
+    try {
+      // Receive user input from the request body
+      const { searchPhrases, feedbackThreshold } = req.body;
+  
+      // Update the global variables
+      this.searchPhrases = searchPhrases;
+      this.feedbackThreshold = feedbackThreshold;
+  
+      // Start the scanning process
+      await startScan();
+  
+      // Return a response to the client
+      res.json({ status: 'Scan started' });
+    } catch (error) {
+      // Handle any errors that occur during the scanning process
+      res.status(500).json({ error: error.message });
+    }
+  });
 
 async function addLog(message) {
-    const timestamp = new Date().toLocaleTimeString();
+// Create timestamp in EST/EDT
+    const timestamp = new Date().toLocaleTimeString('en-US', { 
+    timeZone: 'America/New_York',
+    hour12: true 
+    });    
     const logMessage = `${timestamp}: ${message}\n`;
     
     // Keep limited logs for web display
@@ -236,7 +264,7 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             const chunk = sellers.slice(i, i + 3);
             const results = await Promise.all(chunk.map(async (item) => {
                 const feedbackScore = item.seller?.feedbackScore || 0;
-                if (feedbackScore >= feedbackThreshold) {
+                if (feedbackScore >= this.feedbackThreshold) {
                     await addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
                     return null;
                 }
@@ -280,7 +308,7 @@ async function fetchAllListings() {
 
         const allListings = [];
         
-        for (const phrase of searchPhrases) {
+        for (const phrase of this.searchPhrases) {
             const listings = await fetchListingsForPhrase(phrase, accessToken);
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -354,197 +382,23 @@ app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
 });
 
-app.get('/', async (req, res) => {
-    const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>eBay Listings Scanner</title>
-            <style>
-                body { 
-                    font-family: Arial, sans-serif; 
-                    margin: 20px;
-                    line-height: 1.6;
-                }
-                table { 
-                    width: 100%; 
-                    border-collapse: collapse; 
-                    margin-top: 20px;
-                    font-size: 14px;
-                }
-                th, td { 
-                    border: 1px solid #ccc; 
-                    padding: 10px; 
-                    text-align: left;
-                }
-                th { 
-                    background-color: #f4f4f4;
-                    position: sticky;
-                    top: 0;
-                }
-                tr:nth-child(even) { 
-                    background-color: #f9f9f9;
-                }
-                .auto-refresh { 
-                    color: #666; 
-                    margin-bottom: 20px;
-                }
-                #loading { 
-                    text-align: center; 
-                    padding: 20px;
-                }
-                .spinner { 
-                    width: 50px; 
-                    height: 50px; 
-                    border: 5px solid #f3f3f3;
-                    border-top: 5px solid #3498db; 
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite; 
-                    margin: 20px auto;
-                }
-                @keyframes spin { 
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                .error { 
-                    color: red; 
-                    padding: 20px; 
-                    text-align: center;
-                }
-                #logArea {
-                    max-height: 400px;
-                    overflow-y: auto;
-                    padding: 10px;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    margin: 10px auto;
-                    background-color: #f9f9f9;
-                    font-family: monospace;
-                    width: 95%;
-                    text-align: left;
-                    font-size: 13px;
-                }
-                .log-message {
-                    margin: 2px 0;
-                    padding: 2px 0;
-                    border-bottom: 1px solid #eee;
-                }
-                .note {
-                    background-color: #fff3cd;
-                    border: 1px solid #ffeeba;
-                    padding: 10px;
-                    margin: 10px 0;
-                    border-radius: 4px;
-                }
-                .download-button {
-                    background-color: #4CAF50;
-                    border: none;
-                    color: white;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    font-size: 14px;
-                    margin: 4px 2px;
-                    cursor: pointer;
-                    border-radius: 4px;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>eBay Listings Scanner</h1>
-            <div class="note">
-                Full scanning logs are being written to a file for debugging purposes.
-                <button onclick="downloadLogs()" class="download-button">Download Logs</button>
-            </div>
-            <div id="loading">
-                <div class="spinner"></div>
-                <p>Scanning listings... This may take a few minutes.</p>
-                <p>Recent activity:</p>
-                <div id="logArea"></div>
-            </div>
-            <div id="error" style="display: none;" class="error"></div>
-            <div id="results" style="display: none;"></div>
 
-            <script>
-                function downloadLogs() {
-                    window.location.href = '/download-logs';
-                }
 
-                function checkResults() {
-                    fetch('/results')
-                        .then(response => response.json())
-                        .then(data => {
-                            const logArea = document.getElementById('logArea');
-                            if (data.logMessages) {
-                                logArea.innerHTML = data.logMessages
-                                    .map(msg => '<div class="log-message">' + msg + '</div>')
-                                    .join('');
-                                logArea.scrollTop = logArea.scrollHeight;
-                            }
-
-                            if (data.status === 'complete') {
-                                document.getElementById('loading').style.display = 'none';
-                                document.getElementById('error').style.display = 'none';
-                                document.getElementById('results').style.display = 'block';
-                                document.getElementById('results').innerHTML = data.html;
-                            } else if (data.status === 'error') {
-                                document.getElementById('loading').style.display = 'none';
-                                document.getElementById('results').style.display = 'none';
-                                document.getElementById('error').style.display = 'block';
-                                document.getElementById('error').innerHTML = 'Error: ' + data.error;
-                            }
-                            setTimeout(checkResults, 2000);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            setTimeout(checkResults, 2000);
-                        });
-                }
-
-                checkResults();
-            </script>
-        </body>
-        </html>
-    `;
-
-    res.send(html);
-});
 
 app.get('/results', (req, res) => {
     if (scanResults.status === 'complete') {
-        const html = `
-            <p class="auto-refresh">Last updated: ${scanResults.lastUpdated.toLocaleString()}</p>
-            <p>Total Listings Found: ${scanResults.listings.length}</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Price</th>
-                        <th>Currency</th>
-                        <th>Seller</th>
-                        <th>Feedback Score</th>
-                        <th>Link</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${scanResults.listings.map(item => `
-                        <tr>
-                            <td>${item.title}</td>
-                            <td>${item.price?.value || 'N/A'}</td>
-                            <td>${item.price?.currency || 'N/A'}</td>
-                            <td>${item.seller?.username || 'N/A'}</td>
-                            <td>${item.seller?.feedbackScore || 'N/A'}</td>
-                            <td><a href="${item.itemWebUrl}" target="_blank">View Listing</a></td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-        
         res.json({
             status: 'complete',
-            html: html,
+            lastUpdated: scanResults.lastUpdated,
+            totalListings: scanResults.listings.length,
+            listings: scanResults.listings.map(item => ({
+                title: item.title,
+                price: item.price?.value || 'N/A',
+                currency: item.price?.currency || 'N/A',
+                seller: item.seller?.username || 'N/A',
+                feedbackScore: item.seller?.feedbackScore || 'N/A',
+                itemWebUrl: item.itemWebUrl
+            })),
             logMessages: scanResults.logMessages
         });
     } else {
