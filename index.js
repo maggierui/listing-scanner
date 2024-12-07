@@ -1,6 +1,7 @@
 import express from 'express';
 import fetchAccessToken from './auth.js';
 import fetch from 'node-fetch';
+import { appendFile } from 'fs/promises';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,7 +14,7 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
-// Store results and logs in memory
+// Store results in memory
 let scanResults = {
     status: 'processing',
     listings: [],
@@ -22,14 +23,27 @@ let scanResults = {
     logMessages: []
 };
 
-function addLog(message) {
+async function addLog(message) {
     const timestamp = new Date().toLocaleTimeString();
-    const logMessage = `${timestamp}: ${message}`;
-    scanResults.logMessages.push(logMessage);
+    const logMessage = `${timestamp}: ${message}\n`;
+    
+    // Keep limited logs for web display
+    const webLogMessage = `${timestamp}: ${message}`;
+    scanResults.logMessages.push(webLogMessage);
     if (scanResults.logMessages.length > 50) {
         scanResults.logMessages.shift();
     }
-    console.log(logMessage);
+
+    // Write to console
+    console.log(message);
+
+    // Write to file with timestamp
+    try {
+        const logFileName = `ebay-scanner-${new Date().toISOString().split('T')[0]}.txt`;
+        await appendFile(logFileName, logMessage);
+    } catch (error) {
+        console.error('Error writing to log file:', error);
+    }
 }
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -57,7 +71,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
         `&limit=100` +
         `&offset=0`;
 
-    addLog(`Fetching listings for seller: ${sellerUsername}`);
+    await addLog(`\n=== Fetching listings for seller: ${sellerUsername} ===`);
 
     for (let i = 0; i <= retryCount; i++) {
         try {
@@ -71,14 +85,15 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             }, 8000);
 
             if (response.status === 429) {
-                addLog(`Rate limit reached for seller ${sellerUsername}, waiting 10 seconds...`);
-                await delay(10000); // Reduced from 30s to 10s
+                await addLog(`Rate limit reached for seller ${sellerUsername}, waiting 10 seconds...`);
+                await delay(10000);
                 continue;
             }
 
             if (!response.ok) {
                 const errorData = await response.text();
-                addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
+                await addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
+                await addLog(`Error details: ${errorData}`);
                 
                 if (i === retryCount) {
                     return { error: true, listings: [], total: 0 };
@@ -88,7 +103,8 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             }
 
             const data = await response.json();
-            addLog(`Retrieved ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
+            await addLog(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
+            await addLog(`Total available listings: ${data.total || 0}`);
             
             return {
                 error: false,
@@ -96,7 +112,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
                 total: data.total || 0
             };
         } catch (error) {
-            addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
+            await addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
             if (i === retryCount) {
                 return { error: true, listings: [], total: 0 };
             }
@@ -107,25 +123,23 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
 }
 
 async function analyzeSellerListings(sellerData, username) {
+    await addLog(`\n==== ANALYZING SELLER: ${username} ====`);
+
     if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
-        addLog(`No valid listings found for seller ${username}, excluding`);
+        await addLog(`ERROR: No valid listings found for seller ${username}`);
         return true;
     }
 
     const fetchedListings = sellerData.listings;
     const totalAvailable = sellerData.total;
     
-    addLog(`Analyzing ${fetchedListings.length} listings for seller ${username} (${totalAvailable} total available)`);
+    await addLog(`Total available listings: ${totalAvailable}`);
+    await addLog(`Fetched listings for analysis: ${fetchedListings.length}`);
 
-    // Debug: Print first few titles
-    addLog(`Sample listings for ${username}:`);
-    fetchedListings.slice(0, 3).forEach(item => {
-        addLog(`- ${item.title}`);
-    });
-
-    if (totalAvailable <= 15) {
-        addLog(`Small seller ${username} (${totalAvailable} listings), including`);
-        return false;
+    // Log all titles
+    await addLog(`\nAll listings for ${username}:`);
+    for (const item of fetchedListings) {
+        await addLog(`- ${item.title}`);
     }
 
     let jewelryListings = 0;
@@ -134,7 +148,9 @@ async function analyzeSellerListings(sellerData, username) {
     for (const item of fetchedListings) {
         const matchedPhrases = jewelryPhrases.filter(phrase => {
             const cleanPhrase = phrase.replace(/"/g, '').trim().toLowerCase();
-            return item.title.toLowerCase().includes(cleanPhrase);
+            const itemTitle = item.title.toLowerCase();
+            const isMatch = itemTitle.includes(cleanPhrase);
+            return isMatch;
         });
 
         if (matchedPhrases.length > 0) {
@@ -143,34 +159,30 @@ async function analyzeSellerListings(sellerData, username) {
                 title: item.title,
                 matches: matchedPhrases
             });
+            await addLog(`Jewelry match found: "${item.title}" - matched phrases: ${matchedPhrases.join(', ')}`);
         }
     }
 
     const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
 
-    // Detailed analysis logging
-    addLog(`Analysis for ${username}:`);
-    addLog(`- Total listings analyzed: ${fetchedListings.length}`);
-    addLog(`- Jewelry listings found: ${jewelryListings}`);
-    addLog(`- Jewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
-    if (jewelryMatches.length > 0) {
-        addLog('Sample matches:');
-        jewelryMatches.slice(0, 3).forEach(match => {
-            addLog(`- ${match.title} (matched: ${match.matches.join(', ')})`);
-        });
-    }
+    await addLog(`\nFinal Analysis for ${username}:`);
+    await addLog(`- Total listings analyzed: ${fetchedListings.length}`);
+    await addLog(`- Jewelry listings found: ${jewelryListings}`);
+    await addLog(`- Jewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
 
     const shouldExclude = jewelryPercentage >= 80;
-    addLog(shouldExclude ? 
-        `EXCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry` : 
-        `INCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry`);
+    await addLog(shouldExclude ? 
+        `DECISION: EXCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry` : 
+        `DECISION: INCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry`);
+    await addLog(`==== END ANALYSIS FOR ${username} ====\n`);
     
     return shouldExclude;
 }
 
 async function fetchListingsForPhrase(phrase, accessToken) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
-    addLog(`Searching for phrase: ${phrase}`);
+    await addLog(`\n=== Searching for phrase: ${phrase} ===`);
+    await addLog(`URL: ${url}`);
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -183,19 +195,20 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         });
 
         if (response.status === 429) {
-            addLog('Rate limit reached, waiting 10 seconds...');
+            await addLog('Rate limit reached, waiting 10 seconds...');
             await delay(10000);
             return fetchListingsForPhrase(phrase, accessToken);
         }
 
         if (!response.ok) {
             const errorText = await response.text();
-            addLog(`Error fetching listings for ${phrase}: ${response.status}`);
+            await addLog(`Error fetching listings for ${phrase}: ${response.status}`);
+            await addLog(`Error details: ${errorText}`);
             return [];
         }
 
         const data = await response.json();
-        addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${phrase}`);
+        await addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${phrase}`);
 
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
             return [];
@@ -210,7 +223,7 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             const results = await Promise.all(chunk.map(async (item) => {
                 const feedbackScore = item.seller?.feedbackScore || 0;
                 if (feedbackScore >= feedbackThreshold) {
-                    addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
+                    await addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
                     return null;
                 }
 
@@ -219,12 +232,13 @@ async function fetchListingsForPhrase(phrase, accessToken) {
                     const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                     
                     if (!shouldExclude) {
-                        addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
+                        await addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
                         return item;
                     }
+                    await addLog(`Excluded listing from ${item.seller?.username}: ${item.title}`);
                     return null;
                 } catch (error) {
-                    addLog(`Error processing ${item.seller?.username}: ${error.message}`);
+                    await addLog(`Error processing ${item.seller?.username}: ${error.message}`);
                     return null;
                 }
             }));
@@ -233,19 +247,19 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             await delay(500);
         }
 
-        addLog(`Found ${filteredListings.length} matching listings for ${phrase}`);
+        await addLog(`Found ${filteredListings.length} matching listings for ${phrase}\n`);
         return filteredListings;
     } catch (error) {
-        addLog(`Error processing ${phrase}: ${error.message}`);
+        await addLog(`Error processing ${phrase}: ${error.message}`);
         return [];
     }
 }
 
 async function fetchAllListings() {
     try {
-        addLog('Starting new scan...');
+        await addLog('\n====== Starting new scan ======');
         const accessToken = await fetchAccessToken();
-        addLog('Access token obtained successfully');
+        await addLog('Access token obtained successfully');
 
         const allListings = [];
         
@@ -255,20 +269,34 @@ async function fetchAllListings() {
             await delay(1000);
         }
 
-        addLog(`Scan complete. Found ${allListings.length} total listings`);
+        await addLog(`\n====== Scan complete. Found ${allListings.length} total listings ======\n`);
         return allListings;
     } catch (error) {
-        addLog(`Scan error: ${error.message}`);
+        await addLog(`Scan error: ${error.message}`);
         throw error;
     }
 }
 
 async function startScan() {
     try {
+        const scanStartTime = new Date().toISOString().split('T')[0];
+        const logFileName = `ebay-scanner-${scanStartTime}.txt`;
+        
+        // Add a header to the log file
+        await appendFile(logFileName, `\n\n========================================\n`);
+        await appendFile(logFileName, `New Scan Started at ${new Date().toLocaleString()}\n`);
+        await appendFile(logFileName, `========================================\n\n`);
+        
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
         const listings = await fetchAllListings();
+        
+        // Log completion to file
+        await appendFile(logFileName, `\n========================================\n`);
+        await appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
+        await appendFile(logFileName, `Total listings found: ${listings.length}\n`);
+        await appendFile(logFileName, `========================================\n\n`);
         
         scanResults = {
             status: 'complete',
@@ -278,20 +306,17 @@ async function startScan() {
             logMessages: scanResults.logMessages
         };
         
-        setTimeout(startScan, 300000);
+        setTimeout(startScan, 300000); // 5 minutes
     } catch (error) {
-        addLog(`Error during scan: ${error.message}`);
+        await addLog(`Error during scan: ${error.message}`);
         scanResults = {
             ...scanResults,
             status: 'error',
             error: error.message
         };
-        setTimeout(startScan, 60000);
+        setTimeout(startScan, 60000); // 1 minute on error
     }
 }
-
-// Express routes and UI components
-
 app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
 });
@@ -371,21 +396,24 @@ app.get('/', async (req, res) => {
                     padding: 2px 0;
                     border-bottom: 1px solid #eee;
                 }
-                .log-timestamp {
-                    color: #666;
-                    margin-right: 10px;
-                }
-                #results {
-                    margin-top: 20px;
+                .note {
+                    background-color: #fff3cd;
+                    border: 1px solid #ffeeba;
+                    padding: 10px;
+                    margin: 10px 0;
+                    border-radius: 4px;
                 }
             </style>
         </head>
         <body>
             <h1>eBay Listings Scanner</h1>
+            <div class="note">
+                Full scanning logs are being written to a file for debugging purposes.
+            </div>
             <div id="loading">
                 <div class="spinner"></div>
                 <p>Scanning listings... This may take a few minutes.</p>
-                <p>Live scanning activity:</p>
+                <p>Recent activity:</p>
                 <div id="logArea"></div>
             </div>
             <div id="error" style="display: none;" class="error"></div>
@@ -478,7 +506,7 @@ app.get('/results', (req, res) => {
     }
 });
 
-// Start the background scanning process when server starts
+// Start the background scanning process
 startScan();
 
 // Start the server
