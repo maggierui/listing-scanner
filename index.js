@@ -66,11 +66,11 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
 }
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-        `q=seller:${encodeURIComponent(sellerUsername)}` +
-        `&limit=100` +
-        `&offset=0`;
+        `filter=seller:{${encodeURIComponent(sellerUsername)}}` + // Changed this line
+        `&limit=100`;
 
     await addLog(`\n=== Fetching listings for seller: ${sellerUsername} ===`);
+    await addLog(`Using URL: ${url}`);  // Added for debugging
 
     for (let i = 0; i <= retryCount; i++) {
         try {
