@@ -3,6 +3,16 @@ import fetchAccessToken from './auth.js';
 import fetch from 'node-fetch';
 import { appendFile, readFile } from 'fs/promises';
 
+let apiCallsCount = 0;
+
+async function trackApiCall() {
+    apiCallsCount++;
+    await addLog(`API Calls made today: ${apiCallsCount}/5000`);
+    if (apiCallsCount > 4500) {
+        await addLog('WARNING: Approaching daily API limit (5000)');
+    }
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -65,6 +75,7 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
+    await trackApiCall(); 
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
         `filter=seller:{${encodeURIComponent(sellerUsername)}}` + // Changed this line
         `&limit=100`;
@@ -180,6 +191,7 @@ async function analyzeSellerListings(sellerData, username) {
 }
 
 async function fetchListingsForPhrase(phrase, accessToken) {
+    await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
     await addLog(`\n=== Searching for phrase: ${phrase} ===`);
     await addLog(`URL: ${url}`);
@@ -195,9 +207,11 @@ async function fetchListingsForPhrase(phrase, accessToken) {
         });
 
         if (response.status === 429) {
-            await addLog('Rate limit reached, waiting 10 seconds...');
-            await delay(10000);
-            return fetchListingsForPhrase(phrase, accessToken);
+            const rateLimitMessage = await response.text();
+        await addLog(`RATE LIMIT REACHED: ${rateLimitMessage}`);
+        await addLog('Daily API limit reached. Operations will resume when limit resets.');
+        // Don't retry - it won't help with daily limits
+        return { error: true, listings: [], total: 0 };
         }
 
         if (!response.ok) {
