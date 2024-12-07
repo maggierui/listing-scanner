@@ -1,7 +1,7 @@
 import express from 'express';
 import fetchAccessToken from './auth.js';
 import fetch from 'node-fetch';
-import { appendFile } from 'fs/promises';
+import { appendFile, readFile } from 'fs/promises';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +14,7 @@ const jewelryPhrases = [
 ];
 const feedbackThreshold = 5000;
 
-// Store results in memory
+// Store results and logs in memory
 let scanResults = {
     status: 'processing',
     listings: [],
@@ -64,7 +64,6 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
         throw error;
     }
 }
-
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
         `q=seller:${encodeURIComponent(sellerUsername)}` +
@@ -136,7 +135,6 @@ async function analyzeSellerListings(sellerData, username) {
     await addLog(`Total available listings: ${totalAvailable}`);
     await addLog(`Fetched listings for analysis: ${fetchedListings.length}`);
 
-    // Log all titles
     await addLog(`\nAll listings for ${username}:`);
     for (const item of fetchedListings) {
         await addLog(`- ${item.title}`);
@@ -282,7 +280,6 @@ async function startScan() {
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
         
-        // Add a header to the log file
         await appendFile(logFileName, `\n\n========================================\n`);
         await appendFile(logFileName, `New Scan Started at ${new Date().toLocaleString()}\n`);
         await appendFile(logFileName, `========================================\n\n`);
@@ -292,7 +289,6 @@ async function startScan() {
         scanResults.logMessages = [];
         const listings = await fetchAllListings();
         
-        // Log completion to file
         await appendFile(logFileName, `\n========================================\n`);
         await appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
         await appendFile(logFileName, `Total listings found: ${listings.length}\n`);
@@ -306,7 +302,7 @@ async function startScan() {
             logMessages: scanResults.logMessages
         };
         
-        setTimeout(startScan, 300000); // 5 minutes
+        setTimeout(startScan, 300000);
     } catch (error) {
         await addLog(`Error during scan: ${error.message}`);
         scanResults = {
@@ -314,9 +310,25 @@ async function startScan() {
             status: 'error',
             error: error.message
         };
-        setTimeout(startScan, 60000); // 1 minute on error
+        setTimeout(startScan, 60000);
     }
 }
+
+// New endpoint to download logs
+app.get('/download-logs', async (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+    const logFileName = `ebay-scanner-${today}.txt`;
+    
+    try {
+        const logContent = await readFile(logFileName, 'utf8');
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Disposition', `attachment; filename=${logFileName}`);
+        res.send(logContent);
+    } catch (error) {
+        res.status(500).send('Error downloading log file: ' + error.message);
+    }
+});
+
 app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
 });
@@ -403,12 +415,26 @@ app.get('/', async (req, res) => {
                     margin: 10px 0;
                     border-radius: 4px;
                 }
+                .download-button {
+                    background-color: #4CAF50;
+                    border: none;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 14px;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 4px;
+                }
             </style>
         </head>
         <body>
             <h1>eBay Listings Scanner</h1>
             <div class="note">
                 Full scanning logs are being written to a file for debugging purposes.
+                <button onclick="downloadLogs()" class="download-button">Download Logs</button>
             </div>
             <div id="loading">
                 <div class="spinner"></div>
@@ -420,11 +446,14 @@ app.get('/', async (req, res) => {
             <div id="results" style="display: none;"></div>
 
             <script>
+                function downloadLogs() {
+                    window.location.href = '/download-logs';
+                }
+
                 function checkResults() {
                     fetch('/results')
                         .then(response => response.json())
                         .then(data => {
-                            // Update logs
                             const logArea = document.getElementById('logArea');
                             if (data.logMessages) {
                                 logArea.innerHTML = data.logMessages
