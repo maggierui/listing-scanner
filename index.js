@@ -104,6 +104,8 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             const data = await response.json();
             await addLog(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
             await addLog(`Total available listings: ${data.total || 0}`);
+            await addLog(`API Response: ${JSON.stringify(data, null, 2)}`); // Add this line for debugging
+
             
             return {
                 error: false,
