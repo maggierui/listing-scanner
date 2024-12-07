@@ -2,8 +2,21 @@ import express from 'express';
 import fetchAccessToken from './auth.js';
 import fetch from 'node-fetch';
 import { appendFile, readFile } from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.static(__dirname)); // Serve files from current directory
 
 let apiCallsCount = 0;
+
 
 async function trackApiCall() {
     apiCallsCount++;
@@ -18,8 +31,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 app.use(express.static('public'));
-
-
+app.use(express.json());
 
 
 const jewelryPhrases = [
