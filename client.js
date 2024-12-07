@@ -1,6 +1,7 @@
 document.getElementById('scanForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const searchPhrases = document.getElementById('searchPhrases').value;
+    const categoryPhrases = document.getElementById('categoryPhrases').value;
     const feedbackThreshold = document.getElementById('feedbackThreshold').value;
   
     fetch('/scan', {
@@ -8,7 +9,7 @@ document.getElementById('scanForm').addEventListener('submit', (event) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ searchPhrases, feedbackThreshold })
+      body: JSON.stringify({ searchPhrases, categoryPhrases, feedbackThreshold })
     })
     .then(response => response.json())
     .then(data => {
@@ -22,34 +23,33 @@ document.getElementById('scanForm').addEventListener('submit', (event) => {
       document.getElementById('error').textContent = 'Error starting the scan: ' + error.message;
     });
   });
-
-function checkResults() {
+  
+  function checkResults() {
     fetch('/results')
-        .then(response => response.json())
-        .then(data => {
-            // Update the log area
-            updateLogArea(data.logMessages);
-
-            if (data.status === 'complete') {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('results').style.display = 'block';
-                updateResults(data);
-            } else if (data.status === 'error') {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('results').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'Error: ' + data.error;
-            }
-            setTimeout(checkResults, 2000);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            setTimeout(checkResults, 2000);
-        });
-}
-
-function updateLogArea(logMessages) {
+      .then(response => response.json())
+      .then(data => {
+        updateLogArea(data.logMessages);
+  
+        if (data.status === 'complete') {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'none';
+          document.getElementById('results').style.display = 'block';
+          updateResults(data);
+        } else if (data.status === 'error') {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('results').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error').textContent = 'Error: ' + data.error;
+        }
+        setTimeout(checkResults, 2000);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setTimeout(checkResults, 2000);
+      });
+  }
+  
+  function updateLogArea(logMessages) {
     const logArea = document.getElementById('logArea');
     logArea.innerHTML = logMessages
       .map(msg => '<div class="log-message">' + msg + '</div>')
