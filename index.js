@@ -257,7 +257,10 @@ async function fetchListingsForPhrase(phrase, accessToken) {
                 }
             }));
 
-            filteredListings.push(...results.filter(item => item !== null));
+            const validResults = results.filter(item => item !== null);
+            if (validResults && validResults.length > 0) {
+                filteredListings.push(...validResults);
+            }
             await delay(500);
         }
 
@@ -279,7 +282,9 @@ async function fetchAllListings() {
         
         for (const phrase of searchPhrases) {
             const listings = await fetchListingsForPhrase(phrase, accessToken);
-            allListings.push(...listings);
+            if (listings && listings.length > 0) {
+                allListings.push(...listings);
+            }
             await delay(1000);
         }
 
