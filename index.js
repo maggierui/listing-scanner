@@ -156,7 +156,7 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
 }
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
     let offset = 0;  // Initialize offset
-    const limit = 100;
+    const limit = 50;
     const maxPrice = '500'; // 
 
     await trackApiCall(); 
