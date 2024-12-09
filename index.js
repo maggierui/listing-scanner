@@ -65,7 +65,7 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-app.post('/scan', async (req, res) => {
+app.post('/api/scan', async (req, res) => {
     try {
         // Log the incoming data for debugging
         console.log('Received data:', req.body);
