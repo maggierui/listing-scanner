@@ -159,69 +159,66 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
     const limit = 50;
     const maxPrice = '500'; // 
 
-    await trackApiCall(); 
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-        `q=*&` + 
-        `filter=seller:{${encodeURIComponent(sellerUsername)}},` +
-        `price:[..${maxPrice}],` +  // Add price filter
-        `deliveryCountry:US,` +     // Add country filter
-        `conditionIds:{3000|4000|5000|6000|7000}` + // Add condition filter (New, New other, etc.)
-        `&sort=newlyListed` +       // Sort by newest first
-        `&limit=${limit}` +
-        `&offset=${offset}`;
+    while (true) {
+        await trackApiCall(); 
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `q=*&` + 
+            `filter=seller:{${encodeURIComponent(sellerUsername)}},` +
+            `price:[..${maxPrice}],` +
+            `deliveryCountry:US,` +
+            `conditionIds:{1000|1500|2000|2500|3000}` +
+            `&sort=newlyListed` +
+            `&limit=${limit}` +
+            `&offset=${offset}`;
 
-    await addLog(`\n=== Fetching listings for seller: ${sellerUsername} ===`);
-    await addLog(`Using URL: ${url}`);  // Added for debugging
+        await addLog(`\n=== Fetching listings for seller: ${sellerUsername} (offset: ${offset}) ===`);
+        await addLog(`Using URL: ${url}`);
 
-    for (let i = 0; i <= retryCount; i++) {
-        try {
-            const response = await fetchWithTimeout(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                    'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-                },
-            }, 8000);
+    try {
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            },
+        }, 8000);
 
-            if (response.status === 429) {
-                await addLog(`Rate limit reached for seller ${sellerUsername}, waiting 10 seconds...`);
-                await delay(10000);
-                continue;
-            }
-
-            if (!response.ok) {
-                const errorData = await response.text();
-                await addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
-                await addLog(`Error details: ${errorData}`);
-                
-                if (i === retryCount) {
-                    return { error: true, listings: [], total: 0 };
-                }
-                await delay(1000 * (i + 1));
-                continue;
-            }
-
-            const data = await response.json();
-            await addLog(`Successfully fetched ${data.itemSummaries?.length || 0} listings for seller ${sellerUsername}`);
-            await addLog(`Total available listings: ${data.total || 0}`);
-            await addLog(`API Response: ${JSON.stringify(data, null, 2)}`); // Add this line for debugging
-
-            
-            return {
-                error: false,
-                listings: data.itemSummaries || [],
-                total: data.total || 0
-            };
-        } catch (error) {
-            await addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
-            if (i === retryCount) {
-                return { error: true, listings: [], total: 0 };
-            }
-            await delay(1000 * (i + 1));
+        if (!response.ok) {
+            const errorData = await response.text();
+            await addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
+            await addLog(`Error details: ${errorData}`);
+            return { error: true, listings: allListings, total: allListings.length };
         }
+
+        const data = await response.json();
+        
+        if (!data.itemSummaries || data.itemSummaries.length === 0) {
+            break; // No more items to fetch
+        }
+
+        allListings = allListings.concat(data.itemSummaries);
+        await addLog(`Successfully fetched ${data.itemSummaries.length} listings (total: ${allListings.length})`);
+
+        if (allListings.length >= 200) { // Set a reasonable maximum
+            await addLog(`Reached maximum listing count for ${sellerUsername}`);
+            break;
+        }
+
+        offset += limit;
+        await delay(1000); // Add delay between requests
+
+    } catch (error) {
+        await addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
+        return { error: true, listings: allListings, total: allListings.length };
     }
-    return { error: true, listings: [], total: 0 };
+}
+
+return {
+    error: false,
+    listings: allListings,
+    total: allListings.length
+};
 }
 
 async function analyzeSellerListings(sellerData, username) {
