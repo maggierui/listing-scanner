@@ -1,21 +1,30 @@
 import express from 'express';
 import fetchAccessToken from './auth.js';
 import fetch from 'node-fetch';
-import { appendFile, readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as fs from 'fs/promises';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+const listingsCache = {
+    data: {},
+    timestamps: {}
+};
 
 // Middleware
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve files from current directory
 
+// Initialize variables
 let apiCallsCount = 0;
+let searchPhrases = [];
+let categoryPhrases = [];
+let feedbackThreshold = 0;
 
 
 async function trackApiCall() {
@@ -26,19 +35,6 @@ async function trackApiCall() {
     }
 }
 
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-const path = require('path');
-app.use(express.static('public'));
-app.use(express.json());
-
-
-const jewelryPhrases = [
-    '"jewelry"', '"necklace"', '"necklaces"', '"brooch"', '"brooches"', 
-    '"ring"', '"rings"', '"bracelet"', '"bracelets"', '"earring"', 
-    '"earrings"', '"bangle"', '"bangles"', '"pendant"', '"pendants"'
-];
 
 // Store results and logs in memory
 let scanResults = {
@@ -52,25 +48,66 @@ app.get('/', async (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/api/categories', async (req, res) => {
+    try {
+        // Using the already imported fs promises
+        const files = await fs.readdir('.');
+        const categoryFiles = files.filter(f => f.startsWith('ebay_categories_') && f.endsWith('.json'));
+        const mostRecentFile = categoryFiles.sort().reverse()[0];
+        
+        const categoriesData = await fs.readFile(mostRecentFile, 'utf8');
+        const categories = JSON.parse(categoriesData);
+        
+        res.json(categories);
+    } catch (error) {
+        console.error('Error serving categories:', error);
+        res.status(500).json({ error: 'Failed to load categories' });
+    }
+});
+
 app.post('/scan', async (req, res) => {
     try {
-      // Receive user input from the request body
-      const { searchPhrases, feedbackThreshold } = req.body;
+        // Log the incoming data for debugging
+        console.log('Received data:', req.body);
+
+      // Validate and set search phrases
+        if (!Array.isArray(req.body.searchPhrases) || req.body.searchPhrases.length === 0) {
+            throw new Error('Search phrases must be a non-empty array');
+        }
+        searchPhrases = req.body.searchPhrases;
+        console.log('Set searchPhrases to:', searchPhrases); // Debug log
+
+
+        // Validate and set category phrases
+        if (!Array.isArray(req.body.categoryPhrases)) {
+            categoryPhrases = [];
+        } else {
+            categoryPhrases = req.body.categoryPhrases;
+        }
+        console.log('Set category phrases to:', categoryPhrases); // Debug log
+
+        // Validate and set feedback threshold
+        feedbackThreshold = parseInt(req.body.feedbackThreshold) || 0;
+        console.log('Set feedbackThreshold to:', feedbackThreshold); // Debug log
+
+        console.log('Processed values:', {
+            searchPhrases,
+            categoryPhrases,
+            feedbackThreshold
+        });
+
+    // Start the scanning process
+    await startScan();
   
-      // Update the global variables
-      this.searchPhrases = searchPhrases;
-      this.feedbackThreshold = feedbackThreshold;
-  
-      // Start the scanning process
-      await startScan();
-  
-      // Return a response to the client
-      res.json({ status: 'Scan started' });
-    } catch (error) {
-      // Handle any errors that occur during the scanning process
-      res.status(500).json({ error: error.message });
-    }
-  });
+    res.json({ 
+        status: 'Scan started',
+        message: `Starting scan with ${searchPhrases.length} search phrases`
+    });
+} catch (error) {
+    console.error('Error in /scan endpoint:', error);
+    res.status(500).json({ error: error.message });
+}
+});
 
 async function addLog(message) {
 // Create timestamp in EST/EDT
@@ -93,7 +130,7 @@ async function addLog(message) {
     // Write to file with timestamp
     try {
         const logFileName = `ebay-scanner-${new Date().toISOString().split('T')[0]}.txt`;
-        await appendFile(logFileName, logMessage);
+        await fs.appendFile(logFileName, logMessage,'utf8');
     } catch (error) {
         console.error('Error writing to log file:', error);
     }
@@ -118,10 +155,14 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
+    let offset = 0;  // Initialize offset
+    const limit = 100;
+
     await trackApiCall(); 
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-        `filter=seller:{${encodeURIComponent(sellerUsername)}}` + // Changed this line
-        `&limit=100`;
+    `q=*&` + // Add wildcard search query
+    `filter=seller:{${encodeURIComponent(sellerUsername)}}` +
+    `&limit=${limit}`+`&offset=${offset}`; // Add pagination;
 
     await addLog(`\n=== Fetching listings for seller: ${sellerUsername} ===`);
     await addLog(`Using URL: ${url}`);  // Added for debugging
@@ -233,9 +274,19 @@ async function analyzeSellerListings(sellerData, username) {
     return shouldExclude;
 }
 
-async function fetchListingsForPhrase(phrase, accessToken) {
+async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
+    
+    // Check cache first
+    const cacheKey = phrase.toLowerCase();
+    const currentTime = Date.now();
+    if (listingsCache.data[cacheKey] && 
+        (currentTime - listingsCache.timestamps[cacheKey]) < CACHE_DURATION) {
+        await addLog(`Using cached results for phrase: ${phrase}`);
+        return listingsCache.data[cacheKey];
+    }
+
     await addLog(`\n=== Searching for phrase: ${phrase} ===`);
     await addLog(`URL: ${url}`);
 
@@ -251,10 +302,9 @@ async function fetchListingsForPhrase(phrase, accessToken) {
 
         if (response.status === 429) {
             const rateLimitMessage = await response.text();
-        await addLog(`RATE LIMIT REACHED: ${rateLimitMessage}`);
-        await addLog('Daily API limit reached. Operations will resume when limit resets.');
-        // Don't retry - it won't help with daily limits
-        return { error: true, listings: [], total: 0 };
+            await addLog(`RATE LIMIT REACHED: ${rateLimitMessage}`);
+            await addLog('Daily API limit reached. Operations will resume when limit resets.');
+            return [];
         }
 
         if (!response.ok) {
@@ -279,7 +329,7 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             const chunk = sellers.slice(i, i + 3);
             const results = await Promise.all(chunk.map(async (item) => {
                 const feedbackScore = item.seller?.feedbackScore || 0;
-                if (feedbackScore >= this.feedbackThreshold) {
+                if (feedbackScore >= feedbackThreshold) {
                     await addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
                     return null;
                 }
@@ -307,8 +357,13 @@ async function fetchListingsForPhrase(phrase, accessToken) {
             await delay(500);
         }
 
+        // Store filtered results in cache before returning
+        listingsCache.data[cacheKey] = filteredListings;
+        listingsCache.timestamps[cacheKey] = currentTime;
+        
         await addLog(`Found ${filteredListings.length} matching listings for ${phrase}\n`);
         return filteredListings;
+
     } catch (error) {
         await addLog(`Error processing ${phrase}: ${error.message}`);
         return [];
@@ -320,11 +375,13 @@ async function fetchAllListings() {
         await addLog('\n====== Starting new scan ======');
         const accessToken = await fetchAccessToken();
         await addLog('Access token obtained successfully');
-
+        console.log('Starting scan with searchPhrases:', searchPhrases); // Debug log
         const allListings = [];
         
-        for (const phrase of this.searchPhrases) {
+        for (const phrase of searchPhrases) {
+            console.log('Searching for phrase:', phrase); // Debug log
             const listings = await fetchListingsForPhrase(phrase, accessToken);
+            console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
             }
@@ -344,19 +401,19 @@ async function startScan() {
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
         
-        await appendFile(logFileName, `\n\n========================================\n`);
-        await appendFile(logFileName, `New Scan Started at ${new Date().toLocaleString()}\n`);
-        await appendFile(logFileName, `========================================\n\n`);
+        await fs.appendFile(logFileName, `\n\n========================================\n`);
+        await fs.appendFile(logFileName, `New Scan Started at ${new Date().toLocaleString()}\n`);
+        await fs.appendFile(logFileName, `========================================\n\n`);
         
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
         const listings = await fetchAllListings();
         
-        await appendFile(logFileName, `\n========================================\n`);
-        await appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
-        await appendFile(logFileName, `Total listings found: ${listings.length}\n`);
-        await appendFile(logFileName, `========================================\n\n`);
+        await fs.appendFile(logFileName, `\n========================================\n`);
+        await fs.appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
+        await fs.appendFile(logFileName, `Total listings found: ${listings.length}\n`);
+        await fs.appendFile(logFileName, `========================================\n\n`);
         
         scanResults = {
             status: 'complete',
@@ -384,7 +441,7 @@ app.get('/download-logs', async (req, res) => {
     const logFileName = `ebay-scanner-${today}.txt`;
     
     try {
-        const logContent = await readFile(logFileName, 'utf8');
+        const logContent = await fs.readFile(logFileName, 'utf8');
         res.setHeader('Content-Type', 'text/plain');
         res.setHeader('Content-Disposition', `attachment; filename=${logFileName}`);
         res.send(logContent);

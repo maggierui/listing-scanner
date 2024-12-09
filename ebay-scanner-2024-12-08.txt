@@ -1,0 +1,1840 @@
+
+
+========================================
+New Scan Started at 12/7/2024, 7:03:11 PM
+========================================
+
+7:03:11 PM: 
+====== Starting new scan ======
+7:03:11 PM: Access token obtained successfully
+7:03:11 PM: API Calls made today: 10/5000
+7:03:11 PM: 
+=== Searching for phrase: jewelry lot ===
+7:03:11 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+7:03:12 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:12 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:13 PM: API Calls made today: 11/5000
+7:03:13 PM: 
+=== Searching for phrase: jewelry bundle ===
+7:03:13 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+7:03:13 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:13 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:14 PM: API Calls made today: 12/5000
+7:03:14 PM: 
+=== Searching for phrase: jewelry collection ===
+7:03:14 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+7:03:14 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:14 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:15 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:03:15 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:03:44 PM
+========================================
+
+7:03:44 PM: 
+====== Starting new scan ======
+7:03:45 PM: Access token obtained successfully
+7:03:45 PM: API Calls made today: 13/5000
+7:03:45 PM: 
+=== Searching for phrase: jewelry lot ===
+7:03:45 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+7:03:45 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:45 PM: Daily API limit reached. Operations will resume when limit resets.
+
+
+========================================
+New Scan Started at 12/7/2024, 7:03:46 PM
+========================================
+
+7:03:46 PM: 
+====== Starting new scan ======
+7:03:46 PM: Access token obtained successfully
+7:03:46 PM: API Calls made today: 14/5000
+7:03:46 PM: 
+=== Searching for phrase: jewelry lot ===
+7:03:46 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+7:03:46 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:46 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:46 PM: API Calls made today: 15/5000
+7:03:46 PM: 
+=== Searching for phrase: jewelry bundle ===
+7:03:46 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+7:03:46 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:46 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:47 PM: API Calls made today: 16/5000
+7:03:47 PM: 
+=== Searching for phrase: jewelry bundle ===
+7:03:47 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+7:03:47 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:47 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:47 PM: API Calls made today: 17/5000
+7:03:47 PM: 
+=== Searching for phrase: jewelry collection ===
+7:03:47 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+7:03:47 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:47 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:48 PM: API Calls made today: 18/5000
+7:03:48 PM: 
+=== Searching for phrase: jewelry collection ===
+7:03:48 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+7:03:48 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:48 PM: Daily API limit reached. Operations will resume when limit resets.
+
+
+========================================
+New Scan Started at 12/7/2024, 7:03:48 PM
+========================================
+
+7:03:48 PM: 
+====== Starting new scan ======
+7:03:48 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:03:48 PM
+Total listings found: 0
+========================================
+
+7:03:48 PM: Access token obtained successfully
+7:03:48 PM: API Calls made today: 19/5000
+7:03:48 PM: 
+=== Searching for phrase: jewelry lot ===
+7:03:48 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+7:03:49 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:49 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:49 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:03:49 PM
+Total listings found: 0
+========================================
+
+7:03:50 PM: API Calls made today: 20/5000
+7:03:50 PM: 
+=== Searching for phrase: jewelry bundle ===
+7:03:50 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+7:03:50 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:50 PM: Daily API limit reached. Operations will resume when limit resets.
+7:03:51 PM: API Calls made today: 21/5000
+7:03:51 PM: 
+=== Searching for phrase: jewelry collection ===
+7:03:51 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+7:03:51 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+7:03:51 PM: Daily API limit reached. Operations will resume when limit resets.
+
+
+========================================
+New Scan Started at 12/7/2024, 7:17:35 PM
+========================================
+
+7:17:35 PM: 
+====== Starting new scan ======
+7:17:35 PM: Access token obtained successfully
+7:17:35 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:17:35 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:22:35 PM
+========================================
+
+7:22:35 PM: 
+====== Starting new scan ======
+7:22:35 PM: Access token obtained successfully
+7:22:35 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:22:35 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:27:35 PM
+========================================
+
+7:27:35 PM: 
+====== Starting new scan ======
+7:27:35 PM: Access token obtained successfully
+7:27:35 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:27:35 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:32:35 PM
+========================================
+
+7:32:35 PM: 
+====== Starting new scan ======
+7:32:36 PM: Access token obtained successfully
+7:32:36 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:32:36 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:37:36 PM
+========================================
+
+7:37:36 PM: 
+====== Starting new scan ======
+7:37:36 PM: Access token obtained successfully
+7:37:36 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:37:36 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:42:36 PM
+========================================
+
+7:42:36 PM: 
+====== Starting new scan ======
+7:42:36 PM: Access token obtained successfully
+7:42:36 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:42:36 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:47:36 PM
+========================================
+
+7:47:36 PM: 
+====== Starting new scan ======
+7:47:37 PM: Access token obtained successfully
+7:47:37 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:47:37 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:52:37 PM
+========================================
+
+7:52:37 PM: 
+====== Starting new scan ======
+7:52:37 PM: Access token obtained successfully
+7:52:37 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:52:37 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 7:57:37 PM
+========================================
+
+7:57:37 PM: 
+====== Starting new scan ======
+7:57:37 PM: Access token obtained successfully
+7:57:37 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 7:57:37 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 8:02:37 PM
+========================================
+
+8:02:37 PM: 
+====== Starting new scan ======
+8:02:37 PM: Access token obtained successfully
+8:02:37 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 8:02:37 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 8:13:21 PM
+========================================
+
+8:13:21 PM: 
+====== Starting new scan ======
+8:13:21 PM: Access token obtained successfully
+8:13:21 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 8:13:21 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 8:31:35 PM
+========================================
+
+8:31:35 PM: 
+====== Starting new scan ======
+8:31:38 PM: Access token obtained successfully
+8:31:38 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 8:31:38 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 8:37:56 PM
+========================================
+
+8:37:56 PM: 
+====== Starting new scan ======
+8:37:57 PM: Access token obtained successfully
+8:37:57 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 8:37:57 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 8:42:57 PM
+========================================
+
+8:42:57 PM: 
+====== Starting new scan ======
+8:42:57 PM: Access token obtained successfully
+8:42:57 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 8:42:57 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 9:03:12 PM
+========================================
+
+9:03:12 PM: 
+====== Starting new scan ======
+9:03:12 PM: Access token obtained successfully
+9:03:12 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 9:03:12 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 9:34:59 PM
+========================================
+
+9:34:59 PM: 
+====== Starting new scan ======
+9:35:02 PM: Access token obtained successfully
+9:35:02 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 9:35:02 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 10:07:57 PM
+========================================
+
+10:07:57 PM: 
+====== Starting new scan ======
+10:08:20 PM: Access token obtained successfully
+10:08:20 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 10:08:20 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 10:35:36 PM
+========================================
+
+10:35:36 PM: 
+====== Starting new scan ======
+10:35:36 PM: Access token obtained successfully
+10:35:36 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 10:35:36 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 10:44:41 PM
+========================================
+
+10:44:41 PM: 
+====== Starting new scan ======
+10:44:42 PM: Access token obtained successfully
+10:44:42 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 10:44:42 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 11:18:08 PM
+========================================
+
+11:18:08 PM: 
+====== Starting new scan ======
+11:18:11 PM: Access token obtained successfully
+11:18:11 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 11:18:11 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 11:45:32 PM
+========================================
+
+11:45:32 PM: 
+====== Starting new scan ======
+11:45:32 PM: Access token obtained successfully
+11:45:32 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 11:45:32 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 12:03:07 AM
+========================================
+
+12:03:07 AM: 
+====== Starting new scan ======
+12:03:07 AM: Access token obtained successfully
+12:03:07 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 12:03:07 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 12:19:23 AM
+========================================
+
+12:19:23 AM: 
+====== Starting new scan ======
+12:19:24 AM: Access token obtained successfully
+12:19:24 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 12:19:24 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 12:34:50 AM
+========================================
+
+12:34:50 AM: 
+====== Starting new scan ======
+12:34:54 AM: Access token obtained successfully
+12:34:54 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 12:34:54 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 1:08:16 AM
+========================================
+
+1:08:16 AM: 
+====== Starting new scan ======
+1:08:17 AM: Access token obtained successfully
+1:08:17 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 1:08:17 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 1:42:26 AM
+========================================
+
+1:42:26 AM: 
+====== Starting new scan ======
+
+
+========================================
+New Scan Started at 12/8/2024, 9:10:14 AM
+========================================
+
+9:10:14 AM: 
+====== Starting new scan ======
+9:10:14 AM: Access token obtained successfully
+9:10:14 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 9:10:14 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 9:13:07 AM
+========================================
+
+9:13:07 AM: 
+====== Starting new scan ======
+9:13:08 AM: Access token obtained successfully
+9:13:08 AM: API Calls made today: 1/5000
+9:13:08 AM: 
+=== Searching for phrase: jewelry lot ===
+9:13:08 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+
+
+========================================
+New Scan Started at 12/8/2024, 9:13:09 AM
+========================================
+
+9:13:09 AM: 
+====== Starting new scan ======
+9:13:10 AM: Found 150 initial listings for jewelry lot
+9:13:10 AM: API Calls made today: 2/5000
+9:13:10 AM: API Calls made today: 3/5000
+9:13:10 AM: API Calls made today: 4/5000
+9:13:10 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:10 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:10 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:13:10 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:10 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:10 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{monicassheshed}&limit=100
+9:13:10 AM: Access token obtained successfully
+9:13:10 AM: API Calls made today: 5/5000
+9:13:10 AM: 
+=== Searching for phrase: jewelry lot ===
+9:13:10 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:13:10 AM: Error fetching listings for megri-9283: 400
+9:13:10 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:10 AM: Error fetching listings for adstell1200: 400
+9:13:10 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:10 AM: Error fetching listings for monicassheshed: 400
+9:13:10 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Found 150 initial listings for jewelry lot
+9:13:11 AM: API Calls made today: 6/5000
+9:13:11 AM: API Calls made today: 7/5000
+9:13:11 AM: API Calls made today: 8/5000
+9:13:11 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:11 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:11 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:13:11 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:11 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:11 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{monicassheshed}&limit=100
+9:13:11 AM: Error fetching listings for monicassheshed: 400
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Error fetching listings for adstell1200: 400
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Error fetching listings for megri-9283: 400
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Error fetching listings for megri-9283: 400
+9:13:11 AM: Error fetching listings for adstell1200: 400
+9:13:11 AM: Error fetching listings for monicassheshed: 400
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:11 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+
+
+========================================
+New Scan Started at 12/8/2024, 9:13:11 AM
+========================================
+
+9:13:11 AM: 
+====== Starting new scan ======
+9:13:12 AM: Access token obtained successfully
+9:13:12 AM: API Calls made today: 9/5000
+9:13:12 AM: 
+=== Searching for phrase: jewelry lot ===
+9:13:12 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:13:12 AM: Error fetching listings for monicassheshed: 400
+9:13:12 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:12 AM: Error fetching listings for adstell1200: 400
+9:13:12 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+
+
+========================================
+New Scan Started at 12/8/2024, 9:13:12 AM
+========================================
+
+9:13:12 AM: 
+====== Starting new scan ======
+9:13:12 AM: Error fetching listings for megri-9283: 400
+9:13:12 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:12 AM: Access token obtained successfully
+9:13:13 AM: API Calls made today: 10/5000
+9:13:13 AM: 
+=== Searching for phrase: jewelry lot ===
+9:13:13 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:13:13 AM: Found 150 initial listings for jewelry lot
+9:13:13 AM: API Calls made today: 11/5000
+9:13:13 AM: API Calls made today: 12/5000
+9:13:13 AM: API Calls made today: 13/5000
+9:13:13 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:13 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:13 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{monicassheshed}&limit=100
+9:13:13 AM: Error fetching listings for megri-9283: 400
+9:13:13 AM: Error fetching listings for monicassheshed: 400
+9:13:13 AM: Error fetching listings for adstell1200: 400
+9:13:13 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:13 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:13 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:13 AM: Found 150 initial listings for jewelry lot
+9:13:13 AM: API Calls made today: 14/5000
+9:13:13 AM: API Calls made today: 15/5000
+9:13:13 AM: API Calls made today: 16/5000
+9:13:13 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:13 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:13 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:13 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{monicassheshed}&limit=100
+9:13:14 AM: Error fetching listings for megri-9283: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: Error fetching listings for adstell1200: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: Error fetching listings for monicassheshed: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: Error fetching listings for megri-9283: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:14 AM: ERROR: No valid listings found for seller megri-9283
+9:13:14 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:13:14 AM: Error fetching listings for adstell1200: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:14 AM: ERROR: No valid listings found for seller adstell1200
+9:13:14 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:14 AM: Error fetching listings for monicassheshed: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:13:14 AM: ERROR: No valid listings found for seller monicassheshed
+9:13:14 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:13:14 AM: Error fetching listings for megri-9283: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: Error fetching listings for monicassheshed: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:14 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:14 AM: Skipping seller thehubforstuff (feedback: 1166)
+9:13:14 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:14 AM: Error fetching listings for adstell1200: 400
+9:13:14 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: Error fetching listings for monicassheshed: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:13:15 AM: ERROR: No valid listings found for seller monicassheshed
+9:13:15 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:13:15 AM: Error fetching listings for adstell1200: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:15 AM: ERROR: No valid listings found for seller adstell1200
+9:13:15 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:15 AM: Error fetching listings for megri-9283: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:15 AM: ERROR: No valid listings found for seller megri-9283
+9:13:15 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:13:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:15 AM: Skipping seller whistlepigmarket (feedback: 1212)
+9:13:15 AM: API Calls made today: 17/5000
+9:13:15 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:15 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:15 AM: Error fetching listings for megri-9283: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: Error fetching listings for adstell1200: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: Error fetching listings for monicassheshed: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: Error fetching listings for adstell1200: 400
+9:13:15 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:15 AM: Skipping seller thehubforstuff (feedback: 1166)
+9:13:16 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:16 AM: API Calls made today: 18/5000
+9:13:16 AM: Skipping seller whistlepigmarket (feedback: 1212)
+9:13:16 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:16 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:16 AM: Error fetching listings for adstell1200: 400
+9:13:16 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:16 AM: Error fetching listings for adstell1200: 400
+9:13:16 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:16 AM: Error fetching listings for monicassheshed: 400
+9:13:16 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:16 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:13:16 AM: ERROR: No valid listings found for seller monicassheshed
+9:13:16 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:13:16 AM: Error fetching listings for megri-9283: 400
+9:13:16 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:16 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:16 AM: ERROR: No valid listings found for seller megri-9283
+9:13:16 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:13:17 AM: Error fetching listings for adstell1200: 400
+9:13:17 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:17 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:17 AM: ERROR: No valid listings found for seller adstell1200
+9:13:17 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:17 AM: Error fetching listings for megri-9283: 400
+9:13:17 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:17 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:17 AM: ERROR: No valid listings found for seller megri-9283
+9:13:17 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:13:17 AM: Error fetching listings for adstell1200: 400
+9:13:17 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:17 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:17 AM: ERROR: No valid listings found for seller adstell1200
+9:13:17 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:17 AM: Error fetching listings for monicassheshed: 400
+9:13:17 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:17 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:13:17 AM: ERROR: No valid listings found for seller monicassheshed
+9:13:17 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:13:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:17 AM: Skipping seller thehubforstuff (feedback: 1166)
+9:13:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:17 AM: Error fetching listings for adstell1200: 400
+9:13:17 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:18 AM: Skipping seller thehubforstuff (feedback: 1166)
+9:13:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:18 AM: Skipping seller whistlepigmarket (feedback: 1212)
+9:13:18 AM: API Calls made today: 19/5000
+9:13:18 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:18 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:18 AM: Error fetching listings for adstell1200: 400
+9:13:18 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:18 AM: Skipping seller whistlepigmarket (feedback: 1212)
+9:13:18 AM: API Calls made today: 20/5000
+9:13:18 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:13:18 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{adstell1200}&limit=100
+9:13:18 AM: Error fetching listings for adstell1200: 400
+9:13:18 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:19 AM: Error fetching listings for adstell1200: 400
+9:13:19 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:19 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:19 AM: ERROR: No valid listings found for seller adstell1200
+9:13:19 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:19 AM: Skipping seller loukif (feedback: 1077)
+9:13:19 AM: Skipping seller vikingad (feedback: 1913)
+9:13:19 AM: API Calls made today: 21/5000
+9:13:19 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:19 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:19 AM: Error fetching listings for adstell1200: 400
+9:13:19 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:19 AM: Error fetching listings for butu88: 400
+9:13:19 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:19 AM: Error fetching listings for adstell1200: 400
+9:13:19 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:19 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:19 AM: ERROR: No valid listings found for seller adstell1200
+9:13:19 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:20 AM: Error fetching listings for adstell1200: 400
+9:13:20 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:20 AM: Skipping seller loukif (feedback: 1077)
+9:13:20 AM: API Calls made today: 22/5000
+9:13:20 AM: API Calls made today: 23/5000
+9:13:20 AM: 
+=== Fetching listings for seller: ytqinc ===
+9:13:20 AM: 
+=== Fetching listings for seller: carriejean77777 ===
+9:13:20 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ytqinc}&limit=100
+9:13:20 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{carriejean77777}&limit=100
+9:13:20 AM: Error fetching listings for carriejean77777: 400
+9:13:20 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:20 AM: Error fetching listings for ytqinc: 400
+9:13:20 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:21 AM: Error fetching listings for butu88: 400
+9:13:21 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:21 AM: Error fetching listings for carriejean77777: 400
+9:13:21 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:21 AM: Error fetching listings for ytqinc: 400
+9:13:21 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:21 AM: Error fetching listings for adstell1200: 400
+9:13:21 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:21 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:21 AM: ERROR: No valid listings found for seller adstell1200
+9:13:21 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:22 AM: Error fetching listings for adstell1200: 400
+9:13:22 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:22 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:13:22 AM: ERROR: No valid listings found for seller adstell1200
+9:13:22 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:13:22 AM: Skipping seller loukif (feedback: 1077)
+9:13:22 AM: Skipping seller vikingad (feedback: 1913)
+9:13:22 AM: API Calls made today: 24/5000
+9:13:22 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:22 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:22 AM: Error fetching listings for butu88: 400
+9:13:22 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:22 AM: Skipping seller loukif (feedback: 1077)
+9:13:22 AM: Skipping seller vikingad (feedback: 1913)
+9:13:22 AM: API Calls made today: 25/5000
+9:13:22 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:22 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:23 AM: Error fetching listings for butu88: 400
+9:13:23 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:23 AM: Error fetching listings for butu88: 400
+9:13:23 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:23 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:23 AM: ERROR: No valid listings found for seller butu88
+9:13:23 AM: Excluded listing from butu88: 1.7oz Vintage Now Bulk Jewelry bead Lot ALL Brand New Untested 200+Mix and Match
+9:13:23 AM: Error fetching listings for butu88: 400
+9:13:23 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:23 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:23 AM: API Calls made today: 26/5000
+9:13:23 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:23 AM: 
+=== Fetching listings for seller: wisdomswonders ===
+9:13:23 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{wisdomswonders}&limit=100
+9:13:24 AM: Error fetching listings for ytqinc: 400
+9:13:24 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:24 AM: 
+==== ANALYZING SELLER: ytqinc ====
+9:13:24 AM: ERROR: No valid listings found for seller ytqinc
+9:13:24 AM: Error fetching listings for carriejean77777: 400
+9:13:24 AM: Excluded listing from ytqinc: 1 + Lb Jewelry Vintage To Modern Lot Wearable, Craft, Junk Resell Mix
+9:13:24 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:24 AM: 
+==== ANALYZING SELLER: carriejean77777 ====
+9:13:24 AM: ERROR: No valid listings found for seller carriejean77777
+9:13:24 AM: Excluded listing from carriejean77777: Mystery Vintage- Now 1/2 Pound All Wearable Jewelry Lot Some Signed, A Few 925
+9:13:24 AM: Error fetching listings for wisdomswonders: 400
+9:13:24 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:24 AM: Error fetching listings for butu88: 400
+9:13:24 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:24 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:24 AM: Skipping seller ponytail777 (feedback: 24014)
+9:13:24 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:25 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:25 AM: Skipping seller vikingad (feedback: 1913)
+9:13:25 AM: API Calls made today: 27/5000
+9:13:25 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:25 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:25 AM: Error fetching listings for butu88: 400
+9:13:25 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:25 AM: Error fetching listings for wisdomswonders: 400
+9:13:25 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:26 AM: Error fetching listings for butu88: 400
+9:13:26 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:26 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:26 AM: ERROR: No valid listings found for seller butu88
+9:13:26 AM: Excluded listing from butu88: 1.7oz Vintage Now Bulk Jewelry bead Lot ALL Brand New Untested 200+Mix and Match
+9:13:26 AM: Error fetching listings for butu88: 400
+9:13:26 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:26 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:26 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:26 AM: API Calls made today: 28/5000
+9:13:26 AM: 
+=== Fetching listings for seller: wisdomswonders ===
+9:13:26 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{wisdomswonders}&limit=100
+9:13:26 AM: Error fetching listings for butu88: 400
+9:13:26 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:26 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:26 AM: ERROR: No valid listings found for seller butu88
+9:13:26 AM: Excluded listing from butu88: 1.7oz Vintage Now Bulk Jewelry bead Lot ALL Brand New Untested 200+Mix and Match
+9:13:26 AM: Error fetching listings for wisdomswonders: 400
+9:13:26 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:27 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:27 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:27 AM: API Calls made today: 29/5000
+9:13:27 AM: 
+=== Fetching listings for seller: wisdomswonders ===
+9:13:27 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{wisdomswonders}&limit=100
+9:13:27 AM: Error fetching listings for wisdomswonders: 400
+9:13:27 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:27 AM: Error fetching listings for wisdomswonders: 400
+9:13:27 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:27 AM: 
+==== ANALYZING SELLER: wisdomswonders ====
+9:13:27 AM: ERROR: No valid listings found for seller wisdomswonders
+9:13:27 AM: Excluded listing from wisdomswonders: Jewelry Large Flat Rate Box Bulk Vintage Modern Mixed Wearable Resellable 
+9:13:28 AM: Error fetching listings for wisdomswonders: 400
+9:13:28 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:28 AM: API Calls made today: 31/5000
+9:13:28 AM: API Calls made today: 30/5000
+9:13:28 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:28 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:28 AM: 
+=== Fetching listings for seller: ladyaaz ===
+9:13:28 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:28 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ladyaaz}&limit=100
+9:13:28 AM: Error fetching listings for butu88: 400
+9:13:28 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:28 AM: Error fetching listings for ladyaaz: 400
+9:13:28 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:28 AM: Error fetching listings for butu88: 400
+9:13:28 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:28 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:28 AM: ERROR: No valid listings found for seller butu88
+9:13:28 AM: Excluded listing from butu88: 1.7oz Vintage Now Bulk Jewelry bead Lot ALL Brand New Untested 200+Mix and Match
+9:13:28 AM: Error fetching listings for wisdomswonders: 400
+9:13:28 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:29 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:29 AM: API Calls made today: 32/5000
+9:13:29 AM: API Calls made today: 33/5000
+9:13:29 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:29 AM: 
+=== Fetching listings for seller: ladyaaz ===
+9:13:29 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:29 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ladyaaz}&limit=100
+9:13:29 AM: Error fetching listings for ladyaaz: 400
+9:13:29 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:29 AM: Error fetching listings for butu88: 400
+9:13:29 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:29 AM: Error fetching listings for ladyaaz: 400
+9:13:29 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:29 AM: Error fetching listings for butu88: 400
+9:13:29 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:30 AM: Error fetching listings for wisdomswonders: 400
+9:13:30 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:30 AM: 
+==== ANALYZING SELLER: wisdomswonders ====
+9:13:30 AM: ERROR: No valid listings found for seller wisdomswonders
+9:13:30 AM: Excluded listing from wisdomswonders: Jewelry Large Flat Rate Box Bulk Vintage Modern Mixed Wearable Resellable 
+9:13:30 AM: Error fetching listings for ladyaaz: 400
+9:13:30 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:30 AM: Error fetching listings for butu88: 400
+9:13:30 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: API Calls made today: 34/5000
+9:13:31 AM: API Calls made today: 35/5000
+9:13:31 AM: API Calls made today: 36/5000
+9:13:31 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:31 AM: 
+=== Fetching listings for seller: alleburkholde-0 ===
+9:13:31 AM: 
+=== Fetching listings for seller: ladyaaz ===
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{alleburkholde-0}&limit=100
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ladyaaz}&limit=100
+9:13:31 AM: Error fetching listings for wisdomswonders: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: 
+==== ANALYZING SELLER: wisdomswonders ====
+9:13:31 AM: ERROR: No valid listings found for seller wisdomswonders
+9:13:31 AM: Excluded listing from wisdomswonders: Jewelry Large Flat Rate Box Bulk Vintage Modern Mixed Wearable Resellable 
+9:13:31 AM: Error fetching listings for megri-9283: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: Error fetching listings for alleburkholde-0: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: Error fetching listings for ladyaaz: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: API Calls made today: 37/5000
+9:13:31 AM: API Calls made today: 38/5000
+9:13:31 AM: API Calls made today: 39/5000
+9:13:31 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:31 AM: 
+=== Fetching listings for seller: ladyaaz ===
+9:13:31 AM: 
+=== Fetching listings for seller: alleburkholde-0 ===
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ladyaaz}&limit=100
+9:13:31 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{alleburkholde-0}&limit=100
+9:13:31 AM: Error fetching listings for alleburkholde-0: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: Error fetching listings for ladyaaz: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:31 AM: Error fetching listings for megri-9283: 400
+9:13:31 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: Error fetching listings for ladyaaz: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: 
+==== ANALYZING SELLER: ladyaaz ====
+9:13:32 AM: ERROR: No valid listings found for seller ladyaaz
+9:13:32 AM: Excluded listing from ladyaaz: Lot of 80 mix assorted Vintage Style charms Jewelry Making Bracelet Lucky Scoop
+9:13:32 AM: Error fetching listings for butu88: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:32 AM: ERROR: No valid listings found for seller butu88
+9:13:32 AM: Excluded listing from butu88: Vintage Now Bulk Jewelry bead Lot 130Pc ALL Brand New Untested 200+Mix and Match
+9:13:32 AM: Error fetching listings for megri-9283: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: Error fetching listings for alleburkholde-0: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: Error fetching listings for ladyaaz: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: API Calls made today: 40/5000
+9:13:32 AM: API Calls made today: 41/5000
+9:13:32 AM: API Calls made today: 42/5000
+9:13:32 AM: 
+=== Fetching listings for seller: ytqinc ===
+9:13:32 AM: 
+=== Fetching listings for seller: carriejean77777 ===
+9:13:32 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:32 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ytqinc}&limit=100
+9:13:32 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{carriejean77777}&limit=100
+9:13:32 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:32 AM: Error fetching listings for ytqinc: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: Error fetching listings for carriejean77777: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:32 AM: Error fetching listings for butu88: 400
+9:13:32 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: Error fetching listings for megri-9283: 400
+9:13:33 AM: Error fetching listings for butu88: 400
+9:13:33 AM: Error fetching listings for alleburkholde-0: 400
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:33 AM: ERROR: No valid listings found for seller butu88
+9:13:33 AM: Excluded listing from butu88: Vintage Now Bulk Jewelry bead Lot 130Pc ALL Brand New Untested 200+Mix and Match
+9:13:33 AM: Error fetching listings for ladyaaz: 400
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: 
+==== ANALYZING SELLER: ladyaaz ====
+9:13:33 AM: ERROR: No valid listings found for seller ladyaaz
+9:13:33 AM: Excluded listing from ladyaaz: Lot of 80 mix assorted Vintage Style charms Jewelry Making Bracelet Lucky Scoop
+9:13:33 AM: Error fetching listings for ladyaaz: 400
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:33 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:33 AM: API Calls made today: 43/5000
+9:13:33 AM: API Calls made today: 44/5000
+9:13:33 AM: 
+=== Fetching listings for seller: greatfunfinds_bylia ===
+9:13:33 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:33 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{greatfunfinds_bylia}&limit=100
+9:13:33 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:33 AM: Error fetching listings for butu88: 400
+9:13:33 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: Error fetching listings for ytqinc: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: Error fetching listings for carriejean77777: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: Error fetching listings for butu88: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: Error fetching listings for megri-9283: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:34 AM: ERROR: No valid listings found for seller megri-9283
+9:13:34 AM: Excluded listing from megri-9283: NEW Jewelry Lot
+9:13:34 AM: Error fetching listings for alleburkholde-0: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: 
+==== ANALYZING SELLER: alleburkholde-0 ====
+9:13:34 AM: ERROR: No valid listings found for seller alleburkholde-0
+9:13:34 AM: Excluded listing from alleburkholde-0: Vintage-Now Lot Of Christmas Jewelry Necklaces,Bracelets, and Earrings Mix An 
+9:13:34 AM: Error fetching listings for ladyaaz: 400
+9:13:34 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:34 AM: 
+==== ANALYZING SELLER: ladyaaz ====
+9:13:34 AM: ERROR: No valid listings found for seller ladyaaz
+9:13:34 AM: Excluded listing from ladyaaz: Lot of 80 mix assorted Vintage Style charms Jewelry Making Bracelet Lucky Scoop
+9:13:35 AM: API Calls made today: 45/5000
+9:13:35 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:35 AM: API Calls made today: 46/5000
+9:13:35 AM: Error fetching listings for butu88: 400
+9:13:35 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:35 AM: 
+=== Fetching listings for seller: ytqinc ===
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:35 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ytqinc}&limit=100
+9:13:35 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: Error fetching listings for alleburkholde-0: 400
+9:13:35 AM: Error fetching listings for megri-9283: 400
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: 
+==== ANALYZING SELLER: alleburkholde-0 ====
+9:13:35 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:13:35 AM: ERROR: No valid listings found for seller alleburkholde-0
+9:13:35 AM: ERROR: No valid listings found for seller megri-9283
+9:13:35 AM: Excluded listing from alleburkholde-0: Vintage-Now Lot Of Christmas Jewelry Necklaces,Bracelets, and Earrings Mix An 
+9:13:35 AM: Excluded listing from megri-9283: NEW Jewelry Lot
+9:13:35 AM: Error fetching listings for butu88: 400
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: Error fetching listings for ytqinc: 400
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: Error fetching listings for ladyaaz: 400
+9:13:35 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:35 AM: 
+==== ANALYZING SELLER: ladyaaz ====
+9:13:35 AM: ERROR: No valid listings found for seller ladyaaz
+9:13:35 AM: Excluded listing from ladyaaz: Lot of 80 mix assorted Vintage Style charms Jewelry Making Bracelet Lucky Scoop
+9:13:36 AM: API Calls made today: 47/5000
+9:13:36 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:13:36 AM: API Calls made today: 48/5000
+9:13:36 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:36 AM: 
+=== Fetching listings for seller: ytqinc ===
+9:13:36 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:36 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{ytqinc}&limit=100
+9:13:36 AM: Error fetching listings for ytqinc: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: Error fetching listings for carriejean77777: 400
+9:13:36 AM: Error fetching listings for butu88: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: 
+==== ANALYZING SELLER: carriejean77777 ====
+9:13:36 AM: ERROR: No valid listings found for seller carriejean77777
+9:13:36 AM: Excluded listing from carriejean77777: Mystery Vintage- Now 1/2 Pound All Wearable Jewelry Lot Some Signed, A Few 925
+9:13:36 AM: Error fetching listings for ytqinc: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: 
+==== ANALYZING SELLER: ytqinc ====
+9:13:36 AM: ERROR: No valid listings found for seller ytqinc
+9:13:36 AM: Excluded listing from ytqinc: 1 + Lb Jewelry Vintage To Modern Lot Wearable, Craft, Junk Resell Mix
+9:13:36 AM: Error fetching listings for butu88: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:36 AM: ERROR: No valid listings found for seller butu88
+9:13:36 AM: Excluded listing from butu88: Vintage-now Costume Jewelry makeing Lots button Read Description 50pcs
+9:13:36 AM: Error fetching listings for butu88: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: Error fetching listings for ytqinc: 400
+9:13:36 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:36 AM: Skipping seller vintageinseattle (feedback: 33720)
+9:13:36 AM: API Calls made today: 49/5000
+9:13:36 AM: API Calls made today: 50/5000
+9:13:36 AM: 
+=== Fetching listings for seller: greatfunfinds_bylia ===
+9:13:36 AM: 
+=== Fetching listings for seller: alleburkholde-0 ===
+9:13:36 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{greatfunfinds_bylia}&limit=100
+9:13:36 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{alleburkholde-0}&limit=100
+9:13:37 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:37 AM: Error fetching listings for alleburkholde-0: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:37 AM: Error fetching listings for butu88: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:37 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:37 AM: ERROR: No valid listings found for seller butu88
+9:13:37 AM: Excluded listing from butu88: Vintage-now Costume Jewelry makeing Lots button Read Description 50pcs
+9:13:37 AM: Error fetching listings for ytqinc: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:37 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:37 AM: 
+==== ANALYZING SELLER: greatfunfinds_bylia ====
+9:13:37 AM: ERROR: No valid listings found for seller greatfunfinds_bylia
+9:13:37 AM: Excluded listing from greatfunfinds_bylia: Vintage/Designer Unsearched Estate Jewelry Lot 2-3Lbs + Crown!
+9:13:37 AM: Error fetching listings for butu88: 400
+9:13:37 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:38 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:38 AM: API Calls made today: 51/5000
+9:13:38 AM: Skipping seller sandybb (feedback: 13107)
+9:13:38 AM: 
+=== Fetching listings for seller: wisdomswonders ===
+9:13:38 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{wisdomswonders}&limit=100
+9:13:38 AM: Error fetching listings for wisdomswonders: 400
+9:13:38 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:38 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:38 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:38 AM: Error fetching listings for alleburkholde-0: 400
+9:13:38 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: Error fetching listings for ytqinc: 400
+9:13:39 AM: Error fetching listings for butu88: 400
+9:13:39 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: 
+==== ANALYZING SELLER: ytqinc ====
+9:13:39 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:39 AM: ERROR: No valid listings found for seller ytqinc
+9:13:39 AM: ERROR: No valid listings found for seller butu88
+9:13:39 AM: Excluded listing from ytqinc: 1 + Lb Jewelry Vintage To Modern Lot Wearable, Craft, Junk Resell Mix
+9:13:39 AM: Excluded listing from butu88: Vintage Now Bulk Jewelry bead Lot 130Pc ALL Brand New Untested 200+Mix and Match
+9:13:39 AM: Error fetching listings for wisdomswonders: 400
+9:13:39 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: Error fetching listings for ytqinc: 400
+9:13:39 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: 
+==== ANALYZING SELLER: ytqinc ====
+9:13:39 AM: ERROR: No valid listings found for seller ytqinc
+9:13:39 AM: Excluded listing from ytqinc: 1 + Lb Jewelry Vintage To Modern Lot Wearable, Craft, Junk Resell Mix
+9:13:39 AM: Error fetching listings for butu88: 400
+9:13:39 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:39 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:39 AM: ERROR: No valid listings found for seller butu88
+9:13:39 AM: Excluded listing from butu88: Vintage Now Bulk Jewelry bead Lot 130Pc ALL Brand New Untested 200+Mix and Match
+9:13:39 AM: API Calls made today: 52/5000
+9:13:39 AM: API Calls made today: 53/5000
+9:13:39 AM: Skipping seller vintageinseattle (feedback: 33720)
+9:13:39 AM: 
+=== Fetching listings for seller: carriejean77777 ===
+9:13:39 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:39 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{carriejean77777}&limit=100
+9:13:39 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:40 AM: Error fetching listings for butu88: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: Error fetching listings for carriejean77777: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: API Calls made today: 54/5000
+9:13:40 AM: Skipping seller vintageinseattle (feedback: 33720)
+9:13:40 AM: API Calls made today: 55/5000
+9:13:40 AM: 
+=== Fetching listings for seller: butu88 ===
+9:13:40 AM: 
+=== Fetching listings for seller: carriejean77777 ===
+9:13:40 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{butu88}&limit=100
+9:13:40 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{carriejean77777}&limit=100
+9:13:40 AM: Error fetching listings for carriejean77777: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: Error fetching listings for butu88: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: 
+==== ANALYZING SELLER: greatfunfinds_bylia ====
+9:13:40 AM: ERROR: No valid listings found for seller greatfunfinds_bylia
+9:13:40 AM: Excluded listing from greatfunfinds_bylia: Vintage/Designer Unsearched Estate Jewelry Lot 2-3Lbs + Crown!
+9:13:40 AM: Error fetching listings for alleburkholde-0: 400
+9:13:40 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:40 AM: 
+==== ANALYZING SELLER: alleburkholde-0 ====
+9:13:40 AM: ERROR: No valid listings found for seller alleburkholde-0
+9:13:40 AM: Excluded listing from alleburkholde-0: Vintage-Now Lot Of Christmas Jewelry Necklaces,Bracelets, and Earrings Mix An 
+9:13:41 AM: Error fetching listings for butu88: 400
+9:13:41 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:41 AM: Skipping seller vikingad (feedback: 1913)
+9:13:41 AM: Skipping seller sandybb (feedback: 13107)
+9:13:41 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:41 AM: Error fetching listings for carriejean77777: 400
+9:13:41 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:41 AM: Error fetching listings for carriejean77777: 400
+9:13:41 AM: Error fetching listings for wisdomswonders: 400
+9:13:41 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:41 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:41 AM: 
+==== ANALYZING SELLER: wisdomswonders ====
+9:13:41 AM: ERROR: No valid listings found for seller wisdomswonders
+9:13:41 AM: Excluded listing from wisdomswonders: Jewelry Large Flat Rate Box Bulk Vintage Modern Mixed Wearable Resellable 
+9:13:41 AM: Error fetching listings for butu88: 400
+9:13:41 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:41 AM: API Calls made today: 56/5000
+9:13:41 AM: API Calls made today: 57/5000
+9:13:41 AM: Skipping seller ponytail777 (feedback: 24014)
+9:13:41 AM: 
+=== Fetching listings for seller: hawo2952 ===
+9:13:41 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:13:41 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{hawo2952}&limit=100
+9:13:41 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{megri-9283}&limit=100
+9:13:42 AM: Error fetching listings for megri-9283: 400
+9:13:42 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:42 AM: Error fetching listings for hawo2952: 400
+9:13:42 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:42 AM: API Calls made today: 58/5000
+9:13:42 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:42 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:13:42 AM: 
+=== Fetching listings for seller: sunshineharbor ===
+9:13:42 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{sunshineharbor}&limit=100
+9:13:42 AM: Error fetching listings for sunshineharbor: 400
+9:13:42 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: Error fetching listings for hawo2952: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: Error fetching listings for megri-9283: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: Error fetching listings for butu88: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:43 AM: ERROR: No valid listings found for seller butu88
+9:13:43 AM: Excluded listing from butu88: Vintage-now Costume Jewelry makeing Lots button Read Description 50pcs
+9:13:43 AM: Error fetching listings for sunshineharbor: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: Error fetching listings for carriejean77777: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: 
+==== ANALYZING SELLER: carriejean77777 ====
+9:13:43 AM: ERROR: No valid listings found for seller carriejean77777
+9:13:43 AM: Excluded listing from carriejean77777: Mystery Vintage- Now 1/2 Pound All Wearable Jewelry Lot Some Signed, A Few 925
+9:13:43 AM: Error fetching listings for carriejean77777: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: 
+==== ANALYZING SELLER: carriejean77777 ====
+9:13:43 AM: ERROR: No valid listings found for seller carriejean77777
+9:13:43 AM: Excluded listing from carriejean77777: Mystery Vintage- Now 1/2 Pound All Wearable Jewelry Lot Some Signed, A Few 925
+9:13:43 AM: Error fetching listings for butu88: 400
+9:13:43 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:43 AM: 
+==== ANALYZING SELLER: butu88 ====
+9:13:43 AM: ERROR: No valid listings found for seller butu88
+9:13:43 AM: Excluded listing from butu88: Vintage-now Costume Jewelry makeing Lots button Read Description 50pcs
+9:13:44 AM: API Calls made today: 59/5000
+9:13:44 AM: Skipping seller vikingad (feedback: 1913)
+9:13:44 AM: Skipping seller sandybb (feedback: 13107)
+9:13:44 AM: 
+=== Fetching listings for seller: greatfunfinds_bylia ===
+9:13:44 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{greatfunfinds_bylia}&limit=100
+9:13:44 AM: API Calls made today: 60/5000
+9:13:44 AM: Skipping seller vikingad (feedback: 1913)
+9:13:44 AM: Skipping seller sandybb (feedback: 13107)
+9:13:44 AM: 
+=== Fetching listings for seller: greatfunfinds_bylia ===
+9:13:44 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?filter=seller:{greatfunfinds_bylia}&limit=100
+9:13:44 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:44 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+9:13:44 AM: Error fetching listings for greatfunfinds_bylia: 400
+9:13:44 AM: Error details: {"errors":[{"errorId":12001,"domain":"API_BROWSE","category":"REQUEST","message":"The call must have a valid 'q', 'category_ids', 'charity_ids', 'epid' or 'gtin' query parameter."}]}
+
+
+========================================
+New Scan Started at 12/8/2024, 9:18:19 AM
+========================================
+
+9:18:19 AM: 
+====== Starting new scan ======
+9:18:20 AM: Access token obtained successfully
+9:18:20 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 9:18:20 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 9:18:29 AM
+========================================
+
+9:18:29 AM: 
+====== Starting new scan ======
+9:18:29 AM: Access token obtained successfully
+9:18:29 AM: API Calls made today: 1/5000
+9:18:29 AM: 
+=== Searching for phrase: jewelry lot ===
+9:18:29 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:18:30 AM: Found 150 initial listings for jewelry lot
+9:18:30 AM: API Calls made today: 2/5000
+9:18:30 AM: API Calls made today: 3/5000
+9:18:30 AM: API Calls made today: 4/5000
+9:18:30 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:18:30 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:18:30 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:18:30 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{megri-9283}&limit=100
+9:18:30 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{adstell1200}&limit=100
+9:18:30 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{monicassheshed}&limit=100
+9:18:31 AM: Error fetching listings for megri-9283: 400
+9:18:31 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:31 AM: Error fetching listings for monicassheshed: 400
+9:18:31 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:31 AM: Error fetching listings for adstell1200: 400
+9:18:31 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:32 AM: Error fetching listings for megri-9283: 400
+9:18:32 AM: Error fetching listings for monicassheshed: 400
+9:18:32 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:32 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:32 AM: Error fetching listings for adstell1200: 400
+9:18:32 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:34 AM: Error fetching listings for monicassheshed: 400
+9:18:34 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:34 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:18:34 AM: ERROR: No valid listings found for seller monicassheshed
+9:18:34 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:18:34 AM: Error fetching listings for megri-9283: 400
+9:18:34 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:34 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:18:34 AM: ERROR: No valid listings found for seller megri-9283
+9:18:34 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:18:34 AM: Error fetching listings for adstell1200: 400
+9:18:34 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:18:34 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:18:34 AM: ERROR: No valid listings found for seller adstell1200
+9:18:34 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+9:18:35 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:18:35 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:18:35 AM: Skipping seller thehubforstuff (feedback: 1166)
+
+
+========================================
+New Scan Started at 12/8/2024, 9:21:02 AM
+========================================
+
+9:21:02 AM: 
+====== Starting new scan ======
+9:21:02 AM: Access token obtained successfully
+9:21:02 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 9:21:02 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 9:21:09 AM
+========================================
+
+9:21:09 AM: 
+====== Starting new scan ======
+9:21:09 AM: Access token obtained successfully
+9:21:09 AM: API Calls made today: 1/5000
+9:21:09 AM: 
+=== Searching for phrase: jewelry lot ===
+9:21:09 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:21:10 AM: Found 150 initial listings for jewelry lot
+9:21:10 AM: API Calls made today: 2/5000
+9:21:10 AM: API Calls made today: 3/5000
+9:21:10 AM: API Calls made today: 4/5000
+9:21:10 AM: Error processing megri-9283: offset is not defined
+9:21:10 AM: Error processing adstell1200: offset is not defined
+9:21:10 AM: Error processing monicassheshed: offset is not defined
+9:21:11 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:11 AM: Skipping seller thehubforstuff (feedback: 1166)
+9:21:11 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:11 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:11 AM: Skipping seller whistlepigmarket (feedback: 1212)
+9:21:11 AM: API Calls made today: 5/5000
+9:21:11 AM: Error processing adstell1200: offset is not defined
+9:21:12 AM: Skipping seller loukif (feedback: 1077)
+9:21:12 AM: Skipping seller vikingad (feedback: 1913)
+9:21:12 AM: API Calls made today: 6/5000
+9:21:12 AM: Error processing butu88: offset is not defined
+9:21:12 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:12 AM: API Calls made today: 7/5000
+9:21:12 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:21:12 AM: Error processing wisdomswonders: offset is not defined
+9:21:13 AM: Skipping seller *vintage*treasure*hunter (feedback: 1612)
+9:21:13 AM: API Calls made today: 9/5000
+9:21:13 AM: API Calls made today: 8/5000
+9:21:13 AM: Error processing ladyaaz: offset is not defined
+9:21:13 AM: Error processing butu88: offset is not defined
+9:21:13 AM: API Calls made today: 10/5000
+9:21:13 AM: API Calls made today: 11/5000
+9:21:13 AM: API Calls made today: 12/5000
+9:21:13 AM: Error processing carriejean77777: offset is not defined
+9:21:13 AM: Error processing ytqinc: offset is not defined
+9:21:13 AM: Error processing butu88: offset is not defined
+9:21:14 AM: Skipping seller vintageinseattle (feedback: 33720)
+9:21:14 AM: API Calls made today: 13/5000
+9:21:14 AM: API Calls made today: 14/5000
+9:21:14 AM: Error processing alleburkholde-0: offset is not defined
+9:21:14 AM: Error processing greatfunfinds_bylia: offset is not defined
+9:21:14 AM: Skipping seller vikingad (feedback: 1913)
+9:21:14 AM: Skipping seller sandybb (feedback: 13107)
+9:21:14 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:15 AM: API Calls made today: 15/5000
+9:21:15 AM: API Calls made today: 16/5000
+9:21:15 AM: Skipping seller ponytail777 (feedback: 24014)
+9:21:15 AM: Error processing hawo2952: offset is not defined
+9:21:15 AM: Error processing megri-9283: offset is not defined
+9:21:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:15 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:16 AM: API Calls made today: 17/5000
+9:21:16 AM: Skipping seller 7throwe (feedback: 1731)
+9:21:16 AM: Skipping seller topseg2011 (feedback: 6495)
+9:21:16 AM: Error processing sunshineharbor: offset is not defined
+9:21:16 AM: Skipping seller dan05111948 (feedback: 3580)
+9:21:16 AM: API Calls made today: 18/5000
+9:21:16 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:16 AM: Error processing sarah_sells_smalls: offset is not defined
+9:21:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:17 AM: Skipping seller lmartinez92 (feedback: 3138)
+9:21:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:17 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:18 AM: Skipping seller ponytail777 (feedback: 24014)
+9:21:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:18 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:19 AM: Skipping seller bringinghappyhome (feedback: 10134)
+9:21:19 AM: Skipping seller microdays (feedback: 1225)
+9:21:19 AM: API Calls made today: 19/5000
+9:21:19 AM: Error processing butu88: offset is not defined
+
+
+========================================
+New Scan Started at 12/8/2024, 9:28:11 AM
+========================================
+
+9:28:11 AM: 
+====== Starting new scan ======
+9:28:12 AM: Access token obtained successfully
+9:28:12 AM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 9:28:12 AM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 9:28:16 AM
+========================================
+
+9:28:16 AM: 
+====== Starting new scan ======
+9:28:16 AM: Access token obtained successfully
+9:28:16 AM: API Calls made today: 1/5000
+9:28:16 AM: 
+=== Searching for phrase: jewelry lot ===
+9:28:16 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+
+
+========================================
+New Scan Started at 12/8/2024, 9:28:17 AM
+========================================
+
+9:28:17 AM: 
+====== Starting new scan ======
+9:28:17 AM: Found 150 initial listings for jewelry lot
+9:28:17 AM: API Calls made today: 2/5000
+9:28:17 AM: API Calls made today: 3/5000
+9:28:17 AM: API Calls made today: 4/5000
+9:28:17 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:28:17 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:28:17 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:28:17 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{megri-9283}&limit=100&offset=0
+9:28:17 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{adstell1200}&limit=100&offset=0
+9:28:17 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{monicassheshed}&limit=100&offset=0
+9:28:17 AM: Access token obtained successfully
+9:28:17 AM: API Calls made today: 5/5000
+9:28:17 AM: 
+=== Searching for phrase: jewelry lot ===
+9:28:17 AM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+9:28:17 AM: Error fetching listings for megri-9283: 400
+9:28:17 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:17 AM: Error fetching listings for monicassheshed: 400
+9:28:17 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:17 AM: Error fetching listings for adstell1200: 400
+9:28:17 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:18 AM: Found 150 initial listings for jewelry lot
+9:28:18 AM: API Calls made today: 6/5000
+9:28:18 AM: API Calls made today: 7/5000
+9:28:18 AM: API Calls made today: 8/5000
+9:28:18 AM: 
+=== Fetching listings for seller: megri-9283 ===
+9:28:18 AM: 
+=== Fetching listings for seller: adstell1200 ===
+9:28:18 AM: 
+=== Fetching listings for seller: monicassheshed ===
+9:28:18 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{megri-9283}&limit=100&offset=0
+9:28:18 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{adstell1200}&limit=100&offset=0
+9:28:18 AM: Using URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=*&filter=seller:{monicassheshed}&limit=100&offset=0
+9:28:18 AM: Error fetching listings for monicassheshed: 400
+9:28:18 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:18 AM: Error fetching listings for adstell1200: 400
+9:28:18 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:18 AM: Error fetching listings for megri-9283: 400
+9:28:18 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:19 AM: Error fetching listings for megri-9283: 400
+9:28:19 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:19 AM: Error fetching listings for monicassheshed: 400
+9:28:19 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:19 AM: Error fetching listings for adstell1200: 400
+9:28:19 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:19 AM: Error fetching listings for monicassheshed: 400
+9:28:19 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:19 AM: Error fetching listings for megri-9283: 400
+9:28:19 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:20 AM: Error fetching listings for adstell1200: 400
+9:28:20 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:21 AM: Error fetching listings for megri-9283: 400
+9:28:21 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:21 AM: 
+==== ANALYZING SELLER: megri-9283 ====
+9:28:21 AM: ERROR: No valid listings found for seller megri-9283
+9:28:21 AM: Excluded listing from megri-9283: 1/2 Pound Vintage To Modern FASHION JEWELRY Lot All Wearable!! READ DESCRIPTION
+9:28:21 AM: Error fetching listings for monicassheshed: 400
+9:28:21 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:21 AM: 
+==== ANALYZING SELLER: monicassheshed ====
+9:28:21 AM: ERROR: No valid listings found for seller monicassheshed
+9:28:21 AM: Excluded listing from monicassheshed: 6+ Lbs. POUNDS Unsearched Huge Lot Jewelry Vtg-Now Junk Art Craft Treasure Hunt
+9:28:21 AM: Error fetching listings for adstell1200: 400
+9:28:21 AM: Error details: {"errors":[{"errorId":12023,"domain":"API_BROWSE","category":"REQUEST","message":"This keyword search results in a response that is too large to return. Either change the keyword or add additional query parameters and/or filters."}]}
+9:28:21 AM: 
+==== ANALYZING SELLER: adstell1200 ====
+9:28:21 AM: ERROR: No valid listings found for seller adstell1200
+9:28:21 AM: Excluded listing from adstell1200: Vintage Estate Now Jewelry Lot 5 pieces NO junk SILVER AND GOLD TONE
+
+
+========================================
+New Scan Started at 12/8/2024, 6:15:48 PM
+========================================
+
+6:15:48 PM: 
+====== Starting new scan ======
+6:15:48 PM: Access token obtained successfully
+6:15:48 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 6:15:48 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 6:16:52 PM
+========================================
+
+6:16:52 PM: 
+====== Starting new scan ======
+6:16:53 PM: Access token obtained successfully
+6:16:53 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 6:16:53 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 6:45:00 PM
+========================================
+
+6:45:01 PM: 
+====== Starting new scan ======
+6:45:01 PM: Access token obtained successfully
+6:45:01 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 6:45:01 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/8/2024, 6:58:26 PM
+========================================
+
+6:58:26 PM: 
+====== Starting new scan ======
+6:58:27 PM: Access token obtained successfully
+6:58:27 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/8/2024, 6:58:27 PM
+Total listings found: 0
+========================================
+

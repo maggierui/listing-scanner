@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>eBay Listings Scanner</title>
+  <style>
+    .category-select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    #scanForm {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .loading-categories {
+      color: #666;
+      font-style: italic;
+    }
+
+    .category-group {
+      position: relative;
+    }
+
+    #categorySearch {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #categorySelect {
+      width: 100%;
+      padding: 8px;
+      height: 200px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>eBay Listings Scanner</h1>
+
+    <form id="scanForm">
+      <div class="form-group">
+        <label for="searchPhrases">Search Phrases (comma-separated):</label>
+        <input type="text" id="searchPhrases" name="searchPhrases" required>
+      </div>
+
+      <div class="form-group category-group">
+        <label for="categorySearch">Search Categories:</label>
+        <input type="text" id="categorySearch" placeholder="Type to search categories...">
+        
+        <label for="categorySelect">Select Category:</label>
+        <select id="categorySelect" name="categorySelect" multiple size="10" required>
+          <option value="" disabled>Loading categories...</option>
+        </select>
+        <div class="category-info">
+          Selected Category ID: <span id="selectedCategoryId">None</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="feedbackThreshold">Feedback Threshold:</label>
+        <input type="number" id="feedbackThreshold" name="feedbackThreshold" required>
+      </div>
+
+      <button type="submit">Start Scan</button>
+    </form>
+
+    <div id="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Scanning listings... This may take a few minutes.</p>
+      <p>Recent activity:</p>
+      <div id="logArea"></div>
+    </div>
+
+    <div id="error" style="display: none;" class="error"></div>
+
+    <div id="results" style="display: none;">
+      <p class="auto-refresh">Last updated: <span id="lastUpdated"></span></p>
+      <p>Total Listings Found: <span id="totalListings"></span></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Currency</th>
+            <th>Seller</th>
+            <th>Feedback Score</th>
+            <th>Category</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable"></tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      Full scanning logs are being written to a file for debugging purposes.
+      <button onclick="downloadLogs()" class="download-button">Download Logs</button>
+    </div>
+  </div>
+
+  <script src="/client.js"></script>
+</body>
+</html>

@@ -1,116 +1,103 @@
 import fetch from 'node-fetch';
-import { XMLParser } from 'fast-xml-parser';
-import fs from 'fs';
-import dotenv from 'dotenv';
-import fetchAccessToken from './auth-off.js'; // Import the function
+import { fileURLToPath } from 'url';
+import fetchAccessToken from './auth.js';
+import fs from 'fs/promises';
 
-
-dotenv.config();
-
-const appId = process.env.CLIENT_ID; // Your eBay App ID
-const devId = process.env.dev_id; // Your eBay Dev ID
-const certId = process.env.CLIENT_SECRET; // Your eBay Cert ID
-const token = await fetchAccessToken(); // Fetch the access token
-const parser = new XMLParser();
-
-
-const ENDPOINT = 'https://api.ebay.com/ws/api.dll';
-
-function escapeXml(value) {
-    return value
-        .replace(/&/g, '&amp;') // Escape &
-        .replace(/</g, '&lt;') // Escape <
-        .replace(/>/g, '&gt;') // Escape >
-        .replace(/"/g, '&quot;') // Escape "
-        .replace(/'/g, '&apos;'); // Escape '
-}
-
-const escapedToken = escapeXml(token);
-
-async function getCategories() {
-    const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
-<GetCategoriesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-    <RequesterCredentials>
-        <eBayAuthToken>${escapedToken}</eBayAuthToken>
-    </RequesterCredentials>
-    <CategorySiteID>0</CategorySiteID> 
-    <LevelLimit> 1 </LevelLimit>
-    <ViewAllNodes>false</ViewAllNodes>
-    <DetailLevel>ReturnAll</DetailLevel>
-</GetCategoriesRequest>`;
-
-
+async function getEbayCategories() {
     try {
-        const response = await fetch(ENDPOINT, {
-            method: 'POST',
+        const token = await fetchAccessToken();
+        const categoryTreeId = 0;
+        
+        const response = await fetch(
+            `https://api.ebay.com/commerce/taxonomy/v1/category_tree/${categoryTreeId}`, {
             headers: {
-                'Content-Type': 'text/xml',
-                'X-EBAY-API-COMPATIBILITY-LEVEL': '1367',
-                'X-EBAY-API-DEV-NAME': devId,
-                'X-EBAY-API-APP-NAME': appId,
-                'X-EBAY-API-CERT-NAME': certId,
-                'X-EBAY-API-CALL-NAME': 'GetCategories',
-                'X-EBAY-API-SITEID': '0',
-            },
-            body: xmlRequest,
-        });
-
-        console.log('Request XML:', xmlRequest);
-        console.log('Headers:', {
-            'Content-Type': 'text/xml',
-            'X-EBAY-API-COMPATIBILITY-LEVEL': '1367',
-            'X-EBAY-API-DEV-NAME': devId,
-            'X-EBAY-API-APP-NAME': appId,
-            'X-EBAY-API-CERT-NAME': certId,
-            'X-EBAY-API-CALL-NAME': 'GetCategories',
-            'X-EBAY-API-SITEID': '0',
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch categories: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const xmlData = await response.text();
-        console.log('Raw XML Response:', xmlData);
-        const jsonData = parser.parse(xmlData, { ignoreAttributes: false });
+        const data = await response.json();
+        const categories = [];
 
-        return jsonData.GetCategoriesResponse.CategoryArray.Category;
+        // Function to recursively process categories
+        function processCategoryNode(node, level = 0) {
+            if (!node || !node.category) {
+                return;
+            }
+
+            const indent = '  '.repeat(level);
+            const { categoryId, categoryName } = node.category;
+            console.log(`${indent}${categoryId}: ${categoryName}`);
+            
+            // Add to our categories array
+            categories.push({
+                categoryId,
+                categoryName,
+                level,
+                isLeaf: node.leafCategoryTreeNode || false
+            });
+            
+            // Check for child categories
+            if (node.childCategoryTreeNodes && Array.isArray(node.childCategoryTreeNodes)) {
+                node.childCategoryTreeNodes.forEach(childNode => {
+                    processCategoryNode(childNode, level + 1);
+                });
+            }
+        }
+
+        // Process the root category node
+        console.log('=== eBay Category Hierarchy ===\n');
+        
+        if (data.categoryTreeNode) {
+            processCategoryNode(data.categoryTreeNode);
+        } else if (data.rootCategoryNode) {
+            processCategoryNode(data.rootCategoryNode);
+        } else {
+            console.error('No category tree node found in response');
+            console.log('Available keys in response:', Object.keys(data));
+        }
+
+        // Save categories to files
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        
+        // Save as JSON
+        await fs.writeFile(
+            `ebay_categories_${timestamp}.json`,
+            JSON.stringify(categories, null, 2)
+        );
+        console.log(`\nCategories saved to ebay_categories_${timestamp}.json`);
+
+        // Save as CSV
+        const csvContent = [
+            'Category ID,Category Name,Level,Is Leaf',
+            ...categories.map(cat => 
+                `${cat.categoryId},"${cat.categoryName}",${cat.level},${cat.isLeaf}`
+            )
+        ].join('\n');
+        
+        await fs.writeFile(
+            `ebay_categories_${timestamp}.csv`,
+            csvContent
+        );
+        console.log(`Categories saved to ebay_categories_${timestamp}.csv`);
+
+        return categories;
+
     } catch (error) {
-        console.error('Error fetching categories:', error.message);
-        return [];
+        console.error('Error fetching eBay categories:', error);
+        throw error;
     }
 }
 
-function filterCategories(categories, keyword) {
-    return categories.filter(category => {
-        const categoryName = category.CategoryName.toLowerCase();
-        const parentName = category.CategoryParentName
-            ? category.CategoryParentName.toLowerCase()
-            : '';
-        return categoryName.includes(keyword) || parentName.includes(keyword);
-    });
+// If running this file directly
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    getEbayCategories()
+        .then(() => console.log('\nCategory fetch complete'))
+        .catch(error => console.error('Failed to fetch categories:', error));
 }
 
-async function main() {
-    const categories = await getCategories();
-
-    if (categories.length === 0) {
-        console.error('No categories fetched.');
-        return;
-    }
-
-    console.log(`Total Categories Fetched: ${categories.length}`);
-
-    // Filter categories with "jewelry" in name or parent name
-    const keyword = 'jewelry';
-    const jewelryCategories = filterCategories(categories, keyword);
-
-    console.log(`Filtered Categories: ${jewelryCategories.length}`);
-
-    // Save to a file for future use
-    const outputFile = './jewelry_categories.json';
-    fs.writeFileSync(outputFile, JSON.stringify(jewelryCategories, null, 2));
-    console.log(`Saved jewelry categories to ${outputFile}`);
-}
-
-main();
+export { getEbayCategories };

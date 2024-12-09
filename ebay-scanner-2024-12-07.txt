@@ -1,0 +1,551 @@
+
+
+========================================
+New Scan Started at 12/7/2024, 6:23:33 PM
+========================================
+
+6:23:34 PM: 
+====== Starting new scan ======
+6:23:34 PM: Scan error: Missing eBay API credentials
+6:23:34 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:24:34 PM
+========================================
+
+6:24:34 PM: 
+====== Starting new scan ======
+6:24:34 PM: Scan error: Missing eBay API credentials
+6:24:34 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:25:59 PM
+========================================
+
+6:25:59 PM: 
+====== Starting new scan ======
+6:25:59 PM: Scan error: Missing eBay API credentials
+6:25:59 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:26:59 PM
+========================================
+
+6:26:59 PM: 
+====== Starting new scan ======
+6:26:59 PM: Scan error: Missing eBay API credentials
+6:26:59 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:27:09 PM
+========================================
+
+6:27:09 PM: 
+====== Starting new scan ======
+6:27:09 PM: Scan error: Missing eBay API credentials
+6:27:09 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:27:59 PM
+========================================
+
+6:27:59 PM: 
+====== Starting new scan ======
+6:27:59 PM: Scan error: Missing eBay API credentials
+6:27:59 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:28:09 PM
+========================================
+
+6:28:09 PM: 
+====== Starting new scan ======
+6:28:09 PM: Scan error: Missing eBay API credentials
+6:28:09 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:28:59 PM
+========================================
+
+6:28:59 PM: 
+====== Starting new scan ======
+6:28:59 PM: Scan error: Missing eBay API credentials
+6:28:59 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:29:09 PM
+========================================
+
+6:29:09 PM: 
+====== Starting new scan ======
+6:29:09 PM: Scan error: Missing eBay API credentials
+6:29:09 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:32:44 PM
+========================================
+
+6:32:44 PM: 
+====== Starting new scan ======
+6:32:44 PM: Scan error: Missing eBay API credentials
+6:32:44 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:36:53 PM
+========================================
+
+6:36:53 PM: 
+====== Starting new scan ======
+6:36:53 PM: Scan error: Missing eBay API credentials
+6:36:53 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:37:53 PM
+========================================
+
+6:37:53 PM: 
+====== Starting new scan ======
+6:37:53 PM: Scan error: Missing eBay API credentials
+6:37:53 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:38:53 PM
+========================================
+
+6:38:53 PM: 
+====== Starting new scan ======
+6:38:53 PM: Scan error: Missing eBay API credentials
+6:38:53 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:39:53 PM
+========================================
+
+6:39:53 PM: 
+====== Starting new scan ======
+6:39:53 PM: Scan error: Missing eBay API credentials
+6:39:53 PM: Error during scan: Missing eBay API credentials
+
+
+========================================
+New Scan Started at 12/7/2024, 6:42:00 PM
+========================================
+
+6:42:00 PM: 
+====== Starting new scan ======
+6:42:01 PM: Access token obtained successfully
+6:42:01 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:42:01 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:42:32 PM
+========================================
+
+6:42:32 PM: 
+====== Starting new scan ======
+6:42:32 PM: Access token obtained successfully
+6:42:32 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:42:32 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:42:34 PM
+========================================
+
+6:42:34 PM: 
+====== Starting new scan ======
+6:42:34 PM: Access token obtained successfully
+6:42:34 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:42:34 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:43:01 PM
+========================================
+
+6:43:01 PM: 
+====== Starting new scan ======
+6:43:01 PM: Access token obtained successfully
+6:43:01 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:43:01 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:43:32 PM
+========================================
+
+6:43:32 PM: 
+====== Starting new scan ======
+6:43:32 PM: Access token obtained successfully
+6:43:32 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:43:32 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:43:34 PM
+========================================
+
+6:43:34 PM: 
+====== Starting new scan ======
+6:43:34 PM: Access token obtained successfully
+6:43:34 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:43:34 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:44:01 PM
+========================================
+
+6:44:01 PM: 
+====== Starting new scan ======
+6:44:01 PM: Access token obtained successfully
+6:44:01 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:44:01 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:44:32 PM
+========================================
+
+6:44:32 PM: 
+====== Starting new scan ======
+6:44:33 PM: Access token obtained successfully
+6:44:33 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:44:33 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:44:34 PM
+========================================
+
+6:44:34 PM: 
+====== Starting new scan ======
+6:44:35 PM: Access token obtained successfully
+6:44:35 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:44:35 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:45:01 PM
+========================================
+
+6:45:01 PM: 
+====== Starting new scan ======
+6:45:01 PM: Access token obtained successfully
+6:45:01 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:45:01 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:45:33 PM
+========================================
+
+6:45:33 PM: 
+====== Starting new scan ======
+6:45:33 PM: Access token obtained successfully
+6:45:33 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:45:33 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:45:35 PM
+========================================
+
+6:45:35 PM: 
+====== Starting new scan ======
+6:45:35 PM: Access token obtained successfully
+6:45:35 PM: Scan error: Cannot read properties of undefined (reading 'searchPhrases')
+6:45:35 PM: Error during scan: Cannot read properties of undefined (reading 'searchPhrases')
+
+
+========================================
+New Scan Started at 12/7/2024, 6:46:06 PM
+========================================
+
+6:46:06 PM: 
+====== Starting new scan ======
+6:46:06 PM: Access token obtained successfully
+6:46:06 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:46:06 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 6:46:16 PM
+========================================
+
+6:46:16 PM: 
+====== Starting new scan ======
+6:46:17 PM: Access token obtained successfully
+6:46:17 PM: Scan error: searchPhrases is not iterable
+6:46:17 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:47:17 PM
+========================================
+
+6:47:17 PM: 
+====== Starting new scan ======
+6:47:17 PM: Access token obtained successfully
+6:47:17 PM: Scan error: searchPhrases is not iterable
+6:47:17 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:48:17 PM
+========================================
+
+6:48:17 PM: 
+====== Starting new scan ======
+6:48:17 PM: Access token obtained successfully
+6:48:17 PM: Scan error: searchPhrases is not iterable
+6:48:17 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:49:17 PM
+========================================
+
+6:49:17 PM: 
+====== Starting new scan ======
+6:49:17 PM: Access token obtained successfully
+6:49:17 PM: Scan error: searchPhrases is not iterable
+6:49:17 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:50:17 PM
+========================================
+
+6:50:17 PM: 
+====== Starting new scan ======
+6:50:18 PM: Access token obtained successfully
+6:50:18 PM: Scan error: searchPhrases is not iterable
+6:50:18 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:51:06 PM
+========================================
+
+6:51:06 PM: 
+====== Starting new scan ======
+6:51:06 PM: Access token obtained successfully
+6:51:06 PM: Scan error: searchPhrases is not iterable
+6:51:06 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:51:18 PM
+========================================
+
+6:51:18 PM: 
+====== Starting new scan ======
+6:51:18 PM: Access token obtained successfully
+6:51:18 PM: Scan error: searchPhrases is not iterable
+6:51:18 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:52:06 PM
+========================================
+
+6:52:06 PM: 
+====== Starting new scan ======
+6:52:07 PM: Access token obtained successfully
+6:52:07 PM: Scan error: searchPhrases is not iterable
+6:52:07 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:52:18 PM
+========================================
+
+6:52:18 PM: 
+====== Starting new scan ======
+6:52:18 PM: Access token obtained successfully
+6:52:18 PM: Scan error: searchPhrases is not iterable
+6:52:18 PM: Error during scan: searchPhrases is not iterable
+
+
+========================================
+New Scan Started at 12/7/2024, 6:52:45 PM
+========================================
+
+6:52:45 PM: 
+====== Starting new scan ======
+6:52:45 PM: Access token obtained successfully
+6:52:45 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:52:45 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 6:57:45 PM
+========================================
+
+6:57:45 PM: 
+====== Starting new scan ======
+6:57:46 PM: Access token obtained successfully
+6:57:46 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:57:46 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 6:58:11 PM
+========================================
+
+6:58:11 PM: 
+====== Starting new scan ======
+6:58:11 PM: Access token obtained successfully
+6:58:11 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:58:11 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 6:58:41 PM
+========================================
+
+6:58:41 PM: 
+====== Starting new scan ======
+6:58:41 PM: Access token obtained successfully
+6:58:41 PM: API Calls made today: 1/5000
+6:58:41 PM: 
+=== Searching for phrase: jewelry lot ===
+6:58:41 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+6:58:41 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:41 PM: Daily API limit reached. Operations will resume when limit resets.
+
+
+========================================
+New Scan Started at 12/7/2024, 6:58:42 PM
+========================================
+
+6:58:42 PM: 
+====== Starting new scan ======
+6:58:42 PM: Access token obtained successfully
+6:58:42 PM: API Calls made today: 2/5000
+6:58:42 PM: 
+=== Searching for phrase: jewelry lot ===
+6:58:42 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+6:58:42 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:42 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:42 PM: API Calls made today: 3/5000
+6:58:42 PM: 
+=== Searching for phrase: jewelry bundle ===
+6:58:42 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+6:58:42 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:42 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:43 PM: API Calls made today: 4/5000
+6:58:43 PM: 
+=== Searching for phrase: jewelry bundle ===
+6:58:43 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+6:58:43 PM: API Calls made today: 5/5000
+6:58:43 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:43 PM: 
+=== Searching for phrase: jewelry collection ===
+6:58:43 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:43 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+6:58:44 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:44 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:44 PM: API Calls made today: 6/5000
+6:58:44 PM: 
+=== Searching for phrase: jewelry collection ===
+6:58:44 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+6:58:45 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:58:45 PM
+Total listings found: 0
+========================================
+
+
+
+========================================
+New Scan Started at 12/7/2024, 6:58:45 PM
+========================================
+
+6:58:45 PM: 
+====== Starting new scan ======
+6:58:45 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:45 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:45 PM: Access token obtained successfully
+6:58:45 PM: API Calls made today: 7/5000
+6:58:45 PM: 
+=== Searching for phrase: jewelry lot ===
+6:58:45 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20lot&limit=150
+6:58:45 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:45 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:46 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:58:46 PM
+Total listings found: 0
+========================================
+
+6:58:46 PM: API Calls made today: 8/5000
+6:58:46 PM: 
+=== Searching for phrase: jewelry bundle ===
+6:58:46 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20bundle&limit=150
+6:58:46 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:46 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:47 PM: API Calls made today: 9/5000
+6:58:47 PM: 
+=== Searching for phrase: jewelry collection ===
+6:58:47 PM: URL: https://api.ebay.com/buy/browse/v1/item_summary/search?q=jewelry%20collection&limit=150
+6:58:47 PM: RATE LIMIT REACHED: { "errors": [ { "errorId": 2001, "domain": "ACCESS", "category": "REQUEST", "message": "Too many requests.", "longMessage": "The request limit has been reached for the resource." } ] }
+6:58:47 PM: Daily API limit reached. Operations will resume when limit resets.
+6:58:48 PM: 
+====== Scan complete. Found 0 total listings ======
+
+
+========================================
+Scan Completed at 12/7/2024, 6:58:48 PM
+Total listings found: 0
+========================================
+
