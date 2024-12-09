@@ -158,6 +158,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
     let offset = 0;  // Initialize offset
     const limit = 50;
     const maxPrice = '500'; // 
+    const allListings = [];
 
     while (true) {
         await trackApiCall(); 
@@ -197,7 +198,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
             break; // No more items to fetch
         }
 
-        allListings = allListings.concat(data.itemSummaries);
+        allListings.push(...data.itemSummaries);
         await addLog(`Successfully fetched ${data.itemSummaries.length} listings (total: ${allListings.length})`);
 
         if (allListings.length >= 200) { // Set a reasonable maximum
