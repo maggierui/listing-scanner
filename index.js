@@ -163,14 +163,7 @@ async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) 
     while (true) {
         await trackApiCall(); 
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=*&` + 
-            `filter=seller:{${encodeURIComponent(sellerUsername)}},` +
-            `price:[..${maxPrice}],` +
-            `deliveryCountry:US,` +
-            `conditionIds:{1000|1500|2000|2500|3000}` +
-            `&sort=newlyListed` +
-            `&limit=${limit}` +
-            `&offset=${offset}`;
+            `q=jewelry&limit=${limit}&offset=${offset}&` ;
 
         await addLog(`\n=== Fetching listings for seller: ${sellerUsername} (offset: ${offset}) ===`);
         await addLog(`Using URL: ${url}`);
