@@ -157,12 +157,18 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
 async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
     let offset = 0;  // Initialize offset
     const limit = 100;
+    const maxPrice = '500'; // 
 
     await trackApiCall(); 
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-    `q=*&` + // Add wildcard search query
-    `filter=seller:{${encodeURIComponent(sellerUsername)}}` +
-    `&limit=${limit}`+`&offset=${offset}`; // Add pagination;
+        `q=*&` + 
+        `filter=seller:{${encodeURIComponent(sellerUsername)}},` +
+        `price:[..${maxPrice}],` +  // Add price filter
+        `deliveryCountry:US,` +     // Add country filter
+        `conditionIds:{3000|4000|5000|6000|7000}` + // Add condition filter (New, New other, etc.)
+        `&sort=newlyListed` +       // Sort by newest first
+        `&limit=${limit}` +
+        `&offset=${offset}`;
 
     await addLog(`\n=== Fetching listings for seller: ${sellerUsername} ===`);
     await addLog(`Using URL: ${url}`);  // Added for debugging
