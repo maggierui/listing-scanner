@@ -154,6 +154,36 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
         throw error;
     }
 }
+
+async function getSellerTotalListings(sellerUsername, accessToken) {
+    try {
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `q=seller:${encodeURIComponent(sellerUsername)}&` +
+            `limit=1`;
+
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            }
+        }, 8000);
+
+        const data = await response.json();
+        
+        if (data.total !== undefined) {
+            await addLog(`Seller ${sellerUsername} has ${data.total} total active listings`);
+            return data.total;
+        }
+        return 0;
+    } catch (error) {
+        await addLog(`Error getting total listings for ${sellerUsername}: ${error.message}`);
+        return 0;
+    }
+}
+
+
 async function fetchSellerListings(sellerUsername, accessToken, categoryIds, retryCount = 2) {
     try {
         // First get total listings
@@ -229,33 +259,7 @@ async function analyzeSellerListings(sellerData, username) {
     return shouldExclude;
 }
 
-async function getSellerTotalListings(sellerUsername, accessToken) {
-    try {
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=seller:${encodeURIComponent(sellerUsername)}&` +
-            `limit=1`;
 
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            }
-        }, 8000);
-
-        const data = await response.json();
-        
-        if (data.total !== undefined) {
-            await addLog(`Seller ${sellerUsername} has ${data.total} total active listings`);
-            return data.total;
-        }
-        return 0;
-    } catch (error) {
-        await addLog(`Error getting total listings for ${sellerUsername}: ${error.message}`);
-        return 0;
-    }
-}
 
 async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
     await trackApiCall();
