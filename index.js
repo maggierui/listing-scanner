@@ -23,8 +23,6 @@ app.use(express.static(__dirname)); // Serve files from current directory
 // Initialize variables
 let apiCallsCount = 0;
 let searchPhrases = [];
-let feedbackThreshold = 0;
-
 
 
 async function trackApiCall() {
