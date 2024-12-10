@@ -69,8 +69,9 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/scan', async (req, res) => {
     try {
-        await addLog('Debug: Received scan request');
-        await addLog(`Debug: Request body: ${JSON.stringify(req.body)}`);
+        await addLog('\n=== Starting new scan request ===');
+        const categoryIds = req.body.categoryIds; // Local variable
+        await addLog(`Request categoryIds: ${JSON.stringify(categoryIds || [])}`);
         
 
       // Validate and set search phrases
@@ -80,14 +81,12 @@ app.post('/api/scan', async (req, res) => {
         searchPhrases = req.body.searchPhrases;
         console.log('Set searchPhrases to:', searchPhrases); // Debug log
 
-        // Validate and get category IDs
-        if (!Array.isArray(req.body.categoryIds)) {
-            await addLog(`Debug: categoryIds is not an array: ${typeof req.body.categoryIds}`);
-        } else {
-            await addLog(`Debug: categoryIds length: ${req.body.categoryIds.length}`);
+        if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+            throw new Error('Category IDs must be a non-empty array');
         }
-        categoryIds = req.body.categoryIds;  // Store in global variable or pass through
-        await addLog(`Debug: Set global categoryIds: ${JSON.stringify(categoryIds)}`);
+
+        // Pass categoryIds to startScan
+        await startScan(categoryIds);
 
         // Validate and set feedback threshold
         feedbackThreshold = parseInt(req.body.feedbackThreshold) || 0;
@@ -285,7 +284,7 @@ async function analyzeSellerListings(sellerData, username) {
 
 
 
-async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
+async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCount = 3) {
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
     
@@ -346,7 +345,7 @@ async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
                 }
 
                 try {
-                    const sellerData = await fetchSellerListings(item.seller?.username, accessToken);
+                    const sellerData = await fetchSellerListings(item.seller?.username, accessToken,categoryIds);
                     const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                     
                     if (!shouldExclude) {
@@ -381,7 +380,7 @@ async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
     }
 }
 
-async function fetchAllListings() {
+async function fetchAllListings(categoryIds) {
     try {
         await addLog('\n====== Starting new scan ======');
         const accessToken = await fetchAccessToken();
@@ -391,7 +390,7 @@ async function fetchAllListings() {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(phrase, accessToken);
+            const listings = await fetchListingsForPhrase(phrase, accessToken, categoryIds);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -407,7 +406,7 @@ async function fetchAllListings() {
     }
 }
 
-async function startScan() {
+async function startScan(categoryIds) {
     try {
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
@@ -419,7 +418,7 @@ async function startScan() {
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
-        const listings = await fetchAllListings();
+        const listings = await fetchAllListings(categoryIds);
         
         await fs.appendFile(logFileName, `\n========================================\n`);
         await fs.appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
