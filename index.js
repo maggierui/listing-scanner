@@ -70,6 +70,9 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/scan', async (req, res) => {
     try {
         await addLog('\n=== Starting new scan request ===');
+        await addLog(`Raw feedback threshold from request: ${req.body.feedbackThreshold}`);
+        await addLog(`Type of feedback threshold: ${typeof req.body.feedbackThreshold}`);
+
         const categoryIds = req.body.categoryIds; // Local variable
         await addLog(`Request categoryIds: ${JSON.stringify(categoryIds || [])}`);
         
@@ -89,11 +92,10 @@ app.post('/api/scan', async (req, res) => {
         await startScan(categoryIds);
 
 
-
          // Fix feedback threshold parsing
          feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-         await addLog(`Debug: Set feedback threshold to: ${feedbackThreshold}`);
-         
+         await addLog(`Parsed feedback threshold: ${feedbackThreshold}`);
+         await addLog(`Type after parsing: ${typeof feedbackThreshold}`);         
          if (isNaN(feedbackThreshold)) {
              throw new Error('Invalid feedback threshold value');
          }
@@ -346,6 +348,8 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
             const results = await Promise.all(chunk.map(async (item) => {
                 const feedbackScore = item.seller?.feedbackScore || 0;
                 // Add debug logs
+                await addLog('\n=== Debug: Feedback Check ===');
+                await addLog(`Global feedbackThreshold value: ${feedbackThreshold}`);
                 await addLog(`Debug: Checking seller ${item.seller?.username}`);
                 await addLog(`Debug: Seller feedback score: ${feedbackScore}`);
                 await addLog(`Debug: Feedback threshold: ${feedbackThreshold}`);

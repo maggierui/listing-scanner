@@ -48,10 +48,13 @@ async function loadCategories() {
 async function handleFormSubmit(e) {
   e.preventDefault();
   
-  const categoryIds = Array.from(document.getElementById('categorySelect').selectedOptions)
+  const formdata{
+    categoryIds = Array.from(document.getElementById('categorySelect').selectedOptions)
       .map(option => option.value);
-  const feedbackThreshold = document.getElementById('feedbackThreshold').value;
-  const searchPhrases = document.getElementById('searchPhrases').value;
+    feedbackThreshold = document.getElementById('feedbackThreshold').value;
+     searchPhrases = document.getElementById('searchPhrases').value;
+  }
+  console.log('Client sending data:', formData);  // Add this debug log
 
   // Show loading state
   document.getElementById('loading').style.display = 'block';
@@ -64,11 +67,7 @@ async function handleFormSubmit(e) {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-              categoryIds,
-              feedbackThreshold,
-              searchPhrases: searchPhrases.split(',').map(p => p.trim())
-          })
+          body: JSON.stringify(formData)
       });
 
       if (!response.ok) {
