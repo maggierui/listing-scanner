@@ -465,7 +465,7 @@ async function startScan(categoryIds) {
 }
 
 // New endpoint to download logs
-app.get('/download-logs', async (req, res) => {
+app.get('/api/logs', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const logFileName = `ebay-scanner-${today}.txt`;
     
