@@ -339,6 +339,11 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
             const chunk = sellers.slice(i, i + 3);
             const results = await Promise.all(chunk.map(async (item) => {
                 const feedbackScore = item.seller?.feedbackScore || 0;
+                // Add debug logs
+                await addLog(`Debug: Checking seller ${item.seller?.username}`);
+                await addLog(`Debug: Seller feedback score: ${feedbackScore}`);
+                await addLog(`Debug: Feedback threshold: ${feedbackThreshold}`);
+                await addLog(`Debug: Condition check: ${feedbackScore} >= ${feedbackThreshold} equals ${feedbackScore >= feedbackThreshold}`);
                 if (feedbackScore >= feedbackThreshold) {
                     await addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
                     return null;
