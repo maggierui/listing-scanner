@@ -69,21 +69,27 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/scan', async (req, res) => {
     try {
+        await addLog('Received data:', JSON.stringify(req.body));
         await addLog('\n=== Starting new scan request ===');
         await addLog(`Raw feedback threshold from request: ${req.body.feedbackThreshold}`);
         await addLog(`Type of feedback threshold: ${typeof req.body.feedbackThreshold}`);
+        await addLog(`received search phrases: ${req.body.searchPhrases}`);
 
         const categoryIds = req.body.categoryIds; // Local variable
         await addLog(`Request categoryIds: ${JSON.stringify(categoryIds || [])}`);
         
 
-      // Validate and set search phrases
-        //if (!Array.isArray(req.body.searchPhrases) || req.body.searchPhrases.length === 0) {
-        //    throw new Error('Search phrases must be a non-empty array');
-       // }
-        const searchPhrases = req.body.searchPhrases;
-        await addLog(`Request searchPhrases: ${JSON.stringify(searchPhrases || [])}`);
-        console.log('Set searchPhrases to:', searchPhrases); // Debug log
+      // Fix search phrases parsing
+      const rawSearchPhrases = req.body.searchPhrases;
+      if (typeof rawSearchPhrases === 'string') {
+          searchPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
+      } else if (Array.isArray(rawSearchPhrases)) {
+          searchPhrases = rawSearchPhrases;
+      } else {
+          throw new Error('Invalid search phrases format');
+      }
+
+      await addLog(`Parsed search phrases: ${JSON.stringify(searchPhrases)}`);
 
         if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
             throw new Error('Category IDs must be a non-empty array');
@@ -484,6 +490,7 @@ app.get('/status', (req, res) => {
 
 
 app.get('/results', (req, res) => {
+    console.log('Debug - sending results:', scanResults);
     if (scanResults.status === 'complete') {
         res.json({
             status: 'complete',
