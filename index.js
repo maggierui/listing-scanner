@@ -25,6 +25,8 @@ let apiCallsCount = 0;
 let searchPhrases = [];
 let categoryPhrases = [];
 let feedbackThreshold = 0;
+let categoryIds = [];  // Add this line
+
 
 
 async function trackApiCall() {
