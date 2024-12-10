@@ -69,8 +69,9 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/scan', async (req, res) => {
     try {
-        // Log the incoming data for debugging
-        console.log('Received data:', req.body);
+        await addLog('Debug: Received scan request');
+        await addLog(`Debug: Request body: ${JSON.stringify(req.body)}`);
+        
 
       // Validate and set search phrases
         if (!Array.isArray(req.body.searchPhrases) || req.body.searchPhrases.length === 0) {
@@ -80,11 +81,13 @@ app.post('/api/scan', async (req, res) => {
         console.log('Set searchPhrases to:', searchPhrases); // Debug log
 
         // Validate and get category IDs
-        if (!Array.isArray(req.body.categoryIds) || req.body.categoryIds.length === 0) {
-            throw new Error('Category IDs must be a non-empty array');
+        if (!Array.isArray(req.body.categoryIds)) {
+            await addLog(`Debug: categoryIds is not an array: ${typeof req.body.categoryIds}`);
+        } else {
+            await addLog(`Debug: categoryIds length: ${req.body.categoryIds.length}`);
         }
         categoryIds = req.body.categoryIds;  // Store in global variable or pass through
-        console.log('Set category IDs to:', categoryIds); // Debug log
+        await addLog(`Debug: Set global categoryIds: ${JSON.stringify(categoryIds)}`);
 
         // Validate and set feedback threshold
         feedbackThreshold = parseInt(req.body.feedbackThreshold) || 0;
@@ -186,14 +189,35 @@ async function getSellerTotalListings(sellerUsername, accessToken) {
 
 async function fetchSellerListings(sellerUsername, accessToken, categoryIds, retryCount = 2) {
     try {
+        // Add debug logs
+        await addLog(`Debug: Starting fetchSellerListings for ${sellerUsername}`);
+        await addLog(`Debug: Current categoryIds: ${JSON.stringify(categoryIds)}`);
+
         // First get total listings
         const totalListings = await getSellerTotalListings(sellerUsername, accessToken);
+
+        if (totalListings === 0) {
+            await addLog(`Seller ${sellerUsername} has no active listings`);
+            return { error: true, listings: [], total: 0, categoryTotal: 0 };
+        }
         
+        // Add more debug logs
+        await addLog(`Debug: About to create category query`);
+        await addLog(`Debug: categoryIds type: ${typeof categoryIds}`);
+        await addLog(`Debug: categoryIds value: ${categoryIds}`);
+
+        // Check if categoryIds exists and is an array
+        if (!Array.isArray(categoryIds)) {
+            await addLog(`Error: categoryIds is not an array: ${typeof categoryIds}`);
+            return { error: true, listings: [], total: totalListings, categoryTotal: 0 };
+        }
+
         // Then get category-specific listings
         const categoryQuery = categoryIds.join('|');
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=category:{${categoryQuery}} seller:${encodeURIComponent(sellerUsername)}&` +
             `limit=50`;
+        await addLog(`Debug: Using URL: ${url}`);
 
         const response = await fetchWithTimeout(url, {
             method: 'GET',
