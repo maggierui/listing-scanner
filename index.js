@@ -77,14 +77,12 @@ app.post('/api/scan', async (req, res) => {
         searchPhrases = req.body.searchPhrases;
         console.log('Set searchPhrases to:', searchPhrases); // Debug log
 
-
-        // Validate and set category phrases
-        if (!Array.isArray(req.body.categoryPhrases)) {
-            categoryPhrases = [];
-        } else {
-            categoryPhrases = req.body.categoryPhrases;
+        // Validate and get category IDs
+        if (!Array.isArray(req.body.categoryIds) || req.body.categoryIds.length === 0) {
+            throw new Error('Category IDs must be a non-empty array');
         }
-        console.log('Set category phrases to:', categoryPhrases); // Debug log
+        categoryIds = req.body.categoryIds;  // Store in global variable or pass through
+        console.log('Set category IDs to:', categoryIds); // Debug log
 
         // Validate and set feedback threshold
         feedbackThreshold = parseInt(req.body.feedbackThreshold) || 0;
@@ -92,7 +90,7 @@ app.post('/api/scan', async (req, res) => {
 
         console.log('Processed values:', {
             searchPhrases,
-            categoryPhrases,
+            categoryIds,
             feedbackThreshold
         });
 
