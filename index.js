@@ -78,10 +78,11 @@ app.post('/api/scan', async (req, res) => {
         
 
       // Validate and set search phrases
-        if (!Array.isArray(req.body.searchPhrases) || req.body.searchPhrases.length === 0) {
-            throw new Error('Search phrases must be a non-empty array');
-        }
-        searchPhrases = req.body.searchPhrases;
+        //if (!Array.isArray(req.body.searchPhrases) || req.body.searchPhrases.length === 0) {
+        //    throw new Error('Search phrases must be a non-empty array');
+       // }
+        const searchPhrases = req.body.searchPhrases;
+        await addLog(`Request searchPhrases: ${JSON.stringify(searchPhrases || [])}`);
         console.log('Set searchPhrases to:', searchPhrases); // Debug log
 
         if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
