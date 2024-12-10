@@ -54,7 +54,7 @@ async function handleFormSubmit(e) {
     feedbackThreshold: document.getElementById('feedbackThreshold').value,
      searchPhrases: document.getElementById('searchPhrases').value
   }
-  console.log('Client sending data:', formData);  // Add this debug log
+  console.log('Client sending data:', formdata);  // Add this debug log
 
   // Show loading state
   document.getElementById('loading').style.display = 'block';
