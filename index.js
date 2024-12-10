@@ -23,9 +23,7 @@ app.use(express.static(__dirname)); // Serve files from current directory
 // Initialize variables
 let apiCallsCount = 0;
 let searchPhrases = [];
-let categoryPhrases = [];
 let feedbackThreshold = 0;
-let categoryIds = [];  // Add this line
 
 
 
@@ -78,7 +76,6 @@ app.post('/api/scan', async (req, res) => {
         const categoryIds = req.body.categoryIds; // Local variable
         await addLog(`Request categoryIds: ${JSON.stringify(categoryIds || [])}`);
         
-
       // Fix search phrases parsing
       const rawSearchPhrases = req.body.searchPhrases;
       if (typeof rawSearchPhrases === 'string') {
