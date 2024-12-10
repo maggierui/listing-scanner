@@ -88,9 +88,15 @@ app.post('/api/scan', async (req, res) => {
         // Pass categoryIds to startScan
         await startScan(categoryIds);
 
-        // Validate and set feedback threshold
-        feedbackThreshold = parseInt(req.body.feedbackThreshold) || 0;
-        console.log('Set feedbackThreshold to:', feedbackThreshold); // Debug log
+
+
+         // Fix feedback threshold parsing
+         feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
+         await addLog(`Debug: Set feedback threshold to: ${feedbackThreshold}`);
+         
+         if (isNaN(feedbackThreshold)) {
+             throw new Error('Invalid feedback threshold value');
+         }
 
         console.log('Processed values:', {
             searchPhrases,
