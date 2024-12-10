@@ -23,6 +23,8 @@ app.use(express.static(__dirname)); // Serve files from current directory
 // Initialize variables
 let apiCallsCount = 0;
 let searchPhrases = [];
+let feedbackThreshold = 0;
+
 
 
 async function trackApiCall() {
@@ -397,7 +399,7 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
     }
 }
 
-async function fetchAllListings(categoryIds) {
+async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
     try {
         await addLog('\n====== Starting new scan ======');
         const accessToken = await fetchAccessToken();
@@ -407,7 +409,7 @@ async function fetchAllListings(categoryIds) {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(phrase, accessToken, categoryIds);
+            const listings = await fetchListingsForPhrase(phrase, accessToken, categoryIds,feedbackThreshold);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -423,7 +425,7 @@ async function fetchAllListings(categoryIds) {
     }
 }
 
-async function startScan(categoryIds) {
+async function startScan(categoryIds,searchPhrases, feedbackThreshold) {
     try {
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
@@ -435,7 +437,7 @@ async function startScan(categoryIds) {
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
-        const listings = await fetchAllListings(categoryIds);
+        const listings = await fetchAllListings(categoryIds,searchPhrases, feedbackThreshold);
         
         await fs.appendFile(logFileName, `\n========================================\n`);
         await fs.appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
