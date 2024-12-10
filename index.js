@@ -154,67 +154,53 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
         throw error;
     }
 }
-async function fetchSellerListings(sellerUsername, accessToken, retryCount = 2) {
-    let offset = 0;  // Initialize offset
-    const limit = 10;
-    const maxPrice = '500'; // 
-    const allListings = [];
-
-    while (true) {
-        await trackApiCall(); 
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=jewelry&limit=${limit}&offset=${offset}&` ;
-
-        await addLog(`\n=== Fetching listings for seller: ${sellerUsername} (offset: ${offset}) ===`);
-        await addLog(`Using URL: ${url}`);
-
+async function fetchSellerListings(sellerUsername, accessToken, categoryIds, retryCount = 2) {
     try {
+        // First get total listings
+        const totalListings = await getSellerTotalListings(sellerUsername, accessToken);
+        
+        // Then get category-specific listings
+        const categoryQuery = categoryIds.join('|');
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `q=category:{${categoryQuery}} seller:${encodeURIComponent(sellerUsername)}&` +
+            `limit=50`;
+
         const response = await fetchWithTimeout(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
                 'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            },
+            }
         }, 8000);
 
         if (!response.ok) {
             const errorData = await response.text();
             await addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
             await addLog(`Error details: ${errorData}`);
-            return { error: true, listings: allListings, total: allListings.length };
+            return { 
+                error: true, 
+                listings: [], 
+                total: totalListings,
+                categoryTotal: 0 
+            };
         }
 
         const data = await response.json();
-        
-        if (!data.itemSummaries || data.itemSummaries.length === 0) {
-            break; // No more items to fetch
-        }
-
-        allListings.push(...data.itemSummaries);
-        await addLog(`Successfully fetched ${data.itemSummaries.length} listings (total: ${allListings.length})`);
-
-        if (allListings.length >= 200) { // Set a reasonable maximum
-            await addLog(`Reached maximum listing count for ${sellerUsername}`);
-            break;
-        }
-
-        offset += limit;
-        await delay(1000); // Add delay between requests
+        return {
+            error: false,
+            listings: data.itemSummaries || [],
+            total: totalListings,
+            categoryTotal: data.total || 0
+        };
 
     } catch (error) {
-        await addLog(`Error processing seller ${sellerUsername}: ${error.message}`);
-        return { error: true, listings: allListings, total: allListings.length };
+        await addLog(`Error processing ${sellerUsername}: ${error.message}`);
+        return { error: true, listings: [], total: 0, categoryTotal: 0 };
     }
 }
 
-return {
-    error: false,
-    listings: allListings,
-    total: allListings.length
-};
-}
-
+// Updated analyzeSellerListings function
 async function analyzeSellerListings(sellerData, username) {
     await addLog(`\n==== ANALYZING SELLER: ${username} ====`);
 
@@ -223,52 +209,52 @@ async function analyzeSellerListings(sellerData, username) {
         return true;
     }
 
-    const fetchedListings = sellerData.listings;
-    const totalAvailable = sellerData.total;
+    const totalListings = sellerData.total;
+    const categoryListings = sellerData.categoryTotal;
+    const ratio = (categoryListings / totalListings) * 100;
     
-    await addLog(`Total available listings: ${totalAvailable}`);
-    await addLog(`Fetched listings for analysis: ${fetchedListings.length}`);
+    await addLog(`Analysis for ${username}:`);
+    await addLog(`Total listings: ${totalListings}`);
+    await addLog(`Category-specific listings: ${categoryListings}`);
+    await addLog(`Category ratio: ${ratio.toFixed(2)}%`);
 
-    await addLog(`\nAll listings for ${username}:`);
-    for (const item of fetchedListings) {
-        await addLog(`- ${item.title}`);
-    }
-
-    let jewelryListings = 0;
-    const jewelryMatches = [];
-
-    for (const item of fetchedListings) {
-        const matchedPhrases = jewelryPhrases.filter(phrase => {
-            const cleanPhrase = phrase.replace(/"/g, '').trim().toLowerCase();
-            const itemTitle = item.title.toLowerCase();
-            const isMatch = itemTitle.includes(cleanPhrase);
-            return isMatch;
-        });
-
-        if (matchedPhrases.length > 0) {
-            jewelryListings++;
-            jewelryMatches.push({
-                title: item.title,
-                matches: matchedPhrases
-            });
-            await addLog(`Jewelry match found: "${item.title}" - matched phrases: ${matchedPhrases.join(', ')}`);
-        }
-    }
-
-    const jewelryPercentage = (jewelryListings / fetchedListings.length) * 100;
-
-    await addLog(`\nFinal Analysis for ${username}:`);
-    await addLog(`- Total listings analyzed: ${fetchedListings.length}`);
-    await addLog(`- Jewelry listings found: ${jewelryListings}`);
-    await addLog(`- Jewelry percentage: ${jewelryPercentage.toFixed(2)}%`);
-
-    const shouldExclude = jewelryPercentage >= 80;
+    // You can adjust this threshold as needed
+    const shouldExclude = ratio < 80;  // Exclude if less than 80% in specified categories
+    
     await addLog(shouldExclude ? 
-        `DECISION: EXCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry` : 
-        `DECISION: INCLUDING ${username} - ${jewelryPercentage.toFixed(2)}% jewelry`);
-    await addLog(`==== END ANALYSIS FOR ${username} ====\n`);
-    
+        `DECISION: EXCLUDING ${username} - Only ${ratio.toFixed(2)}% in specified categories` : 
+        `DECISION: INCLUDING ${username} - ${ratio.toFixed(2)}% in specified categories`
+    );
+
     return shouldExclude;
+}
+
+async function getSellerTotalListings(sellerUsername, accessToken) {
+    try {
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `q=seller:${encodeURIComponent(sellerUsername)}&` +
+            `limit=1`;
+
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            }
+        }, 8000);
+
+        const data = await response.json();
+        
+        if (data.total !== undefined) {
+            await addLog(`Seller ${sellerUsername} has ${data.total} total active listings`);
+            return data.total;
+        }
+        return 0;
+    } catch (error) {
+        await addLog(`Error getting total listings for ${sellerUsername}: ${error.message}`);
+        return 0;
+    }
 }
 
 async function fetchListingsForPhrase(phrase, accessToken, retryCount = 3) {
