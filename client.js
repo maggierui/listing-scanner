@@ -48,11 +48,11 @@ async function loadCategories() {
 async function handleFormSubmit(e) {
   e.preventDefault();
   
-  const formdata{
-    categoryIds = Array.from(document.getElementById('categorySelect').selectedOptions)
-      .map(option => option.value);
-    feedbackThreshold = document.getElementById('feedbackThreshold').value;
-     searchPhrases = document.getElementById('searchPhrases').value;
+  const formdata={
+    categoryIds: Array.from(document.getElementById('categorySelect').selectedOptions)
+      .map(option => option.value),
+    feedbackThreshold: document.getElementById('feedbackThreshold').value,
+     searchPhrases: document.getElementById('searchPhrases').value
   }
   console.log('Client sending data:', formData);  // Add this debug log
 
