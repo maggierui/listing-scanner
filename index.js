@@ -287,15 +287,15 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
     
     // Check cache first
-    const cacheKey = phrase.toLowerCase();
+    const cacheKey = searchPhrases.toLowerCase();
     const currentTime = Date.now();
     if (listingsCache.data[cacheKey] && 
         (currentTime - listingsCache.timestamps[cacheKey]) < CACHE_DURATION) {
-        await addLog(`Using cached results for phrase: ${phrase}`);
+        await addLog(`Using cached results for phrase: ${searchPhrases}`);
         return listingsCache.data[cacheKey];
     }
 
-    await addLog(`\n=== Searching for phrase: ${phrase} ===`);
+    await addLog(`\n=== Searching for phrase: ${searchPhrases} ===`);
     await addLog(`URL: ${url}`);
 
     try {
@@ -323,7 +323,7 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
         }
 
         const data = await response.json();
-        await addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${phrase}`);
+        await addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${searchPhrases}`);
 
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
             return [];
@@ -380,7 +380,7 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
         return filteredListings;
 
     } catch (error) {
-        await addLog(`Error processing ${phrase}: ${error.message}`);
+        await addLog(`Error processing ${searchPhrases}: ${error.message}`);
         return [];
     }
 }
