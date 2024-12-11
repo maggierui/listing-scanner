@@ -4,7 +4,11 @@ import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as fs from 'fs/promises';
+import dotenv from 'dotenv';
+import { URLSearchParams } from 'url';
 
+// Load environment variables
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,10 +26,12 @@ app.use(express.static(__dirname)); // Serve files from current directory
 
 // Initialize variables
 let apiCallsCount = 0;
-let searchPhrases = [];
-let feedbackThreshold = 0;
 
 
+// Simple logging function (to replace addLog)
+async function log(message) {
+    console.log(message);
+}
 
 async function trackApiCall() {
     apiCallsCount++;
