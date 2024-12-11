@@ -155,7 +155,7 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 
-async function getSellerTotalListings(sellerUsername, accessToken) {
+async function getSellerTotalListings(accessToken,sellerUsername) {
     try {
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=seller:${encodeURIComponent(sellerUsername)}&` +
@@ -282,7 +282,7 @@ async function analyzeSellerListings(sellerData, username) {
 
 
 
-async function fetchListingsForPhrase(searchPhrases, feedbackThreshold, categoryIds, accessToken) {
+async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds) {
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
     
@@ -397,7 +397,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(searchPhrases, feedbackThreshold, categoryIds, accessToken);
+            const listings = await fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
