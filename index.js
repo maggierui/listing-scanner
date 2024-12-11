@@ -73,7 +73,12 @@ app.post('/api/scan', async (req, res) => {
         await addLog(`Type of feedback threshold: ${typeof req.body.feedbackThreshold}`);
         await addLog(`received search phrases: ${req.body.searchPhrases}`);
 
-        const categories = req.body.categoryIds; // Local variable
+        // Parse feedback threshold
+        const threshold = parseInt(req.body.feedbackThreshold, 10);
+        await addLog(`Parsed feedback threshold: ${threshold}`);
+
+        // Get category IDs
+        const categories = req.body.categoryIds;
         await addLog(`Request categoryIds: ${JSON.stringify(categories || [])}`);
         
       // Parse search phrases
@@ -90,21 +95,6 @@ app.post('/api/scan', async (req, res) => {
       }
 
       await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
-
-
-        if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
-            throw new Error('Category IDs must be a non-empty array');
-        }
-
-
-
-         // Fix feedback threshold parsing
-         threshold = parseInt(req.body.feedbackThreshold, 10);
-         await addLog(`Parsed feedback threshold: ${threshold}`);
-         await addLog(`Type after parsing: ${typeof threshold}`);         
-         if (isNaN(threshold)) {
-             throw new Error('Invalid feedback threshold value');
-         }
 
          // Pass all parameters to startScan
          await startScan({
