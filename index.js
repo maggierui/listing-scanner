@@ -155,45 +155,66 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 
-async function getSellerTotalListings(accessToken,sellerUsername) {
+async function getSellerTotalListings(sellerUsername) {
     try {
-        await addLog(`Getting total listings for seller ${sellerUsername}`);
-        await addLog(`Using access token: ${accessToken}`);
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `username=${sellerUsername}}&` +
-            `limit=1`;
+        const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
+        const params = {
+            'OPERATION-NAME': 'findItemsAdvanced',
+            'SERVICE-VERSION': '1.0.0',
+            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
+            'RESPONSE-DATA-FORMAT': 'JSON',
+            'itemFilter(0).name': 'Seller',
+            'itemFilter(0).value': sellerUsername,
+            'paginationInput.entriesPerPage': '1'
+        };
 
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            }
-        }, 8000);
+        const queryString = new URLSearchParams(params).toString();
+        await log(`Seller listings request for ${sellerUsername}: ${queryString}`);
+        const fullUrl = `${url}?${queryString}`;
+        await log(`Full URL: ${fullUrl}`);
 
-        const data = await response.json();
-        
-        if (data.total !== undefined) {
-            await addLog(`Seller ${sellerUsername} has ${data.total} total active listings`);
-            return data.total;
+        const response = await fetch(fullUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return 0;
+        const data = await response.json();
+        await log(`Seller listings response for ${sellerUsername}: ${JSON.stringify(data, null, 2)}`);
+
+        // Debug each step
+        const advancedResponse = data.findItemsAdvancedResponse[0];
+        console.log('Advanced response:', advancedResponse);
+
+        const paginationOutput = advancedResponse.paginationOutput[0];
+        console.log('Pagination output:', paginationOutput);
+
+        const totalEntries = paginationOutput.totalEntries[0];
+        console.log('Total entries:', totalEntries);
+
+
+        if (data.findItemsAdvancedResponse[0].ack[0] === "Failure") {
+            throw new Error(data.findItemsAdvancedResponse[0].errorMessage[0].error[0].message[0]);
+        }
+        
+        // Now try to get the total
+        const total = parseInt(totalEntries);
+        await log(`Total listings for ${sellerUsername}: ${total}`);
+        
+        return parseInt(total);
     } catch (error) {
-        await addLog(`Error getting total listings for ${sellerUsername}: ${error.message}`);
+        await log(`Error getting total listings for ${sellerUsername}: ${error.message}`);
         return 0;
     }
 }
 
 
-async function fetchSellerListings(accessToken, sellerUsername, categoryIds) {
+async function fetchSellerListings(sellerUsername, categoryIds) {
     try {
         // Add debug logs
         await addLog(`Debug: Starting fetchSellerListings for ${sellerUsername}`);
         await addLog(`Debug: Current fetchSellerListing categoryIds: ${JSON.stringify(categoryIds)}`);
 
         // First get total listings
-        const totalListings = await getSellerTotalListings(accessToken,sellerUsername);
+        const totalListings = await getSellerTotalListings(sellerUsername);
 
         if (totalListings === 0) {
             await addLog(`Seller ${sellerUsername} has no active listings`);
@@ -213,19 +234,25 @@ async function fetchSellerListings(accessToken, sellerUsername, categoryIds) {
 
         // Then get category-specific listings
         const categoryQuery = categoryIds.join('|');
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=category:{${categoryQuery}} seller:${encodeURIComponent(sellerUsername)}&` +
-            `limit=50`;
-        await addLog(`Debug: Using URL: ${url}`);
+        const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
+        const params = {
+            'OPERATION-NAME': 'findItemsAdvanced',
+            'SERVICE-VERSION': '1.0.0',
+            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
+            'RESPONSE-DATA-FORMAT': 'JSON',
+            'itemFilter(0).name': 'Seller',
+            'itemFilter(0).value': sellerUsername,
+            'itemFilter(0).name': 'Category',
+            'itemFilter(0).value': categoryQuery,
+            'paginationInput.entriesPerPage': '50'
+        };
+        const queryString = new URLSearchParams(params).toString();
+        await log(`Seller listings request for ${sellerUsername}: ${queryString}`);
+        const fullUrl = `${url}?${queryString}`;
+        await log(`Full URL: ${fullUrl}`);
 
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            }
-        }, 8000);
+        
+        const response = await fetchWithTimeout(fullUrl);
 
         if (!response.ok) {
             const errorData = await response.text();
@@ -352,7 +379,7 @@ async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThresho
                 }
 
                 try {
-                    const sellerData = await fetchSellerListings(accessToken, item.seller?.username, categoryIds);
+                    const sellerData = await fetchSellerListings(item.seller?.username, categoryIds);
                     await addLog(`Seller data for ${item.seller?.username}: ${JSON.stringify(sellerData)}`);
                     const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                     
