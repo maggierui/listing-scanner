@@ -404,10 +404,10 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
 
 async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
     try {
-        await addLog('\n====== Starting new scan ======');
+        await addLog('\n====== Starting new scan- Fetch all listings ======');
         const accessToken = await fetchAccessToken();
         await addLog('Access token obtained successfully');
-        console.log('Starting scan with searchPhrases:', searchPhrases); // Debug log
+        await addLog(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
         const allListings = [];
         
         for (const phrase of searchPhrases) {
