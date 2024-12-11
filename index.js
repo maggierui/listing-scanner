@@ -73,58 +73,54 @@ app.post('/api/scan', async (req, res) => {
         await addLog(`Type of feedback threshold: ${typeof req.body.feedbackThreshold}`);
         await addLog(`received search phrases: ${req.body.searchPhrases}`);
 
-        const categoryIds = req.body.categoryIds; // Local variable
-        await addLog(`Request categoryIds: ${JSON.stringify(categoryIds || [])}`);
+        const categories = req.body.categoryIds; // Local variable
+        await addLog(`Request categoryIds: ${JSON.stringify(categories || [])}`);
         
       // Parse search phrases
       let rawSearchPhrases = req.body.searchPhrases;
       if (typeof rawSearchPhrases === 'string') {
           // If it's a single string with commas
-          searchPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
+          parsedPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
       } else if (Array.isArray(rawSearchPhrases)) {
           // If it's already an array
-          searchPhrases = rawSearchPhrases;
+          parsedPhrases = rawSearchPhrases;
       } else {
           throw new Error('Invalid search phrases format');
       }
 
-      await addLog(`Parsed searchPhrases: ${JSON.stringify(searchPhrases)}`);
+      await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
 
 
         if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
             throw new Error('Category IDs must be a non-empty array');
         }
 
-        // Pass categoryIds to startScan
-        await startScan(categoryIds);
 
 
          // Fix feedback threshold parsing
-         feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-         await addLog(`Parsed feedback threshold: ${feedbackThreshold}`);
-         await addLog(`Type after parsing: ${typeof feedbackThreshold}`);         
-         if (isNaN(feedbackThreshold)) {
+         threshold = parseInt(req.body.feedbackThreshold, 10);
+         await addLog(`Parsed feedback threshold: ${threshold}`);
+         await addLog(`Type after parsing: ${typeof threshold}`);         
+         if (isNaN(threshold)) {
              throw new Error('Invalid feedback threshold value');
          }
 
-        console.log('Processed values:', {
-            searchPhrases,
-            categoryIds,
-            feedbackThreshold
-        });
-
-    // Start the scanning process
-    await startScan();
-  
-    res.json({ 
-        status: 'Scan started',
-        message: `Starting scan with ${searchPhrases.length} search phrases`
-    });
-} catch (error) {
-    console.error('Error in /scan endpoint:', error);
-    res.status(500).json({ error: error.message });
-}
-});
+         // Pass all parameters to startScan
+         await startScan({
+             searchPhrases: parsedPhrases,
+             feedbackThreshold: threshold,
+             categoryIds: categories
+         });
+         
+         res.json({ 
+             status: 'Scan started',
+             message: `Starting scan with ${parsedPhrases.length} search phrases`
+         });
+     } catch (error) {
+         await addLog(`Error in scan endpoint: ${error.message}`);
+         res.status(500).json({ error: error.message });
+     }
+ });
 
 async function addLog(message) {
 // Create timestamp in EST/EDT
@@ -434,7 +430,7 @@ async function startScan(categoryIds,searchPhrases, feedbackThreshold) {
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
         
         await fs.appendFile(logFileName, `\n\n========================================\n`);
-        await fs.appendFile(logFileName, `New Scan Started at ${new Date().toLocaleString()}\n`);
+        await fs.appendFile(logFileName, `startScan function - New Scan Started at ${new Date().toLocaleString()}\n`);
         await fs.appendFile(logFileName, `========================================\n\n`);
         
         scanResults.status = 'processing';
