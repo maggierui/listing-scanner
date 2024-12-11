@@ -188,10 +188,10 @@ async function fetchSellerListings(accessToken, sellerUsername, categoryIds) {
     try {
         // Add debug logs
         await addLog(`Debug: Starting fetchSellerListings for ${sellerUsername}`);
-        await addLog(`Debug: Current categoryIds: ${JSON.stringify(categoryIds)}`);
+        await addLog(`Debug: Current fetchSellerListing categoryIds: ${JSON.stringify(categoryIds)}`);
 
         // First get total listings
-        const totalListings = await getSellerTotalListings(sellerUsername, accessToken);
+        const totalListings = await getSellerTotalListings(accessToken,sellerUsername);
 
         if (totalListings === 0) {
             await addLog(`Seller ${sellerUsername} has no active listings`);
