@@ -28,11 +28,6 @@ app.use(express.static(__dirname)); // Serve files from current directory
 let apiCallsCount = 0;
 
 
-// Simple logging function (to replace addLog)
-async function log(message) {
-    console.log(message);
-}
-
 async function trackApiCall() {
     apiCallsCount++;
     await addLog(`API Calls made today: ${apiCallsCount}/5000`);
@@ -253,9 +248,9 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             'paginationInput.entriesPerPage': '50'
         };
         const queryString = new URLSearchParams(params).toString();
-        await log(`Seller listings request for ${sellerUsername}: ${queryString}`);
+        await addLog(`Seller listings request for ${sellerUsername}: ${queryString}`);
         const fullUrl = `${url}?${queryString}`;
-        await log(`Full URL: ${fullUrl}`);
+        await addLog(`Full URL: ${fullUrl}`);
 
         
         const response = await fetchWithTimeout(fullUrl);
