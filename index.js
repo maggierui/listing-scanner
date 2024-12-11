@@ -286,14 +286,14 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
     
-    // Check cache first
-    const cacheKey = searchPhrases.toLowerCase();
+    // Cache handling
+    const cacheKey = searchPhrases.join(',').toLowerCase();  // Convert array to string
     const currentTime = Date.now();
     if (listingsCache.data[cacheKey] && 
         (currentTime - listingsCache.timestamps[cacheKey]) < CACHE_DURATION) {
-        await addLog(`Using cached results for phrase: ${searchPhrases}`);
+        await addLog(`Using cached results for phrases: ${searchPhrases}`);
         return listingsCache.data[cacheKey];
-    }
+}
 
     await addLog(`\n=== Searching for phrase: ${searchPhrases} ===`);
     await addLog(`URL: ${url}`);
