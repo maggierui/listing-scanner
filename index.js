@@ -516,7 +516,7 @@ app.get('/results', (req, res) => {
 });
 
 // Start the background scanning process
-startScan();
+//startScan();
 
 // Start the server
 app.listen(PORT, () => {
