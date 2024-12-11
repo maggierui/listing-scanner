@@ -259,6 +259,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
         
         const response = await fetchWithTimeout(fullUrl);
+        await addLog(`Fetch Seller data by category IDs for ${sellerUsername}: ${response.status}`);
 
         if (!response.ok) {
             const errorData = await response.text();
@@ -273,6 +274,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         }
 
         const data = await response.json();
+        await addLog(`Seller listings by CategoryIds for ${sellerUsername}: ${JSON.stringify(data, null, 2)}`);
         return {
             error: false,
             listings: data.itemSummaries || [],
@@ -289,7 +291,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 // Updated analyzeSellerListings function
 async function analyzeSellerListings(sellerData, username) {
     await addLog(`\n==== ANALYZING SELLER: ${username} ====`);
-    await addLog(`Seller data for ${item.seller?.username}: ${JSON.stringify(sellerData)}`);
+    await addLog(`Seller data for ${username}: ${JSON.stringify(sellerData)}`);
     if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
         await addLog(`ERROR: No valid listings found for seller ${username}`);
         return true;
