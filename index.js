@@ -254,7 +254,7 @@ async function fetchSellerListings(accessToken, sellerUsername, categoryIds) {
 // Updated analyzeSellerListings function
 async function analyzeSellerListings(sellerData, username) {
     await addLog(`\n==== ANALYZING SELLER: ${username} ====`);
-
+    await addLog(`Seller data for ${item.seller?.username}: ${JSON.stringify(sellerData)}`);
     if (sellerData.error || !sellerData.listings || sellerData.listings.length === 0) {
         await addLog(`ERROR: No valid listings found for seller ${username}`);
         return true;
@@ -351,6 +351,7 @@ async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThresho
 
                 try {
                     const sellerData = await fetchSellerListings(accessToken, item.seller?.username, categoryIds);
+                    await addLog(`Seller data for ${item.seller?.username}: ${JSON.stringify(sellerData)}`);
                     const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                     
                     if (!shouldExclude) {
