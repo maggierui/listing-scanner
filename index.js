@@ -97,11 +97,7 @@ app.post('/api/scan', async (req, res) => {
       await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
 
          // Pass all parameters to startScan
-         await startScan({
-             searchPhrases: parsedPhrases,
-             feedbackThreshold: threshold,
-             categoryIds: categories
-         });
+         await startScan(parsedPhrases, threshold, categories);
          
          res.json({ 
              status: 'Scan started',
@@ -286,9 +282,9 @@ async function analyzeSellerListings(sellerData, username) {
 
 
 
-async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCount = 3) {
+async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThreshold, categoryIds,retryCount = 3) {
     await trackApiCall();
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(phrase)}&limit=150`;
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
     
     // Check cache first
     const cacheKey = phrase.toLowerCase();
@@ -321,7 +317,7 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
 
         if (!response.ok) {
             const errorText = await response.text();
-            await addLog(`Error fetching listings for ${phrase}: ${response.status}`);
+            await addLog(`Error fetching listings for ${searchPhrases}: ${response.status}`);
             await addLog(`Error details: ${errorText}`);
             return [];
         }
@@ -391,7 +387,9 @@ async function fetchListingsForPhrase(phrase, accessToken, categoryIds,retryCoun
 
 async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
     try {
-        await addLog('\n====== Starting new scan- Fetch all listings ======');
+        await addLog('\n=== fetchAllListings received parameters ===');
+        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+    
         const accessToken = await fetchAccessToken();
         await addLog('Access token obtained successfully');
         await addLog(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
@@ -399,7 +397,7 @@ async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(phrase, accessToken, categoryIds,feedbackThreshold);
+            const listings = await fetchListingsForPhrase(searchPhrases, accessToken, categoryIds,feedbackThreshold);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -415,7 +413,7 @@ async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
     }
 }
 
-async function startScan(categoryIds,searchPhrases, feedbackThreshold) {
+async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
     try {
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
@@ -423,7 +421,8 @@ async function startScan(categoryIds,searchPhrases, feedbackThreshold) {
         await fs.appendFile(logFileName, `\n\n========================================\n`);
         await fs.appendFile(logFileName, `startScan function - New Scan Started at ${new Date().toLocaleString()}\n`);
         await fs.appendFile(logFileName, `========================================\n\n`);
-        
+        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
