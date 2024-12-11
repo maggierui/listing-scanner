@@ -77,7 +77,8 @@ app.post('/api/scan', async (req, res) => {
         await addLog(`Request categoryIds: ${JSON.stringify(categories || [])}`);
         
       // Parse search phrases
-      let rawSearchPhrases = req.body.searchPhrases;
+      const rawSearchPhrases = req.body.searchPhrases;
+      let parsedPhrases;
       if (typeof rawSearchPhrases === 'string') {
           // If it's a single string with commas
           parsedPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
