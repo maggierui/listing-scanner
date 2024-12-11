@@ -184,7 +184,7 @@ async function getSellerTotalListings(sellerUsername, accessToken) {
 }
 
 
-async function fetchSellerListings(sellerUsername, accessToken, categoryIds, retryCount = 2) {
+async function fetchSellerListings(accessToken, sellerUsername, categoryIds) {
     try {
         // Add debug logs
         await addLog(`Debug: Starting fetchSellerListings for ${sellerUsername}`);
@@ -282,7 +282,7 @@ async function analyzeSellerListings(sellerData, username) {
 
 
 
-async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThreshold, categoryIds,retryCount = 3) {
+async function fetchListingsForPhrase(searchPhrases, feedbackThreshold, categoryIds, accessToken) {
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
     
@@ -350,7 +350,7 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
                 }
 
                 try {
-                    const sellerData = await fetchSellerListings(item.seller?.username, accessToken,categoryIds);
+                    const sellerData = await fetchSellerListings(accessToken, item.seller?.username, categoryIds);
                     const shouldExclude = await analyzeSellerListings(sellerData, item.seller?.username);
                     
                     if (!shouldExclude) {
@@ -385,10 +385,10 @@ async function fetchListingsForPhrase(searchPhrases, accessToken, feedbackThresh
     }
 }
 
-async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
+async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
     try {
         await addLog('\n=== fetchAllListings received parameters ===');
-        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
     
         const accessToken = await fetchAccessToken();
         await addLog('Access token obtained successfully');
@@ -397,7 +397,7 @@ async function fetchAllListings(categoryIds,searchPhrases, feedbackThreshold) {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(searchPhrases, accessToken, categoryIds,feedbackThreshold);
+            const listings = await fetchListingsForPhrase(searchPhrases, feedbackThreshold, categoryIds, accessToken);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -426,7 +426,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
-        const listings = await fetchAllListings(categoryIds,searchPhrases, feedbackThreshold);
+        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,);
         
         await fs.appendFile(logFileName, `\n========================================\n`);
         await fs.appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
