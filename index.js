@@ -160,7 +160,7 @@ async function getSellerTotalListings(accessToken,sellerUsername) {
         await addLog(`Getting total listings for seller ${sellerUsername}`);
         await addLog(`Using access token: ${accessToken}`);
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=seller:${encodeURIComponent(sellerUsername)}&` +
+            `username=${sellerUsername}}&` +
             `limit=1`;
 
         const response = await fetchWithTimeout(url, {
