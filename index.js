@@ -9,7 +9,10 @@ import { URLSearchParams } from 'url';
 
 // Load environment variables
 dotenv.config();
-
+// Simple logging function (to replace addLog)
+async function log(message) {
+    console.log(message);
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
