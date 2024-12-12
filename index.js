@@ -213,76 +213,61 @@ async function getSellerTotalListings(sellerUsername) {
 
 async function fetchSellerListings(sellerUsername, categoryIds) {
     try {
-        // Add debug logs
-        await addLog(`Debug: Starting fetchSellerListings for ${sellerUsername}`);
-        await addLog(`Debug: Current fetchSellerListing categoryIds: ${JSON.stringify(categoryIds)}`);
+        let allListings = [];
+        let totalCount = 0;
 
-        // First get total listings
-        const totalListings = await getSellerTotalListings(sellerUsername);
-
-        if (totalListings === 0) {
-            await addLog(`Seller ${sellerUsername} has no active listings`);
-            return { error: true, listings: [], total: 0, categoryTotal: 0 };
-        }
-        
-        // Add more debug logs
-        await addLog(`Debug: About to create category query`);
-        await addLog(`Debug: categoryIds type: ${typeof categoryIds}`);
-        await addLog(`Debug: categoryIds value: ${categoryIds}`);
-
-        // Check if categoryIds exists and is an array
-        if (!Array.isArray(categoryIds)) {
-            await addLog(`Error: categoryIds is not an array: ${typeof categoryIds}`);
-            return { error: true, listings: [], total: totalListings, categoryTotal: 0 };
-        }
-
-        // Then get category-specific listings
-        const categoryQuery = categoryIds.join('|');
-        const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
-        const params = {
-            'OPERATION-NAME': 'findItemsAdvanced',
-            'SERVICE-VERSION': '1.0.0',
-            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
-            'RESPONSE-DATA-FORMAT': 'JSON',
-            'itemFilter(0).name': 'Seller',
-            'itemFilter(0).value': sellerUsername,
-            'itemFilter(0).name': 'Category',
-            'itemFilter(0).value': categoryQuery,
-            'paginationInput.entriesPerPage': '50'
-        };
-        const queryString = new URLSearchParams(params).toString();
-        await addLog(`Seller listings request for ${sellerUsername}: ${queryString}`);
-        const fullUrl = `${url}?${queryString}`;
-        await addLog(`Full URL: ${fullUrl}`);
-
-        
-        const response = await fetchWithTimeout(fullUrl);
-        await addLog(`Fetch Seller data by category IDs for ${sellerUsername}: ${response.status}`);
-
-        if (!response.ok) {
-            const errorData = await response.text();
-            await addLog(`Error fetching listings for ${sellerUsername}: ${response.status}`);
-            await addLog(`Error details: ${errorData}`);
-            return { 
-                error: true, 
-                listings: [], 
-                total: totalListings,
-                categoryTotal: 0 
+        // Process categories in groups of 3
+        for (let i = 0; i < categoryIds.length; i += 3) {
+            const currentCategories = categoryIds.slice(i, i + 3);
+            
+            const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
+            const params = {
+                'OPERATION-NAME': 'findItemsAdvanced',
+                'SERVICE-VERSION': '1.0.0',
+                'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
+                'GLOBAL-ID': 'EBAY-US',
+                'RESPONSE-DATA-FORMAT': 'JSON',
+                'itemFilter(0).name': 'Seller',
+                'itemFilter(0).value': sellerUsername,
+                'paginationInput.entriesPerPage': '50'
             };
+
+            // Add up to 3 category IDs
+            currentCategories.forEach((catId, index) => {
+                params[`categoryId[${index}]`] = catId;
+            });
+
+            const queryString = new URLSearchParams(params).toString();
+            const fullUrl = `${url}?${queryString}`;
+
+            await addLog(`Processing categories ${i + 1}-${i + currentCategories.length} of ${categoryIds.length}`);
+            await addLog(`Full URL for batch ${i+1}: ${fullUrl}`);
+
+            const response = await fetch(fullUrl);
+            const data = await response.json();
+
+            if (data.findItemsAdvancedResponse[0].ack[0] === "Success") {
+                const searchResult = data.findItemsAdvancedResponse[0].searchResult[0];
+                if (searchResult.item) {
+                    allListings = allListings.concat(searchResult.item);
+                }
+                const currentTotal = parseInt(data.findItemsAdvancedResponse[0].paginationOutput[0].totalEntries[0]) || 0;
+                totalCount += currentTotal;
+            }
+
+            // Add delay between API calls
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        const data = await response.json();
-        await addLog(`Seller listings by CategoryIds for ${sellerUsername}: ${JSON.stringify(data, null, 2)}`);
         return {
             error: false,
-            listings: data.itemSummaries || [],
-            total: totalListings,
-            categoryTotal: data.total || 0
+            listings: allListings,
+            total: totalCount
         };
 
     } catch (error) {
-        await addLog(`Error processing ${sellerUsername}: ${error.message}`);
-        return { error: true, listings: [], total: 0, categoryTotal: 0 };
+        await addLog(`Error fetching listings for ${sellerUsername}: ${error.message}`);
+        return { error: true, listings: [], total: 0 };
     }
 }
 
