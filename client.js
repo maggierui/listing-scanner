@@ -85,6 +85,37 @@ async function handleFormSubmit(e) {
   }
 }
 
+async function pollResults() {
+  try {
+      const response = await fetch('/api/results');  // Changed to match server endpoint
+      const data = await response.json();
+
+      if (data.status === 'complete') {
+          displayResults(data.listings);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('results').style.display = 'block';
+      } else if (data.status === 'error') {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').textContent = 'Scan failed: ' + data.error;
+          document.getElementById('error').style.display = 'block';
+      } else {
+          // Continue polling if still processing
+          setTimeout(pollResults, 5000);
+      }
+
+// Update log area
+if (data.logMessages && data.logMessages.length > 0) {
+  const logArea = document.getElementById('logArea');
+  logArea.innerHTML = data.logMessages.join('<br>');
+}
+
+} catch (error) {
+document.getElementById('loading').style.display = 'none';
+document.getElementById('error').textContent = 'Error checking results: ' + error.message;
+document.getElementById('error').style.display = 'block';
+}
+}
+
 // Results display function
 function displayResults(results) {
   const resultsDiv = document.getElementById('results');
