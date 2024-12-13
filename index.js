@@ -71,11 +71,12 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/scan', async (req, res) => {
     try {
-        await addLog('Received data:', JSON.stringify(req.body));
-        await addLog('\n=== Got scan request from the user ===');
-        await addLog(`Raw feedback threshold from request: ${req.body.feedbackThreshold}`);
-        await addLog(`Type of feedback threshold: ${typeof req.body.feedbackThreshold}`);
-        await addLog(`received search phrases: ${req.body.searchPhrases}`);
+
+          // Send immediate response to client
+          res.json({ 
+            status: 'started',
+            message: 'Scan started successfully'
+        });
 
         // Parse feedback threshold
         const threshold = parseInt(req.body.feedbackThreshold, 10);
@@ -229,7 +230,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
                 'RESPONSE-DATA-FORMAT': 'JSON',
                 'itemFilter(0).name': 'Seller',
                 'itemFilter(0).value': sellerUsername,
-                'paginationInput.entriesPerPage': '50'
+                'paginationInput.entriesPerPage': '20'
             };
 
             // Add up to 3 category IDs
@@ -305,7 +306,7 @@ async function analyzeSellerListings(sellerData, username) {
 
 async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds) {
     await trackApiCall();
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=150`;
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=50`;
     
     // Cache handling
     const cacheKey = searchPhrases.join(',').toLowerCase();  // Convert array to string

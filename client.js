@@ -53,6 +53,7 @@ async function handleScanSubmit(e) {
       document.getElementById('loading').style.display = 'block';
       document.getElementById('error').style.display = 'none';
       document.getElementById('results').style.display = 'none';
+      console.log('Submitting scan request...');
 
       const response = await fetch('/api/scan', {  // This is a POST request
           method: 'POST',
@@ -67,11 +68,16 @@ async function handleScanSubmit(e) {
           })
       });
 
+      console.log('Scan response status:', response.status);
+        const responseData = await response.json();
+        console.log('Scan response data:', responseData);
+
       if (!response.ok) {
           throw new Error('Failed to initiate scan');
       }
 
       // Start polling for results
+      console.log('Starting results polling...');
       pollResults();
 
   } catch (error) {
