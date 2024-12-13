@@ -29,6 +29,8 @@ app.use(express.static(__dirname)); // Serve files from current directory
 
 // Initialize variables
 let apiCallsCount = 0;
+// Near the top of index.js
+let scanInProgress = false;
 
 
 async function trackApiCall() {
@@ -70,13 +72,22 @@ app.get('/api/categories', async (req, res) => {
 });
 
 app.post('/api/scan', async (req, res) => {
-    try {
+        if (scanInProgress) {
+            return res.status(409).json({ 
+                error: 'A scan is already in progress'
+            });
+        }
+        
+        scanInProgress = true;
+        scanResults.status = 'processing';
+        scanResults.error = null;
 
           // Send immediate response to client
-          res.json({ 
-            status: 'started',
-            message: 'Scan started successfully'
-        });
+          try {
+            res.json({ 
+                status: 'started',
+                message: 'Scan started successfully'
+            });
 
         // Parse feedback threshold
         const threshold = parseInt(req.body.feedbackThreshold, 10);
@@ -101,18 +112,24 @@ app.post('/api/scan', async (req, res) => {
 
       await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
 
-         // Pass all parameters to startScan
-         await startScan(parsedPhrases, threshold, categories);
-         
-         res.json({ 
-             status: 'Scan started',
-             message: `Starting scan with ${parsedPhrases.length} search phrases`
-         });
-     } catch (error) {
-         await addLog(`Error in scan endpoint: ${error.message}`);
-         res.status(500).json({ error: error.message });
-     }
- });
+        // Start the scan in the background
+        startScan(parsedPhrases, threshold, categories)
+            .catch(error => {
+                console.error('Scan error:', error);
+                scanResults.status = 'error';
+                scanResults.error = error.message;
+            })
+            .finally(() => {
+                scanInProgress = false;
+            });
+            
+    } catch (error) {
+        scanInProgress = false;
+        scanResults.status = 'error';
+        scanResults.error = error.message;
+        res.status(500).json({ error: error.message });
+    }
+});
 
 async function addLog(message) {
 // Create timestamp in EST/EDT
@@ -495,31 +512,27 @@ app.get('/status', (req, res) => {
     res.json({ status: 'Server is running' });
 });
 
-
-
-
 app.get('/api/results', (req, res) => {
-    console.log('Debug - sending results:', scanResults);
-    if (scanResults.status === 'complete') {
-        res.json({
-            status: 'complete',
-            lastUpdated: scanResults.lastUpdated,
-            totalListings: scanResults.listings.length,
-            listings: scanResults.listings.map(item => ({
-                title: item.title,
-                price: item.price?.value || 'N/A',
-                currency: item.price?.currency || 'N/A',
-                seller: item.seller?.username || 'N/A',
-                feedbackScore: item.seller?.feedbackScore || 'N/A',
-                itemWebUrl: item.itemWebUrl
-            })),
-            logMessages: scanResults.logMessages
+    try {
+        console.log('Sending scan results:', {
+            status: scanResults.status,
+            listingCount: scanResults.listings?.length,
+            hasError: !!scanResults.error
         });
-    } else {
+        
         res.json({
             status: scanResults.status,
+            lastUpdated: scanResults.lastUpdated,
+            totalListings: scanResults.listings?.length || 0,
+            listings: scanResults.listings || [],
             error: scanResults.error,
             logMessages: scanResults.logMessages
+        });
+    } catch (error) {
+        console.error('Error in /api/results:', error);
+        res.status(500).json({
+            status: 'error',
+            error: 'Internal server error'
         });
     }
 });

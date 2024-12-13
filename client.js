@@ -88,12 +88,22 @@ async function handleScanSubmit(e) {
 }
 
 // Results polling function
-async function pollResults() {
+// Results polling function with retry logic
+async function pollResults(retryCount = 0, maxRetries = 3) {
   try {
       const response = await fetch('/api/results', {
-          method: 'GET'  // Explicitly specify GET method
+          method: 'GET',
+          headers: {
+              'Cache-Control': 'no-cache'
+          }
       });
+      
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Poll response:', data);
 
       // Update log area if available
       if (data.logMessages && data.logMessages.length > 0) {
@@ -106,15 +116,28 @@ async function pollResults() {
           document.getElementById('loading').style.display = 'none';
           document.getElementById('results').style.display = 'block';
       } else if (data.status === 'error') {
+          if (retryCount < maxRetries) {
+              console.log(`Retrying poll... Attempt ${retryCount + 1} of ${maxRetries}`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              return pollResults(retryCount + 1, maxRetries);
+          }
           document.getElementById('loading').style.display = 'none';
           document.getElementById('error').textContent = 'Scan failed: ' + data.error;
           document.getElementById('error').style.display = 'block';
       } else {
           // Continue polling if still processing
-          setTimeout(pollResults, 5000);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          return pollResults(0, maxRetries); // Reset retry count for new polling cycle
       }
-
   } catch (error) {
+      console.error('Polling error:', error);
+      
+      if (retryCount < maxRetries) {
+          console.log(`Retrying poll... Attempt ${retryCount + 1} of ${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return pollResults(retryCount + 1, maxRetries);
+      }
+      
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error').textContent = 'Error checking results: ' + error.message;
       document.getElementById('error').style.display = 'block';
