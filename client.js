@@ -62,7 +62,7 @@ async function handleFormSubmit(e) {
   document.getElementById('results').style.display = 'none';
 
   try {
-      const response = await fetch('/api/scan', {
+      const response = await fetch('/api/results', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -75,6 +75,7 @@ async function handleFormSubmit(e) {
       }
 
       const results = await response.json();
+      await add_log('Found results:', results);  // Add this debug log    
       displayResults(results);
   } catch (error) {
       document.getElementById('error').textContent = 'Scan failed: ' + error.message;

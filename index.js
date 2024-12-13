@@ -245,6 +245,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
             const response = await fetch(fullUrl);
             const data = await response.json();
+            await addLog(`Response for batch ${i+1}: ${JSON.stringify(data)}`);
 
             if (data.findItemsAdvancedResponse[0].ack[0] === "Success") {
                 const searchResult = data.findItemsAdvancedResponse[0].searchResult[0];
@@ -496,7 +497,7 @@ app.get('/status', (req, res) => {
 
 
 
-app.get('/results', (req, res) => {
+app.get('/api/results', (req, res) => {
     console.log('Debug - sending results:', scanResults);
     if (scanResults.status === 'complete') {
         res.json({
