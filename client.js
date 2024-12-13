@@ -44,51 +44,56 @@ async function loadCategories() {
   }
 }
 
-// Form submission handling
-async function handleFormSubmit(e) {
+// Form submission handler
+async function handleScanSubmit(e) {
   e.preventDefault();
   
-  const formdata={
-    categoryIds: Array.from(document.getElementById('categorySelect').selectedOptions)
-      .map(option => option.value),
-    feedbackThreshold: document.getElementById('feedbackThreshold').value,
-     searchPhrases: document.getElementById('searchPhrases').value
-  }
-  console.log('Client sending data:', formdata);  // Add this debug log
-
-  // Show loading state
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('error').style.display = 'none';
-  document.getElementById('results').style.display = 'none';
-
   try {
-      const response = await fetch('/api/results', {
+      // Show loading state
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('results').style.display = 'none';
+
+      const response = await fetch('/api/scan', {  // This is a POST request
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formdata)
+          body: JSON.stringify({
+              categoryIds: Array.from(document.getElementById('categorySelect').selectedOptions)
+                  .map(option => option.value),
+              feedbackThreshold: document.getElementById('feedbackThreshold').value,
+              searchPhrases: document.getElementById('searchPhrases').value
+          })
       });
 
       if (!response.ok) {
-          throw new Error('Scan failed');
+          throw new Error('Failed to initiate scan');
       }
 
-      const results = await response.json();
-      await add_log('Found results:', results);  // Add this debug log    
-      displayResults(results);
+      // Start polling for results
+      pollResults();
+
   } catch (error) {
+      document.getElementById('loading').style.display = 'none';
       document.getElementById('error').textContent = 'Scan failed: ' + error.message;
       document.getElementById('error').style.display = 'block';
-  } finally {
-      document.getElementById('loading').style.display = 'none';
   }
 }
 
+// Results polling function
 async function pollResults() {
   try {
-      const response = await fetch('/api/results');  // Changed to match server endpoint
+      const response = await fetch('/api/results', {
+          method: 'GET'  // Explicitly specify GET method
+      });
       const data = await response.json();
+
+      // Update log area if available
+      if (data.logMessages && data.logMessages.length > 0) {
+          const logArea = document.getElementById('logArea');
+          logArea.innerHTML = data.logMessages.join('<br>');
+      }
 
       if (data.status === 'complete') {
           displayResults(data.listings);
@@ -103,18 +108,15 @@ async function pollResults() {
           setTimeout(pollResults, 5000);
       }
 
-// Update log area
-if (data.logMessages && data.logMessages.length > 0) {
-  const logArea = document.getElementById('logArea');
-  logArea.innerHTML = data.logMessages.join('<br>');
+  } catch (error) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').textContent = 'Error checking results: ' + error.message;
+      document.getElementById('error').style.display = 'block';
+  }
 }
 
-} catch (error) {
-document.getElementById('loading').style.display = 'none';
-document.getElementById('error').textContent = 'Error checking results: ' + error.message;
-document.getElementById('error').style.display = 'block';
-}
-}
+// Make sure form is connected to handler
+document.getElementById('scanForm').addEventListener('submit', handleScanSubmit);
 
 // Results display function
 function displayResults(results) {
