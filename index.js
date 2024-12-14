@@ -364,13 +364,9 @@ async function analyzeSellerListings(sellerData) {
     await addLog(`Categories analyzed: ${sellerData.categories.join(', ')}`);
 
     // Analysis criteria
-    const MINIMUM_RATIO = 90;
-    const MINIMUM_LISTINGS = 5;
-    const MAXIMUM_LISTINGS = 1000;
+    const MINIMUM_RATIO = 80;
     
-    const shouldExclude = ratio < MINIMUM_RATIO || 
-                         categoryListings < MINIMUM_LISTINGS || 
-                         totalListings > MAXIMUM_LISTINGS;
+    const shouldExclude = ratio > MINIMUM_RATIO;
 
     await addLog(shouldExclude
         ? `DECISION: EXCLUDING ${sellerData.username} - ${ratio.toFixed(2)}% in target categories`
