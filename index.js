@@ -94,9 +94,7 @@ app.post('/api/scan', async (req, res) => {
         await addLog(`Parsed feedback threshold: ${threshold}`);
 
         // Get category IDs
-        const categories = req.body.categoryIds;
-        await addLog(`Request categoryIds: ${JSON.stringify(categories || [])}`);
-        
+        const categories = req.body.categoryIds;        
       // Parse search phrases
       const rawSearchPhrases = req.body.searchPhrases;
       let parsedPhrases;
@@ -200,7 +198,6 @@ async function getSellerTotalListings(sellerUsername) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        await log(`Seller listings response for ${sellerUsername}: ${JSON.stringify(data, null, 2)}`);
 
         // Debug each step
         const advancedResponse = data.findItemsAdvancedResponse[0];
@@ -249,7 +246,6 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         // Process categories in groups of 3 (eBay API limitation)
         for (let i = 0; i < categoryIds.length; i += 3) {
             const currentCategories = categoryIds.slice(i, i + 3);
-            await addLog(`Processing categories ${currentCategories.join(', ')}`);
 
             // Configure the eBay Finding API request
             const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
