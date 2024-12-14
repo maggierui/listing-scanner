@@ -269,9 +269,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             // Build and execute the API request
             const queryString = new URLSearchParams(params).toString();
             const fullUrl = `${url}?${queryString}`;
-            
-            await addLog(`Requesting data from eBay API: ${fullUrl}`);
-            
+                        
             const response = await fetch(fullUrl);
             const data = await response.json();
 
@@ -474,6 +472,16 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
             }
             sellerListings.get(sellerUsername).push(item);
         });
+        await addLog(`======= Grouped listings by seller: ${sellerListings.size} unique sellers=======`);
+        await addLog(`Grouped listings by seller: ${JSON.stringify([...sellerListings.keys()])}`);
+
+        // Now process each seller once
+        let sellerCounter = 0;
+        let qualifiedSellerCounter = 0;
+        let totalSellers = sellerListings.size;
+
+        await addLog(`\n=== Beginning Seller Processing ===`);
+        await addLog(`Total sellers to process: ${totalSellers}`);
 
         // Now process each seller once
         for (const [sellerUsername, listings] of sellerListings) {
@@ -482,7 +490,9 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
                 await addLog(`Skipping already processed seller: ${sellerUsername}`);
                 continue;
             }
-
+            sellerCounter++;
+            await addLog(`\n--- Processing Seller ${sellerCounter} of ${totalSellers}: ${sellerUsername} ---`);
+            await addLog(`This seller has ${listings.length} listings in search results`);
             processedSellers.add(sellerUsername);
             
             // Check feedback score
@@ -500,17 +510,19 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
 
             if (!shouldExclude && !sellerData.error) {
                 // If seller passes our criteria, add their listings
-                await addLog(`Including listings from seller ${sellerUsername}`);
+                qualifiedSellerCounter++;
+                await addLog(`Seller ${sellerUsername} has passed analysis`);
                 // Only add one listing per seller to avoid duplicates
                 if (listings.length > 0) {
                     filteredListings.push(listings[0]);
-                    await addLog(`Added listing: ${listings[0].title}`);
+                    await addLog(`Found a qualified listing. Adding this listing: ${listings[0].title}`);
                 }
             } else {
                 await addLog(`Excluded seller ${sellerUsername} based on analysis`);
             }
         }
-
+        await addLog(`\nFinished processing. Processed ${sellerCounter} sellers`);
+        await addLog(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
         await addLog(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
         return filteredListings;
 
