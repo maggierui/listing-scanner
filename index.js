@@ -435,21 +435,13 @@ async function createSellerData(username, categoryIds) {
     }
 }
 
-async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds) {
+async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThreshold, categoryIds) {
     await trackApiCall();
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=50`;
     
-    // Cache handling
-    const cacheKey = searchPhrases.join(',').toLowerCase();  // Convert array to string
-    const currentTime = Date.now();
-    if (listingsCache.data[cacheKey] && 
-        (currentTime - listingsCache.timestamps[cacheKey]) < CACHE_DURATION) {
-        await addLog(`Using cached results for phrases: ${searchPhrases}`);
-        return listingsCache.data[cacheKey];
-}
-
-    await addLog(`\n=== Searching for phrase: ${searchPhrases} ===`);
-    await addLog(`URL: ${url}`);
+    // Track unique sellers we've already processed
+    const processedSellers = new Set();
+    const filteredListings = [];
 
     try {
         const response = await fetchWithTimeout(url, {
@@ -461,78 +453,69 @@ async function fetchListingsForPhrase(accessToken,searchPhrases, feedbackThresho
             },
         });
 
-        if (response.status === 429) {
-            const rateLimitMessage = await response.text();
-            await addLog(`RATE LIMIT REACHED: ${rateLimitMessage}`);
-            await addLog('Daily API limit reached. Operations will resume when limit resets.');
-            return [];
-        }
-
         if (!response.ok) {
-            const errorText = await response.text();
-            await addLog(`Error fetching listings for ${searchPhrases}: ${response.status}`);
-            await addLog(`Error details: ${errorText}`);
-            return [];
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        await addLog(`Found ${data.itemSummaries?.length || 0} initial listings for ${searchPhrases}`);
-
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
+            await addLog('No listings found for this search phrase');
             return [];
         }
 
-        const filteredListings = [];
-        const sellers = data.itemSummaries;
+        await addLog(`Found ${data.itemSummaries.length} initial listings to process`);
+
+        // Group listings by seller
+        const sellerListings = new Map();
         
-        // Process sellers in chunks of 3
-        for (let i = 0; i < sellers.length; i += 3) {
-            const chunk = sellers.slice(i, i + 3);
-            const results = await Promise.all(chunk.map(async (item) => {
-                const feedbackScore = item.seller?.feedbackScore || 0;
-                // Add debug logs
-                await addLog('\n=== Debug: Feedback Check ===');
-                await addLog(`Global feedbackThreshold value: ${feedbackThreshold}`);
-                await addLog(`Debug: Checking seller ${item.seller?.username}`);
-                await addLog(`Debug: Seller feedback score: ${feedbackScore}`);
-                await addLog(`Debug: Feedback threshold: ${feedbackThreshold}`);
-                await addLog(`Debug: Condition check: ${feedbackScore} >= ${feedbackThreshold} equals ${feedbackScore >= feedbackThreshold}`);
-                if (feedbackScore >= feedbackThreshold) {
-                    await addLog(`Skipping seller ${item.seller?.username} (feedback: ${feedbackScore})`);
-                    return null;
-                }
-
-                try {
-                    // Create complete seller data structure
-                    const sellerData = await createSellerData(item.seller?.username, categoryIds);
-                    await addLog(`Seller data for ${item.seller?.username}: ${JSON.stringify(sellerData)}`);
-                    // Analyze the seller using the complete data
-                    const shouldExclude = await analyzeSellerListings(sellerData);
-                    
-                    if (!shouldExclude && !sellerData.error) {
-                        await addLog(`Adding listing from ${item.seller?.username}: ${item.title}`);
-                        filteredListings.push(item);
-                    }
-                    await addLog(`Excluded listing from ${item.seller?.username}: ${item.title}`);
-                    return null;
-                } catch (error) {
-                    await addLog(`Error processing ${item.seller?.username}: ${error.message}`);
-                    return null;
-                }
-            }));
-
-            const validResults = results.filter(item => item !== null);
-            if (validResults && validResults.length > 0) {
-                filteredListings.push(...validResults);
+        // First, group all listings by seller
+        data.itemSummaries.forEach(item => {
+            const sellerUsername = item.seller?.username;
+            if (!sellerUsername) return;
+            
+            if (!sellerListings.has(sellerUsername)) {
+                sellerListings.set(sellerUsername, []);
             }
-            await delay(500);
+            sellerListings.get(sellerUsername).push(item);
+        });
+
+        // Now process each seller once
+        for (const [sellerUsername, listings] of sellerListings) {
+            // Skip if we've already processed this seller
+            if (processedSellers.has(sellerUsername)) {
+                await addLog(`Skipping already processed seller: ${sellerUsername}`);
+                continue;
+            }
+
+            processedSellers.add(sellerUsername);
+            
+            // Check feedback score
+            const feedbackScore = listings[0].seller?.feedbackScore || 0;
+            await addLog(`\nProcessing seller ${sellerUsername} (feedback: ${feedbackScore})`);
+            
+            if (feedbackScore >= feedbackThreshold) {
+                await addLog(`Skipping seller ${sellerUsername} due to high feedback score`);
+                continue;
+            }
+
+            // Get and analyze all of this seller's listings
+            const sellerData = await createSellerData(sellerUsername, categoryIds);
+            const shouldExclude = await analyzeSellerListings(sellerData);
+
+            if (!shouldExclude && !sellerData.error) {
+                // If seller passes our criteria, add their listings
+                await addLog(`Including listings from seller ${sellerUsername}`);
+                // Only add one listing per seller to avoid duplicates
+                if (listings.length > 0) {
+                    filteredListings.push(listings[0]);
+                    await addLog(`Added listing: ${listings[0].title}`);
+                }
+            } else {
+                await addLog(`Excluded seller ${sellerUsername} based on analysis`);
+            }
         }
 
-        // Store filtered results in cache before returning
-        listingsCache.data[cacheKey] = filteredListings;
-        listingsCache.timestamps[cacheKey] = currentTime;
-        
-        await addLog(`Found ${filteredListings.length} matching listings for ${phrase}\n`);
+        await addLog(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
         return filteredListings;
 
     } catch (error) {
