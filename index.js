@@ -514,17 +514,39 @@ app.get('/status', (req, res) => {
 
 app.get('/api/results', (req, res) => {
     try {
+        // Log the initial state for debugging
         console.log('Sending scan results:', {
             status: scanResults.status,
             listingCount: scanResults.listings?.length,
             hasError: !!scanResults.error
         });
         
+        // Transform the listings data if we have completed listings
+        const transformedListings = scanResults.listings?.map(item => {
+            // Extract the specific values we need from the nested objects
+            return {
+                title: item.title || 'N/A',
+                // Extract numeric price value from the price object
+                price: item.price?.value 
+                    ? parseFloat(item.price.value).toFixed(2) 
+                    : 'N/A',
+                // Extract currency from the price object
+                currency: item.price?.currency || 'USD',
+                // Extract username from the seller object
+                seller: item.seller?.username || 'N/A',
+                // Extract and format feedback score from the seller object
+                feedbackScore: item.seller?.feedbackScore?.toString() || 'N/A',
+                // Use the direct link to the item
+                link: item.itemWebUrl || '#'
+            };
+        }) || [];  // If no listings, default to empty array
+        
+        // Send the transformed data in the response
         res.json({
             status: scanResults.status,
             lastUpdated: scanResults.lastUpdated,
             totalListings: scanResults.listings?.length || 0,
-            listings: scanResults.listings || [],
+            listings: transformedListings,
             error: scanResults.error,
             logMessages: scanResults.logMessages
         });
