@@ -117,8 +117,8 @@ app.post('/api/scan', async (req, res) => {
                 message: 'Scan started successfully'
             });
 
-        // Start the scan in the background
-        startScan(searchPhrases, threshold, categories)
+        // Start the scan in the background without awaiting
+        startScan(searchPhrases, feedbackThreshold, categoryIds)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
@@ -129,10 +129,14 @@ app.post('/api/scan', async (req, res) => {
             });
             
     } catch (error) {
-        scanInProgress = false;
-        scanResults.status = 'error';
-        scanResults.error = error.message;
-        res.status(500).json({ error: error.message });
+        // Only send error response if we haven't sent a response yet
+        if (!res.headersSent) {
+            scanInProgress = false;
+            scanResults.status = 'error';
+            scanResults.error = error.message;
+            await addLog(`Error in scan endpoint: ${error.message}`);
+            res.status(500).json({ error: error.message });
+        }
     }
 });
 
