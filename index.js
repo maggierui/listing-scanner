@@ -82,12 +82,6 @@ app.post('/api/scan', async (req, res) => {
         scanResults.status = 'processing';
         scanResults.error = null;
 
-          // Send immediate response to client
-          try {
-            res.json({ 
-                status: 'started',
-                message: 'Scan started successfully'
-            });
 
         // Parse feedback threshold
         const threshold = parseInt(req.body.feedbackThreshold, 10);
@@ -95,20 +89,39 @@ app.post('/api/scan', async (req, res) => {
 
         // Get category IDs
         const categories = req.body.categoryIds;        
-      // Parse search phrases
-      const rawSearchPhrases = req.body.searchPhrases;
-      let parsedPhrases;
-      if (typeof rawSearchPhrases === 'string') {
+        // Parse search phrases
+        const rawSearchPhrases = req.body.searchPhrases;
+        let parsedPhrases;
+        if (typeof rawSearchPhrases === 'string') {
           // If it's a single string with commas
           parsedPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
-      } else if (Array.isArray(rawSearchPhrases)) {
+        } else if (Array.isArray(rawSearchPhrases)) {
           // If it's already an array
           parsedPhrases = rawSearchPhrases;
-      } else {
+        } else {
           throw new Error('Invalid search phrases format');
-      }
+        }
+        // Validate the inputs
+        if (!searchPhrases || searchPhrases.length === 0) {
+            return res.status(400).json({ error: 'Search phrases are required' });
+        }
 
-      await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
+        if (isNaN(feedbackThreshold)) {
+            return res.status(400).json({ error: 'Valid feedback threshold is required' });
+        }
+
+        if (!categoryIds || categoryIds.length === 0) {
+            return res.status(400).json({ error: 'Category IDs are required' });
+        }
+
+        await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
+
+        // Send immediate response to client
+        try {
+            res.json({ 
+                status: 'started',
+                message: 'Scan started successfully'
+            });
 
         // Start the scan in the background
         startScan(parsedPhrases, threshold, categories)
@@ -569,6 +582,21 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
 
 async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
     try {
+        // Add validation at the start of the function
+        if (!searchPhrases || !Array.isArray(searchPhrases)) {
+            await addLog('Error: Invalid or missing search phrases');
+            throw new Error('Invalid search phrases provided');
+        }
+        if (!feedbackThreshold) {
+            await addLog('Error: Missing feedback threshold');
+            throw new Error('Missing feedback threshold');
+        }
+
+        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
+            await addLog('Error: Invalid or missing category IDs');
+            throw new Error('Invalid category IDs provided');
+        }
+
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
         
@@ -576,6 +604,12 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         await fs.appendFile(logFileName, `startScan function - New Scan Started at ${new Date().toLocaleString()}\n`);
         await fs.appendFile(logFileName, `========================================\n\n`);
         await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+
+        // Add debug logging
+        await addLog('Scan parameters:');
+        await addLog(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
+        await addLog(`- Feedback Threshold: ${feedbackThreshold}`);
+        await addLog(`- Category IDs: ${JSON.stringify(categoryIds)}`);
 
         scanResults.status = 'processing';
         scanResults.error = null;
