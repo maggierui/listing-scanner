@@ -603,6 +603,16 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         await fs.appendFile(logFileName, `========================================\n\n`);
         await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
 
+        // Add logging for database cleanup
+        try {
+            await addLog('Starting database cleanup...');
+            await previousListings.cleanup();
+            await addLog('Database cleanup completed');
+        } catch (cleanupError) {
+            await addLog(`Database cleanup error: ${cleanupError.message}`);
+            // Continue with scan even if cleanup fails
+        }
+
         // Add debug logging
         await addLog('Scan parameters:');
         await addLog(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
@@ -612,6 +622,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
+        
         await addLog('Calling fetchAllListings...');
         const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,);
         await addLog(`fetchAllListings completed. Found ${listings.length} listings`);

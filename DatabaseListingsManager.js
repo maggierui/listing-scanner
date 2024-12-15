@@ -44,12 +44,20 @@ class DatabaseListingsManager {
         );
     }
 
-    async cleanup(daysToKeep = 30) {
+    // In your DatabaseListingsManager class
+async cleanup(daysToKeep = 30) {
+    try {
+        // Fix the parameter binding syntax
         await this.pool.query(
-            'DELETE FROM previous_listings WHERE created_at < NOW() - INTERVAL \'$1 days\'',
+            'DELETE FROM previous_listings WHERE created_at < NOW() - INTERVAL $1 || \' days\'',
             [daysToKeep]
         );
+        await addLog(`Cleaned up listings older than ${daysToKeep} days`);
+    } catch (error) {
+        await addLog(`Error cleaning up old listings: ${error.message}`);
+        console.error('Error cleaning up old listings:', error);
     }
+}
 }
 
 export default DatabaseListingsManager;
