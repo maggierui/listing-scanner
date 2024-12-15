@@ -8,6 +8,8 @@ import dotenv from 'dotenv';
 import { URLSearchParams } from 'url';
 import { generatePreviousListingsCSV, generateSearchResultsCSV } from './csv-handlers.js';
 import DatabaseListingsManager from './DatabaseListingsManager.js';
+import logger from './logger.js';
+
 
 
 // Load environment variables
