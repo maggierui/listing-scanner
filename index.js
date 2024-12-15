@@ -77,44 +77,38 @@ app.post('/api/scan', async (req, res) => {
                 error: 'A scan is already in progress'
             });
         }
-        
-        scanInProgress = true;
-        scanResults.status = 'processing';
-        scanResults.error = null;
 
-
-        // Parse feedback threshold
-        const threshold = parseInt(req.body.feedbackThreshold, 10);
-        await addLog(`Parsed feedback threshold: ${threshold}`);
-
-        // Get category IDs
-        const categories = req.body.categoryIds;        
-        // Parse search phrases
-        const rawSearchPhrases = req.body.searchPhrases;
-        let parsedPhrases;
-        if (typeof rawSearchPhrases === 'string') {
-          // If it's a single string with commas
-          parsedPhrases = rawSearchPhrases.split(',').map(phrase => phrase.trim());
-        } else if (Array.isArray(rawSearchPhrases)) {
-          // If it's already an array
-          parsedPhrases = rawSearchPhrases;
-        } else {
-          throw new Error('Invalid search phrases format');
-        }
-        // Validate the inputs
-        if (!searchPhrases || searchPhrases.length === 0) {
+        // Check if req.body.searchPhrases exists first
+        if (!req.body.searchPhrases) {
             return res.status(400).json({ error: 'Search phrases are required' });
+        }
+
+        // Then parse the search phrases
+        const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
+        const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
+        const categoryIds = req.body.categoryIds;
+
+        await addLog(`Received request with:`);
+        await addLog(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
+        await addLog(`- Feedback threshold: ${feedbackThreshold}`);
+        await addLog(`- Category IDs: ${JSON.stringify(categoryIds)}`);
+
+        // Validate after parsing
+        if (searchPhrases.length === 0) {
+            return res.status(400).json({ error: 'At least one search phrase is required' });
         }
 
         if (isNaN(feedbackThreshold)) {
             return res.status(400).json({ error: 'Valid feedback threshold is required' });
         }
 
-        if (!categoryIds || categoryIds.length === 0) {
+        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
             return res.status(400).json({ error: 'Category IDs are required' });
         }
-
-        await addLog(`Parsed searchPhrases: ${JSON.stringify(parsedPhrases)}`);
+        
+        scanInProgress = true;
+        scanResults.status = 'processing';
+        scanResults.error = null;
 
         // Send immediate response to client
         try {
@@ -124,7 +118,7 @@ app.post('/api/scan', async (req, res) => {
             });
 
         // Start the scan in the background
-        startScan(parsedPhrases, threshold, categories)
+        startScan(searchPhrases, threshold, categories)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
