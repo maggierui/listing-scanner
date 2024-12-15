@@ -1,5 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
+import logger from './logger.js';
 
 class DatabaseListingsManager {
     constructor() {
@@ -52,9 +53,9 @@ async cleanup(daysToKeep = 30) {
             'DELETE FROM previous_listings WHERE created_at < NOW() - INTERVAL $1 || \' days\'',
             [daysToKeep]
         );
-        await addLog(`Cleaned up listings older than ${daysToKeep} days`);
+        await logger.log(`Cleaned up listings older than ${daysToKeep} days`);
     } catch (error) {
-        await addLog(`Error cleaning up old listings: ${error.message}`);
+        await logger.log(`Error cleaning up old listings: ${error.message}`);
         console.error('Error cleaning up old listings:', error);
     }
 }

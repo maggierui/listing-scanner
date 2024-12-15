@@ -12,7 +12,7 @@ import DatabaseListingsManager from './DatabaseListingsManager.js';
 
 // Load environment variables
 dotenv.config();
-// Simple logging function (to replace addLog)
+// Simple logging function (to replace logger.log)
 async function log(message) {
     console.log(message);
 }
@@ -35,9 +35,9 @@ let scanInProgress = false;
 
 async function trackApiCall() {
     apiCallsCount++;
-    await addLog(`API Calls made today: ${apiCallsCount}/5000`);
+    await logger.log(`API Calls made today: ${apiCallsCount}/5000`);
     if (apiCallsCount > 4500) {
-        await addLog('WARNING: Approaching daily API limit (5000)');
+        await logger.log('WARNING: Approaching daily API limit (5000)');
     }
 }
 
@@ -88,10 +88,10 @@ app.post('/api/scan', async (req, res) => {
         const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
         const categoryIds = req.body.categoryIds;
 
-        await addLog(`Received request with:`);
-        await addLog(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
-        await addLog(`- Feedback threshold: ${feedbackThreshold}`);
-        await addLog(`- Category IDs: ${JSON.stringify(categoryIds)}`);
+        await logger.log(`Received request with:`);
+        await logger.log(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
+        await logger.log(`- Feedback threshold: ${feedbackThreshold}`);
+        await logger.log(`- Category IDs: ${JSON.stringify(categoryIds)}`);
 
         // Validate after parsing
         if (searchPhrases.length === 0) {
@@ -134,38 +134,12 @@ app.post('/api/scan', async (req, res) => {
             scanInProgress = false;
             scanResults.status = 'error';
             scanResults.error = error.message;
-            await addLog(`Error in scan endpoint: ${error.message}`);
+            await logger.log(`Error in scan endpoint: ${error.message}`);
             res.status(500).json({ error: error.message });
         }
     }
 });
 
-async function addLog(message) {
-// Create timestamp in EST/EDT
-    const timestamp = new Date().toLocaleTimeString('en-US', { 
-    timeZone: 'America/New_York',
-    hour12: true 
-    });    
-    const logMessage = `${timestamp}: ${message}\n`;
-    
-    // Keep limited logs for web display
-    const webLogMessage = `${timestamp}: ${message}`;
-    scanResults.logMessages.push(webLogMessage);
-    if (scanResults.logMessages.length > 50) {
-        scanResults.logMessages.shift();
-    }
-
-    // Write to console
-    console.log(message);
-
-    // Write to file with timestamp
-    try {
-        const logFileName = `ebay-scanner-${new Date().toISOString().split('T')[0]}.txt`;
-        await fs.appendFile(logFileName, logMessage,'utf8');
-    } catch (error) {
-        console.error('Error writing to log file:', error);
-    }
-}
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -247,11 +221,11 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         
         // First, get the seller's total listings across ALL categories
         totalListings = await getSellerTotalListings(sellerUsername);
-        await addLog(`Total listings for seller ${sellerUsername}: ${totalListings}`);
+        await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
         // If we can't get total listings, we should still continue but log a warning
         if (totalListings === 0) {
-            await addLog(`Warning: Could not get total listings for ${sellerUsername}`);
+            await logger.log(`Warning: Could not get total listings for ${sellerUsername}`);
         }
 
         // Process categories in groups of 3 (eBay API limitation)
@@ -306,14 +280,14 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
                     // Update our category total with only the new, unique listings
                     categoryTotal += newListingsCount;
                     
-                    await addLog(`Found ${newListingsCount} new unique listings in current batch`);
-                    await addLog(`Running total of unique listings: ${seenListingIds.size}`);
+                    await logger.log(`Found ${newListingsCount} new unique listings in current batch`);
+                    await logger.log(`Running total of unique listings: ${seenListingIds.size}`);
                 }
             } else {
                 // Log any API errors but continue processing
-                await addLog(`Warning: API request failed for categories ${currentCategories.join(', ')}`);
+                await logger.log(`Warning: API request failed for categories ${currentCategories.join(', ')}`);
                 if (data.findItemsAdvancedResponse[0].errorMessage) {
-                    await addLog(`API Error: ${JSON.stringify(data.findItemsAdvancedResponse[0].errorMessage)}`);
+                    await logger.log(`API Error: ${JSON.stringify(data.findItemsAdvancedResponse[0].errorMessage)}`);
                 }
             }
 
@@ -322,10 +296,10 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         }
 
         // Log final results
-        await addLog(`\nFinal results for seller ${sellerUsername}:`);
-        await addLog(`- Total listings across all categories: ${totalListings}`);
-        await addLog(`- Unique listings found in specified categories: ${categoryTotal}`);
-        await addLog(`- Number of unique listing IDs: ${seenListingIds.size}`);
+        await logger.log(`\nFinal results for seller ${sellerUsername}:`);
+        await logger.log(`- Total listings across all categories: ${totalListings}`);
+        await logger.log(`- Unique listings found in specified categories: ${categoryTotal}`);
+        await logger.log(`- Number of unique listing IDs: ${seenListingIds.size}`);
 
         // Return the complete seller data structure
         return {
@@ -339,7 +313,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
     } catch (error) {
         // Log and handle any errors that occurred during the process
-        await addLog(`Error fetching listings for ${sellerUsername}: ${error.message}`);
+        await logger.log(`Error fetching listings for ${sellerUsername}: ${error.message}`);
         return {
             error: true,
             listings: [],
@@ -354,11 +328,11 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
 // Update analyzeSellerListings to use the complete structure
 async function analyzeSellerListings(sellerData) {
-    await addLog(`\n==== ANALYZING SELLER: ${sellerData.username} ====`);
+    await logger.log(`\n==== ANALYZING SELLER: ${sellerData.username} ====`);
     
     // Check for errors or missing data
     if (sellerData.error || !sellerData.metadata.hasEnoughData) {
-        await addLog(`ERROR: Insufficient data for seller ${sellerData.username}`);
+        await logger.log(`ERROR: Insufficient data for seller ${sellerData.username}`);
         return true;
     }
 
@@ -368,18 +342,18 @@ async function analyzeSellerListings(sellerData) {
     // Perform ratio calculation and analysis
     const ratio = (categoryListings / totalListings) * 100;
     
-    await addLog(`\nDetailed Analysis for ${sellerData.username}:`);
-    await addLog(`Total listings: ${totalListings}`);
-    await addLog(`Category listings: ${categoryListings}`);
-    await addLog(`Category ratio: ${ratio.toFixed(2)}%`);
-    await addLog(`Categories analyzed: ${sellerData.categories.join(', ')}`);
+    await logger.log(`\nDetailed Analysis for ${sellerData.username}:`);
+    await logger.log(`Total listings: ${totalListings}`);
+    await logger.log(`Category listings: ${categoryListings}`);
+    await logger.log(`Category ratio: ${ratio.toFixed(2)}%`);
+    await logger.log(`Categories analyzed: ${sellerData.categories.join(', ')}`);
 
     // Analysis criteria
     const MINIMUM_RATIO = 20;
     
     const shouldExclude = ratio > MINIMUM_RATIO;
 
-    await addLog(shouldExclude
+    await logger.log(shouldExclude
         ? `DECISION: EXCLUDING ${sellerData.username} - ${ratio.toFixed(2)}% in target categories`
         : `DECISION: INCLUDING ${sellerData.username} - ${ratio.toFixed(2)}% in target categories`);
 
@@ -392,7 +366,7 @@ async function createSellerData(username, categoryIds) {
     try {
         // Get total listings across all categories
         const totalListings = await getSellerTotalListings(username);
-        await addLog(`Initial total listings for ${username}: ${totalListings}`);
+        await logger.log(`Initial total listings for ${username}: ${totalListings}`);
 
         // Get category-specific listings and details
         const categoryData = await fetchSellerListings(username, categoryIds);
@@ -416,7 +390,7 @@ async function createSellerData(username, categoryIds) {
         return sellerData;
 
     } catch (error) {
-        await addLog(`Error creating seller data for ${username}: ${error.message}`);
+        await logger.log(`Error creating seller data for ${username}: ${error.message}`);
         return {
             username: username,
             error: true,
@@ -457,7 +431,7 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
 
         const data = await response.json();
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
-            await addLog('No listings found for this search phrase');
+            await logger.log('No listings found for this search phrase');
             return [];
         }
         // Filter out previously seen listings using database
@@ -467,12 +441,12 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
             newListings.push(item);
             }
         }
-        await addLog(`Found ${data.itemSummaries.length} listings, ${newListings.length} are new`);
+        await logger.log(`Found ${data.itemSummaries.length} listings, ${newListings.length} are new`);
 
         // Add all new listings to database at once
         if (newListings.length > 0) {
             await previousListings.addMany(newListings.map(item => item.itemId));
-            await addLog(`Stored ${newListings.length} new listing IDs in database`);
+            await logger.log(`Stored ${newListings.length} new listing IDs in database`);
         }
 
         // Group listings by seller
@@ -488,35 +462,35 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
             }
             sellerListings.get(sellerUsername).push(item);
         });
-        await addLog(`======= Grouped listings by seller: ${sellerListings.size} unique sellers=======`);
-        await addLog(`Grouped listings by seller: ${JSON.stringify([...sellerListings.keys()])}`);
+        await logger.log(`======= Grouped listings by seller: ${sellerListings.size} unique sellers=======`);
+        await logger.log(`Grouped listings by seller: ${JSON.stringify([...sellerListings.keys()])}`);
 
         // Now process each seller once
         let sellerCounter = 0;
         let qualifiedSellerCounter = 0;
         let totalSellers = sellerListings.size;
 
-        await addLog(`\n=== Beginning Seller Processing ===`);
-        await addLog(`Total sellers to process: ${totalSellers}`);
+        await logger.log(`\n=== Beginning Seller Processing ===`);
+        await logger.log(`Total sellers to process: ${totalSellers}`);
 
         // Now process each seller once
         for (const [sellerUsername, listings] of sellerListings) {
             // Skip if we've already processed this seller
             if (processedSellers.has(sellerUsername)) {
-                await addLog(`Skipping already processed seller: ${sellerUsername}`);
+                await logger.log(`Skipping already processed seller: ${sellerUsername}`);
                 continue;
             }
             sellerCounter++;
-            await addLog(`\n--- Processing Seller ${sellerCounter} of ${totalSellers}: ${sellerUsername} ---`);
-            await addLog(`This seller has ${listings.length} listings in search results`);
+            await logger.log(`\n--- Processing Seller ${sellerCounter} of ${totalSellers}: ${sellerUsername} ---`);
+            await logger.log(`This seller has ${listings.length} listings in search results`);
             processedSellers.add(sellerUsername);
             
             // Check feedback score
             const feedbackScore = listings[0].seller?.feedbackScore || 0;
-            await addLog(`\nProcessing seller ${sellerUsername} (feedback: ${feedbackScore})`);
+            await logger.log(`\nProcessing seller ${sellerUsername} (feedback: ${feedbackScore})`);
             
             if (feedbackScore >= feedbackThreshold) {
-                await addLog(`Skipping seller ${sellerUsername} due to high feedback score`);
+                await logger.log(`Skipping seller ${sellerUsername} due to high feedback score`);
                 continue;
             }
 
@@ -527,37 +501,37 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
             if (!shouldExclude && !sellerData.error) {
                 // If seller passes our criteria, add their listings
                 qualifiedSellerCounter++;
-                await addLog(`Seller ${sellerUsername} has passed analysis`);
+                await logger.log(`Seller ${sellerUsername} has passed analysis`);
                 // Only add one listing per seller to avoid duplicates
                 if (listings.length > 0) {
                     filteredListings.push(listings[0]);
-                    await addLog(`Found a qualified listing. Adding this listing: ${listings[0].title}`);
-                    await addLog(`Current qualified listings: ${filteredListings}`);
+                    await logger.log(`Found a qualified listing. Adding this listing: ${listings[0].title}`);
+                    await logger.log(`Current qualified listings: ${filteredListings}`);
                 }
             } else {
-                await addLog(`Excluded seller ${sellerUsername} based on analysis`);
+                await logger.log(`Excluded seller ${sellerUsername} based on analysis`);
             }
         }
-        await addLog(`\nFinished processing. Processed ${sellerCounter} sellers`);
-        await addLog(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
-        await addLog(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
+        await logger.log(`\nFinished processing. Processed ${sellerCounter} sellers`);
+        await logger.log(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
+        await logger.log(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
         return filteredListings;
 
     } catch (error) {
-        await addLog(`Error processing ${searchPhrases}: ${error.message}`);
+        await logger.log(`Error processing ${searchPhrases}: ${error.message}`);
         return [];
     }
 }
 
 async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
     try {
-        await addLog('\n=== fetchAllListings received parameters ===');
-        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
+        await logger.log('\n=== fetchAllListings received parameters ===');
+        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
     
         await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
-        await addLog('Access token obtained successfully');
-        await addLog(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
+        await logger.log('Access token obtained successfully');
+        await logger.log(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
         const allListings = [];
         
         for (const phrase of searchPhrases) {
@@ -570,10 +544,10 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
             await delay(1000);
         }
 
-        await addLog(`\n====== Scan complete. Found ${allListings.length} total listings ======\n`);
+        await logger.log(`\n====== Scan complete. Found ${allListings.length} total listings ======\n`);
         return allListings;
     } catch (error) {
-        await addLog(`Scan error: ${error.message}`);
+        await logger.log(`Scan error: ${error.message}`);
         throw error;
     }
 }
@@ -582,16 +556,16 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
     try {
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
-            await addLog('Error: Invalid or missing search phrases');
+            await logger.log('Error: Invalid or missing search phrases');
             throw new Error('Invalid search phrases provided');
         }
         if (!feedbackThreshold) {
-            await addLog('Error: Missing feedback threshold');
+            await logger.log('Error: Missing feedback threshold');
             throw new Error('Missing feedback threshold');
         }
 
         if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
-            await addLog('Error: Invalid or missing category IDs');
+            await logger.log('Error: Invalid or missing category IDs');
             throw new Error('Invalid category IDs provided');
         }
 
@@ -601,31 +575,31 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         await fs.appendFile(logFileName, `\n\n========================================\n`);
         await fs.appendFile(logFileName, `startScan function - New Scan Started at ${new Date().toLocaleString()}\n`);
         await fs.appendFile(logFileName, `========================================\n\n`);
-        await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
 
         // Add logging for database cleanup
         try {
-            await addLog('Starting database cleanup...');
+            await logger.log('Starting database cleanup...');
             await previousListings.cleanup();
-            await addLog('Database cleanup completed');
+            await logger.log('Database cleanup completed');
         } catch (cleanupError) {
-            await addLog(`Database cleanup error: ${cleanupError.message}`);
+            await logger.log(`Database cleanup error: ${cleanupError.message}`);
             // Continue with scan even if cleanup fails
         }
 
         // Add debug logging
-        await addLog('Scan parameters:');
-        await addLog(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
-        await addLog(`- Feedback Threshold: ${feedbackThreshold}`);
-        await addLog(`- Category IDs: ${JSON.stringify(categoryIds)}`);
+        await logger.log('Scan parameters:');
+        await logger.log(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
+        await logger.log(`- Feedback Threshold: ${feedbackThreshold}`);
+        await logger.log(`- Category IDs: ${JSON.stringify(categoryIds)}`);
 
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
-        
-        await addLog('Calling fetchAllListings...');
+
+        await logger.log('Calling fetchAllListings...');
         const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,);
-        await addLog(`fetchAllListings completed. Found ${listings.length} listings`);
+        await logger.log(`fetchAllListings completed. Found ${listings.length} listings`);
 
         
         await fs.appendFile(logFileName, `\n========================================\n`);
@@ -643,7 +617,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         
         setTimeout(startScan, 300000);
     } catch (error) {
-        await addLog(`Error during scan: ${error.message}`);
+        await logger.log(`Error during scan: ${error.message}`);
         scanResults = {
             ...scanResults,
             status: 'error',
