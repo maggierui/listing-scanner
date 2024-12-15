@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url';
 import * as fs from 'fs/promises';
 import dotenv from 'dotenv';
 import { URLSearchParams } from 'url';
+import { generatePreviousListingsCSV, generateSearchResultsCSV } from './csv-handlers.js';
+import DatabaseListingsManager from './DatabaseListingsManager.js';
+
 
 // Load environment variables
 dotenv.config();
@@ -17,11 +20,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
-const listingsCache = {
-    data: {},
-    timestamps: {}
-};
+const previousListings = new DatabaseListingsManager();
+await previousListings.init();
 
 // Middleware
 app.use(express.json());
@@ -364,7 +364,7 @@ async function analyzeSellerListings(sellerData) {
     await addLog(`Categories analyzed: ${sellerData.categories.join(', ')}`);
 
     // Analysis criteria
-    const MINIMUM_RATIO = 80;
+    const MINIMUM_RATIO = 20;
     
     const shouldExclude = ratio > MINIMUM_RATIO;
 
@@ -401,9 +401,6 @@ async function createSellerData(username, categoryIds) {
                 hasEnoughData: totalListings > 0 && categoryData.listings.length > 0
             }
         };
-
-        await addLog(`Created seller data structure for ${username}:`);
-        await addLog(JSON.stringify(sellerData, null, 2));
 
         return sellerData;
 
@@ -452,14 +449,26 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
             await addLog('No listings found for this search phrase');
             return [];
         }
+        // Filter out previously seen listings using database
+        const newListings = [];
+        for (const item of data.itemSummaries) {
+            if (!(await previousListings.has(item.itemId))) {
+            newListings.push(item);
+            }
+        }
+        await addLog(`Found ${data.itemSummaries.length} listings, ${newListings.length} are new`);
 
-        await addLog(`Found ${data.itemSummaries.length} initial listings to process`);
+        // Add all new listings to database at once
+        if (newListings.length > 0) {
+            await previousListings.addMany(newListings.map(item => item.itemId));
+            await addLog(`Stored ${newListings.length} new listing IDs in database`);
+        }
 
         // Group listings by seller
         const sellerListings = new Map();
         
         // First, group all listings by seller
-        data.itemSummaries.forEach(item => {
+        newListings.forEach(item => {
             const sellerUsername = item.seller?.username;
             if (!sellerUsername) return;
             
@@ -512,6 +521,7 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
                 if (listings.length > 0) {
                     filteredListings.push(listings[0]);
                     await addLog(`Found a qualified listing. Adding this listing: ${listings[0].title}`);
+                    await addLog(`Current qualified listings: ${filteredListings}`);
                 }
             } else {
                 await addLog(`Excluded seller ${sellerUsername} based on analysis`);
@@ -533,6 +543,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
         await addLog('\n=== fetchAllListings received parameters ===');
         await addLog(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
     
+        await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
         await addLog('Access token obtained successfully');
         await addLog(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
@@ -608,6 +619,28 @@ app.get('/api/logs', async (req, res) => {
         res.send(logContent);
     } catch (error) {
         res.status(500).send('Error downloading log file: ' + error.message);
+    }
+});
+
+app.get('/api/download/previous-listings', async (req, res) => {
+    try {
+        const csvData = await generatePreviousListingsCSV();
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=previous-listings.csv');
+        res.send(csvData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate CSV' });
+    }
+});
+
+app.get('/api/download/search-results', async (req, res) => {
+    try {
+        const csvData = generateSearchResultsCSV(scanResults.listings);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=search-results.csv');
+        res.send(csvData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate CSV' });
     }
 });
 

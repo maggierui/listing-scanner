@@ -164,7 +164,6 @@ function displayResults(results) {
           <td>${item.currency}</td>
           <td>${item.seller}</td>
           <td>${item.feedbackScore}</td>
-          <td>${item.category}</td>
           <td><a href="${item.link}" target="_blank">View</a></td>
       `;
   });
@@ -195,5 +194,45 @@ async function downloadLogs() {
   } catch (error) {
       console.error('Error downloading logs:', error);
       alert('Failed to download logs');
+  }
+}
+// Add these functions to client.js
+async function downloadSearchResults() {
+  try {
+      const response = await fetch('/api/download/search-results');
+      if (!response.ok) throw new Error('Download failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `search-results-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+  } catch (error) {
+      console.error('Error downloading search results:', error);
+      alert('Failed to download search results');
+  }
+}
+
+async function downloadPreviousListings() {
+  try {
+      const response = await fetch('/api/download/previous-listings');
+      if (!response.ok) throw new Error('Download failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `previous-listings-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+  } catch (error) {
+      console.error('Error downloading previous listings:', error);
+      alert('Failed to download previous listings');
   }
 }

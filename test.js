@@ -1,76 +1,92 @@
-import fetch from 'node-fetch';
+import pkg from 'pg';
+const { Pool } = pkg;
 import dotenv from 'dotenv';
-import { URLSearchParams } from 'url';
 
-// Load environment variables
 dotenv.config();
 
-// Simple logging function (to replace addLog)
-async function log(message) {
-    console.log(message);
-}
+async function testDatabaseOperations() {
+    const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
 
-async function getSellerTotalListings(sellerUsername) {
     try {
-        const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
-        const params = {
-            'OPERATION-NAME': 'findItemsAdvanced',
-            'SERVICE-VERSION': '1.0.0',
-            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
-            'RESPONSE-DATA-FORMAT': 'JSON',
-            'itemFilter(0).name': 'Seller',
-            'itemFilter(0).value': sellerUsername,
-            'paginationInput.entriesPerPage': '1'
-        };
+        console.log('🚀 Starting database operations test...\n');
 
-        const queryString = new URLSearchParams(params).toString();
-        await log(`Seller listings request for ${sellerUsername}: ${queryString}`);
-        const fullUrl = `${url}?${queryString}`;
-        await log(`Full URL: ${fullUrl}`);
+        // Test 1: Create the listings table
+        console.log('1️⃣ Creating listings table...');
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS previous_listings (
+                item_id TEXT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Table created successfully\n');
 
-        const response = await fetch(fullUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        await log(`Seller listings response for ${sellerUsername}: ${JSON.stringify(data, null, 2)}`);
+        // Test 2: Insert single listing
+        console.log('2️⃣ Testing single listing insertion...');
+        const testItemId = 'TEST123456789';
+        await pool.query(
+            'INSERT INTO previous_listings (item_id) VALUES ($1) ON CONFLICT (item_id) DO NOTHING',
+            [testItemId]
+        );
+        console.log('✅ Single listing inserted successfully\n');
 
-        // Debug each step
-        const advancedResponse = data.findItemsAdvancedResponse[0];
-        console.log('Advanced response:', advancedResponse);
+        // Test 3: Insert multiple listings
+        console.log('3️⃣ Testing multiple listings insertion...');
+        const testItemIds = ['TEST987654321', 'TEST555555555', 'TEST777777777'];
+        const values = testItemIds.map((_, index) => `($${index + 1})`).join(',');
+        await pool.query(
+            `INSERT INTO previous_listings (item_id) VALUES ${values} ON CONFLICT (item_id) DO NOTHING`,
+            testItemIds
+        );
+        console.log('✅ Multiple listings inserted successfully\n');
 
-        const paginationOutput = advancedResponse.paginationOutput[0];
-        console.log('Pagination output:', paginationOutput);
+        // Test 4: Check if listing exists
+        console.log('4️⃣ Testing listing existence check...');
+        const existsResult = await pool.query(
+            'SELECT EXISTS(SELECT 1 FROM previous_listings WHERE item_id = $1)',
+            [testItemId]
+        );
+        console.log(`✅ Listing existence check successful: ${existsResult.rows[0].exists}\n`);
 
-        const totalEntries = paginationOutput.totalEntries[0];
-        console.log('Total entries:', totalEntries);
+        // Test 5: Count total listings
+        console.log('5️⃣ Testing listings count...');
+        const countResult = await pool.query('SELECT COUNT(*) FROM previous_listings');
+        console.log(`✅ Count successful: ${countResult.rows[0].count} listings\n`);
 
+        // Test 6: Select all test listings
+        console.log('6️⃣ Testing listings retrieval...');
+        const selectResult = await pool.query(
+            'SELECT * FROM previous_listings WHERE item_id LIKE \'TEST%\' ORDER BY created_at DESC'
+        );
+        console.log('✅ Retrieved listings:', selectResult.rows, '\n');
 
-        if (data.findItemsAdvancedResponse[0].ack[0] === "Failure") {
-            throw new Error(data.findItemsAdvancedResponse[0].errorMessage[0].error[0].message[0]);
-        }
-        
-        // Now try to get the total
-        const total = parseInt(totalEntries);
-        await log(`Total listings for ${sellerUsername}: ${total}`);
-        
-        return parseInt(total);
+        // Test 7: Delete test listings
+        console.log('7️⃣ Testing deletion of test listings...');
+        const deleteResult = await pool.query(
+            'DELETE FROM previous_listings WHERE item_id LIKE \'TEST%\' RETURNING *'
+        );
+        console.log(`✅ Deleted ${deleteResult.rowCount} test listings\n`);
+
+        // Test 8: Test cleanup of old listings
+        console.log('8️⃣ Testing cleanup of old listings...');
+        await pool.query(
+            'DELETE FROM previous_listings WHERE created_at < NOW() - INTERVAL \'30 days\''
+        );
+        console.log('✅ Cleanup successful\n');
+
+        console.log('🎉 All database operations completed successfully!');
+
     } catch (error) {
-        await log(`Error getting total listings for ${sellerUsername}: ${error.message}`);
-        return 0;
+        console.error('❌ Error during testing:', error);
+        throw error;
+    } finally {
+        await pool.end();
     }
 }
 
-// Test function
-async function test() {
-    try {
-        const sellerUsername = 'maggiehucat'; // Replace with actual seller username
-        const result = await getSellerTotalListings(null, sellerUsername);
-        console.log(`Test result: ${result} total listings`);
-    } catch (error) {
-        console.error('Test failed:', error);
-    }
-}
-
-// Run the test
-test();
+// Run the tests
+testDatabaseOperations().catch(console.error);
