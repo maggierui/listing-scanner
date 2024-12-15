@@ -608,7 +608,10 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
+        await addLog('Calling fetchAllListings...');
         const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,);
+        await addLog(`fetchAllListings completed. Found ${listings.length} listings`);
+
         
         await fs.appendFile(logFileName, `\n========================================\n`);
         await fs.appendFile(logFileName, `Scan Completed at ${new Date().toLocaleString()}\n`);
