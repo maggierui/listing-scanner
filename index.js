@@ -414,14 +414,14 @@ async function createSellerData(username, categoryIds) {
     }
 }
 
-async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThreshold, categoryIds,conditions) {
+async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds,conditions) {
     await trackApiCall();
     // Add condition filter to URL if conditions are specified
     const conditionFilter = conditions && conditions.length > 0 
         ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
         : '';
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-        `q=${encodeURIComponent(searchPhrase)}` +
+        `q=${encodeURIComponent(phrase)}` +
         `&limit=50${conditionFilter}`;    
     // Track unique sellers we've already processed
     const processedSellers = new Set();
