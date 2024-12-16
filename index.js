@@ -74,8 +74,9 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-app.get('/api/conditions', (req, res) => {
+app.get('/api/conditions', async (req, res) => {
     res.json(getAllConditionOptions());
+    await logger.log('Conditions requested');
 });
 
 app.post('/api/scan', async (req, res) => {
@@ -353,7 +354,6 @@ async function analyzeSellerListings(sellerData) {
     await logger.log(`Total listings: ${totalListings}`);
     await logger.log(`Category listings: ${categoryListings}`);
     await logger.log(`Category ratio: ${ratio.toFixed(2)}%`);
-    await logger.log(`Categories analyzed: ${sellerData.categories.join(', ')}`);
 
     // Analysis criteria
     const MINIMUM_RATIO = 20;
@@ -420,9 +420,13 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
     const conditionFilter = conditions && conditions.length > 0 
         ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
         : '';
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+    await logger.log(`Fetching listings for search phrase: ${phrase}`);
+    await logger.log(`Condition filter: ${conditionFilter}`);
+
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
         `q=${encodeURIComponent(phrase)}` +
-        `&limit=50${conditionFilter}`;    
+        `&limit=50${conditionFilter}`;   
+    await logger.log(`Fetching listings from URL: ${url}`); 
     // Track unique sellers we've already processed
     const processedSellers = new Set();
     const filteredListings = [];
