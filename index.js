@@ -16,6 +16,7 @@ import { getAllConditionOptions } from './conditions.js';
 // Load environment variables
 dotenv.config();
 // Simple logging function (to replace logger.log)
+app.use(express.static(__dirname));
 async function log(message) {
     console.log(message);
 }

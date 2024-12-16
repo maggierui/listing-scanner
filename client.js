@@ -46,26 +46,26 @@ async function loadCategories() {
 
 async function loadConditions() {
   const conditionContainer = document.getElementById('conditionCheckboxes');
-  const conditions = await fetch('/api/conditions').then(res => res.json());
-  
-  conditions.forEach(condition => {
-      const div = document.createElement('div');
-      div.className = 'condition-option';
-      
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = `condition-${condition.id}`;
-      checkbox.name = 'conditions';
-      checkbox.value = condition.id;
-      
-      const label = document.createElement('label');
-      label.htmlFor = `condition-${condition.id}`;
-      label.textContent = condition.name;
-      
-      div.appendChild(checkbox);
-      div.appendChild(label);
-      conditionContainer.appendChild(div);
-  });
+    const conditions = await fetch('/api/conditions').then(res => res.json());
+    
+    conditions.forEach(condition => {
+        const div = document.createElement('div');
+        div.className = 'condition-option';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `condition-${condition.id}`;
+        checkbox.name = 'conditions';
+        checkbox.value = condition.id;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `condition-${condition.id}`;
+        label.textContent = condition.name;
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        conditionContainer.appendChild(div);
+    });
 }
 
 // Form submission handler
