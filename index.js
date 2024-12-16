@@ -548,7 +548,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, c
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds,conditions);
+            const listings = await fetchListingsForPhrase(accessToken,phrase, feedbackThreshold, categoryIds,conditions);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
