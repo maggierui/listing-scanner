@@ -9,6 +9,7 @@ import { URLSearchParams } from 'url';
 import { generatePreviousListingsCSV, generateSearchResultsCSV } from './csv-handlers.js';
 import DatabaseListingsManager from './DatabaseListingsManager.js';
 import logger from './logger.js';
+import { getAllConditionOptions } from './conditions.js';
 
 
 
@@ -71,6 +72,10 @@ app.get('/api/categories', async (req, res) => {
         console.error('Error serving categories:', error);
         res.status(500).json({ error: 'Failed to load categories' });
     }
+});
+
+app.get('/api/conditions', (req, res) => {
+    res.json(getAllConditionOptions());
 });
 
 app.post('/api/scan', async (req, res) => {
@@ -409,10 +414,15 @@ async function createSellerData(username, categoryIds) {
     }
 }
 
-async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThreshold, categoryIds) {
+async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThreshold, categoryIds,conditions) {
     await trackApiCall();
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(searchPhrases)}&limit=50`;
-    
+    // Add condition filter to URL if conditions are specified
+    const conditionFilter = conditions && conditions.length > 0 
+        ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
+        : '';
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+        `q=${encodeURIComponent(searchPhrase)}` +
+        `&limit=50${conditionFilter}`;    
     // Track unique sellers we've already processed
     const processedSellers = new Set();
     const filteredListings = [];
@@ -525,7 +535,7 @@ async function fetchListingsForPhrase(accessToken, searchPhrases, feedbackThresh
     }
 }
 
-async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
+async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, conditions) {
     try {
         await logger.log('\n=== fetchAllListings received parameters ===');
         await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
@@ -538,7 +548,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds);
+            const listings = await fetchListingsForPhrase(accessToken,searchPhrases, feedbackThreshold, categoryIds,conditions);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -554,7 +564,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds) {
     }
 }
 
-async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
+async function startScan(searchPhrases, feedbackThreshold, categoryIds,conditions) {
     try {
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
@@ -600,7 +610,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds) {
         scanResults.logMessages = [];
 
         await logger.log('Calling fetchAllListings...');
-        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,);
+        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,conditions);
         await logger.log(`fetchAllListings completed. Found ${listings.length} listings`);
 
         
