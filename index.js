@@ -223,196 +223,107 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
     try {
         // Initialize data structures to track listings and counts
         let allListings = [];         // Stores the actual listing objects
-        let categoryTotal = 0;        // Running count of listings in specified categories
         let totalListings = 0;        // Total listings across all categories
+        let sampleListings = [];  // Define the array here
         const seenListingIds = new Set();  // Track unique listings to prevent duplicates
         
         // First, get the seller's total listings across ALL categories
         totalListings = await getSellerTotalListings(sellerUsername);
-        await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
         // If we can't get total listings, we should still continue but log a warning
         if (totalListings === 0) {
             await logger.log(`Warning: Could not get total listings for ${sellerUsername}`);
         }
 
-        // Process categories in groups of 3 (eBay API limitation)
-        for (let i = 0; i < categoryIds.length; i += 3) {
-            const currentCategories = categoryIds.slice(i, i + 3);
-
-            // Configure the eBay Finding API request
-            const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
-            const params = {
-                'OPERATION-NAME': 'findItemsAdvanced',
-                'SERVICE-VERSION': '1.0.0',
-                'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
-                'GLOBAL-ID': 'EBAY-US',
-                'RESPONSE-DATA-FORMAT': 'JSON',
-                'itemFilter(0).name': 'Seller',
-                'itemFilter(0).value': sellerUsername,
-                'paginationInput.entriesPerPage': '100',  // Maximum allowed by eBay
-                'outputSelector': 'SellerInfo'  // Request additional seller details
-            };
-
-            // Add the current batch of category IDs to the parameters
-            currentCategories.forEach((catId, index) => {
-                params[`categoryId[${index}]`] = catId;
-            });
-
-            // Build and execute the API request
-            const queryString = new URLSearchParams(params).toString();
-            const fullUrl = `${url}?${queryString}`;
-                        
-            const response = await fetch(fullUrl);
-            const data = await response.json();
-
-            // Process the API response
-            if (data.findItemsAdvancedResponse[0].ack[0] === "Success") {
-                const searchResult = data.findItemsAdvancedResponse[0].searchResult[0];
-                
-                if (searchResult.item) {
-                    // Process each listing, tracking unique items
-                    let newListingsCount = 0;
-                    
-                    searchResult.item.forEach(item => {
-                        const listingId = item.itemId[0];
-                        
-                        // Only process this listing if we haven't seen it before
-                        if (!seenListingIds.has(listingId)) {
-                            seenListingIds.add(listingId);
-                            newListingsCount++;
-                            allListings.push(item);
-                        }
-                    });
-
-                    // Update our category total with only the new, unique listings
-                    categoryTotal += newListingsCount;
-                    
-                    await logger.log(`Found ${newListingsCount} new unique listings in current batch`);
-                    await logger.log(`Running total of unique listings: ${seenListingIds.size}`);
-                }
-            } else {
-                // Log any API errors but continue processing
-                await logger.log(`Warning: API request failed for categories ${currentCategories.join(', ')}`);
-                if (data.findItemsAdvancedResponse[0].errorMessage) {
-                    await logger.log(`API Error: ${JSON.stringify(data.findItemsAdvancedResponse[0].errorMessage)}`);
-                }
-            }
-
-            // Add delay between API calls to respect rate limits
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        if (totalListings > 100) {
+            totalListings = 100;
+        } else {
+            totalListings = totalListings;
         }
 
-        // Log final results
-        await logger.log(`\nFinal results for seller ${sellerUsername}:`);
-        await logger.log(`- Total listings across all categories: ${totalListings}`);
-        await logger.log(`- Unique listings found in specified categories: ${categoryTotal}`);
-        await logger.log(`- Number of unique listing IDs: ${seenListingIds.size}`);
+        
 
-        // Return the complete seller data structure
-        return {
-            error: false,
-            listings: allListings,
-            categoryTotal: categoryTotal,
-            total: totalListings,
-            uniqueListings: seenListingIds.size,
-            categoriesScanned: categoryIds.length
+        await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
+
+        // Set up base parameters for Finding API
+        const params = {
+            'OPERATION-NAME': 'findItemsAdvanced',
+            'SERVICE-VERSION': '1.0.0',
+            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
+            'RESPONSE-DATA-FORMAT': 'JSON',
+            'itemFilter(0).name': 'Seller',
+            'itemFilter(0).value': sellerUsername,
+            'paginationInput.entriesPerPage': ITEMS_PER_PAGE,
+            'outputSelector': 'SellerInfo'
         };
 
+        // Create a Set of category IDs for faster lookup
+        const categorySet = new Set(categoryIds);
+        
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`https://svcs.ebay.com/services/search/FindingService/v1?${queryString}`);
+        const data = await response.json();
+
+        if (data.findItemsAdvancedResponse[0].ack[0] === "Success" && 
+            data.findItemsAdvancedResponse[0].searchResult[0].item) {
+            
+            const items = data.findItemsAdvancedResponse[0].searchResult[0].item;
+            
+            // Process items and count category matches
+            items.forEach(item => {
+                sampleListings.push(item);
+                
+                // Check if item's category matches any of our target categories
+                const itemCategory = item.primaryCategory[0].categoryId[0];
+                if (categorySet.has(itemCategory)) {
+                    categoryListingsCount++;
+                }
+            });
+            
+            await logger.log(`Analyzed ${items.length} sample listings for ${sellerUsername}`);
+            await logger.log(`Found ${categoryListingsCount} listings in target categories`);
+        }
+        
+        // Calculate the ratio based on the sample
+        const sampleSize = sampleListings.length;
+        const categoryRatio = sampleSize > 0 ? (categoryListingsCount / sampleSize) : 0;
+        const ratio = categoryRatio * 100; // Convert to percentage
+        
+        // Analysis criteria
+        const MINIMUM_RATIO = 20;
+        const shouldExclude = ratio > MINIMUM_RATIO;
+        
+        await logger.log(`Sample ratio: ${ratio.toFixed(2)}%`);
+        await logger.log(shouldExclude
+            ? `DECISION: EXCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% in target categories`
+            : `DECISION: INCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% in target categories`);
+        
+        return {
+            shouldExclude,
+            error: false,
+            listings: sampleListings,
+            ratio: ratio,
+            total: totalListings,
+            sampleData: {
+                sampleSize,
+                categoryCount: categoryListingsCount
+            }
+        };
+        
     } catch (error) {
-        // Log and handle any errors that occurred during the process
         await logger.log(`Error fetching listings for ${sellerUsername}: ${error.message}`);
         return {
+            shouldExclude: true, // Exclude on error to be safe
             error: true,
             listings: [],
-            categoryTotal: 0,
+            ratio: 0,
             total: 0,
-            uniqueListings: 0,
-            categoriesScanned: 0,
             errorMessage: error.message
         };
     }
 }
 
-// Update analyzeSellerListings to use the complete structure
-async function analyzeSellerListings(sellerData) {
-    await logger.log(`\n==== ANALYZING SELLER: ${sellerData.username} ====`);
-    
-    // Check for errors or missing data
-    if (sellerData.error || !sellerData.metadata.hasEnoughData) {
-        await logger.log(`ERROR: Insufficient data for seller ${sellerData.username}`);
-        return true;
-    }
 
-    const totalListings = sellerData.total;
-    const categoryListings = sellerData.categoryTotal;
-    
-    // Perform ratio calculation and analysis
-    const ratio = (categoryListings / totalListings) * 100;
-    
-    await logger.log(`\nDetailed Analysis for ${sellerData.username}:`);
-    await logger.log(`Total listings: ${totalListings}`);
-    await logger.log(`Category listings: ${categoryListings}`);
-    await logger.log(`Category ratio: ${ratio.toFixed(2)}%`);
-
-    // Analysis criteria
-    const MINIMUM_RATIO = 20;
-    
-    const shouldExclude = ratio > MINIMUM_RATIO;
-
-    await logger.log(shouldExclude
-        ? `DECISION: EXCLUDING ${sellerData.username} - ${ratio.toFixed(2)}% in target categories`
-        : `DECISION: INCLUDING ${sellerData.username} - ${ratio.toFixed(2)}% in target categories`);
-
-    return shouldExclude;
-}
-
-
-// First, create a helper function to structure seller data
-async function createSellerData(username, categoryIds) {
-    try {
-        // Get total listings across all categories
-        const totalListings = await getSellerTotalListings(username);
-        await logger.log(`Initial total listings for ${username}: ${totalListings}`);
-
-        // Get category-specific listings and details
-        const categoryData = await fetchSellerListings(username, categoryIds);
-        
-        // Create a complete seller data structure
-        const sellerData = {
-            username: username,
-            error: false,
-            listings: categoryData.listings || [],
-            categoryTotal: categoryData.categoryTotal || 0,
-            total: totalListings,
-            categories: categoryIds,
-            // Add metadata to help with analysis
-            metadata: {
-                scanDate: new Date().toISOString(),
-                categoriesScanned: categoryIds.length,
-                hasEnoughData: totalListings > 0 && categoryData.listings.length > 0
-            }
-        };
-
-        return sellerData;
-
-    } catch (error) {
-        await logger.log(`Error creating seller data for ${username}: ${error.message}`);
-        return {
-            username: username,
-            error: true,
-            listings: [],
-            categoryTotal: 0,
-            total: 0,
-            categories: categoryIds,
-            metadata: {
-                scanDate: new Date().toISOString(),
-                error: error.message,
-                hasEnoughData: false
-            }
-        };
-    }
-}
 
 async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds,conditions) {
     await trackApiCall();
@@ -511,10 +422,9 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             }
 
             // Get and analyze all of this seller's listings
-            const sellerData = await createSellerData(sellerUsername, categoryIds);
-            const shouldExclude = await analyzeSellerListings(sellerData);
+            const sellerAnalysis = await fetchSellerListings(sellerUsername, categoryIds);
 
-            if (!shouldExclude && !sellerData.error) {
+            if (!sellerAnalysis.error && !sellerAnalysis.shouldExclude) {
                 // If seller passes our criteria, add their listings
                 qualifiedSellerCounter++;
                 await logger.log(`Seller ${sellerUsername} has passed analysis`);
@@ -527,17 +437,20 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             } else {
                 await logger.log(`Excluded seller ${sellerUsername} based on analysis`);
             }
-        }
+
         await logger.log(`\nFinished processing. Processed ${sellerCounter} sellers`);
         await logger.log(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
         await logger.log(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
         return filteredListings;
 
+        }
     } catch (error) {
         await logger.log(`Error processing ${searchPhrases}: ${error.message}`);
         return [];
     }
 }
+
+
 
 async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, conditions) {
     try {
