@@ -447,13 +447,12 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             } else {
                 await logger.log(`Excluded seller ${sellerUsername} based on analysis`);
             }
-
+        }
         await logger.log(`\nFinished processing. Processed ${sellerCounter} sellers`);
         await logger.log(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
         await logger.log(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
         return filteredListings;
 
-        }
     } catch (error) {
         await logger.log(`Error processing ${searchPhrases}: ${error.message}`);
         return [];
