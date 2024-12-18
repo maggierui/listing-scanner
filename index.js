@@ -332,7 +332,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
     const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
         `q=${encodeURIComponent(phrase)}` +
-        `&limit=50${conditionFilter}`;   
+        `&limit=150${conditionFilter}`;   
     await logger.log(`Fetching listings from URL: ${url}`); 
     // Track unique sellers we've already processed
     const processedSellers = new Set();
