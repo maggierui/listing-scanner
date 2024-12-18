@@ -80,6 +80,10 @@ app.get('/api/conditions', async (req, res) => {
 });
 
 app.post('/api/scan', async (req, res) => {
+    // Cconsole.log('Received request body:', req.body);
+        console.log('Type of req.body:', typeof req.body);
+        console.log('Keys in req.body:', Object.keys(req.body));
+        //check if a scan is already in progress
         if (scanInProgress) {
             return res.status(409).json({ 
                 error: 'A scan is already in progress'
@@ -95,6 +99,7 @@ app.post('/api/scan', async (req, res) => {
         const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
         const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
         const categoryIds = req.body.categoryIds;
+        const conditions = req.body.selectedConditions;
 
         await logger.log(`Received request with:`);
         await logger.log(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
