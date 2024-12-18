@@ -223,6 +223,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
     try {
         // Initialize data structures to track listings and counts
         let totalListings = 0;        // Total listings across all categories
+        let categoryListingsCount = 0; // Listings in target categories
         let sampleListings = [];  // Define the array here
         
         // First, get the seller's total listings across ALL categories
