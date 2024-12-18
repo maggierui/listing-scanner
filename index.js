@@ -222,10 +222,8 @@ async function getSellerTotalListings(sellerUsername) {
 async function fetchSellerListings(sellerUsername, categoryIds) {
     try {
         // Initialize data structures to track listings and counts
-        let allListings = [];         // Stores the actual listing objects
         let totalListings = 0;        // Total listings across all categories
         let sampleListings = [];  // Define the array here
-        const seenListingIds = new Set();  // Track unique listings to prevent duplicates
         
         // First, get the seller's total listings across ALL categories
         totalListings = await getSellerTotalListings(sellerUsername);
@@ -241,8 +239,6 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             totalListings = totalListings;
         }
 
-        
-
         await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
         // Set up base parameters for Finding API
@@ -253,7 +249,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             'RESPONSE-DATA-FORMAT': 'JSON',
             'itemFilter(0).name': 'Seller',
             'itemFilter(0).value': sellerUsername,
-            'paginationInput.entriesPerPage': ITEMS_PER_PAGE,
+            'paginationInput.entriesPerPage': 100,
             'outputSelector': 'SellerInfo'
         };
 
