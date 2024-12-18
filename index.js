@@ -239,11 +239,9 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             await logger.log(`Warning: Could not get total listings for ${sellerUsername}`);
         }
 
-        if (totalListings > 100) {
+        if (totalListings > 100) 
             totalListings = 100;
-        } else {
-            totalListings = totalListings;
-        }
+        
 
         await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
@@ -335,24 +333,26 @@ function formatConditionsForQuery(conditions) {
     return conditions.join(',');
 }
 
-async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds,conditions) {
+async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds, conditions) {
     await trackApiCall();
-    // Add condition filter to URL if conditions are specified
-    const conditionFilter = conditions && conditions.length > 0 
-        ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
-        : '';
-    await logger.log(`Fetching listings for search phrase: ${phrase}`);
-    await logger.log(`Condition filter: ${conditionFilter}`);
-
-    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-        `q=${encodeURIComponent(phrase)}` +
-        `&limit=150${conditionFilter}`;   
-    await logger.log(`Fetching listings from URL: ${url}`); 
-    // Track unique sellers we've already processed
-    const processedSellers = new Set();
-    const filteredListings = [];
-
+    
     try {
+        // Add condition filter to URL if conditions are specified
+        const conditionFilter = conditions && conditions.length > 0 
+            ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
+            : '';
+        await logger.log(`\n=== Fetching listings for search phrase: "${phrase}" ===`);
+        await logger.log(`Condition filter: ${conditionFilter}`);
+
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `q=${encodeURIComponent(phrase)}` +
+            `&limit=150${conditionFilter}`;   
+        await logger.log(`API URL: ${url}`);
+
+        const processedSellers = new Set();
+        const filteredListings = [];
+
+        // Fetch listings from eBay API
         const response = await fetchWithTimeout(url, {
             method: 'GET',
             headers: {
@@ -363,98 +363,109 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`eBay API error! Status: ${response.status}`);
         }
 
         const data = await response.json();
+        
+        // Check for empty results
         if (!data.itemSummaries || data.itemSummaries.length === 0) {
-            await logger.log('No listings found for this search phrase');
+            await logger.log(`No listings found for phrase "${phrase}"`);
             return [];
         }
-        // Filter out previously seen listings using database
+
+        await logger.log(`Found ${data.itemSummaries.length} total listings for phrase "${phrase}"`);
+
+        // Filter out previously seen listings
         const newListings = [];
         for (const item of data.itemSummaries) {
             if (!(await previousListings.has(item.itemId))) {
-            newListings.push(item);
+                newListings.push(item);
             }
         }
-        await logger.log(`Found ${data.itemSummaries.length} listings, ${newListings.length} are new`);
+        
+        await logger.log(`Found ${newListings.length} new listings (not previously processed)`);
 
-        // Add all new listings to database at once
+        // Store new listing IDs
         if (newListings.length > 0) {
             await previousListings.addMany(newListings.map(item => item.itemId));
             await logger.log(`Stored ${newListings.length} new listing IDs in database`);
         }
 
-        // Group listings by seller
+        // Group by seller with validation
         const sellerListings = new Map();
+        let skippedListings = 0;
         
-        // First, group all listings by seller
         newListings.forEach(item => {
-            const sellerUsername = item.seller?.username;
-            if (!sellerUsername) return;
+            if (!item.seller?.username) {
+                skippedListings++;
+                return;
+            }
             
+            const sellerUsername = item.seller.username;
             if (!sellerListings.has(sellerUsername)) {
                 sellerListings.set(sellerUsername, []);
             }
             sellerListings.get(sellerUsername).push(item);
         });
-        await logger.log(`======= Grouped listings by seller: ${sellerListings.size} unique sellers=======`);
-        await logger.log(`Grouped listings by seller: ${JSON.stringify([...sellerListings.keys()])}`);
 
-        // Now process each seller once
+        if (skippedListings > 0) {
+            await logger.log(`Skipped ${skippedListings} listings with missing seller information`);
+        }
+
+        const totalSellers = sellerListings.size;
+        await logger.log(`\n=== Processing ${totalSellers} unique sellers ===`);
+        await logger.log(`Sellers found: ${[...sellerListings.keys()].join(', ')}`);
+
         let sellerCounter = 0;
         let qualifiedSellerCounter = 0;
-        let totalSellers = sellerListings.size;
 
-        await logger.log(`\n=== Beginning Seller Processing ===`);
-        await logger.log(`Total sellers to process: ${totalSellers}`);
-
-        // Now process each seller once
+        // Process each seller
         for (const [sellerUsername, listings] of sellerListings) {
-            // Skip if we've already processed this seller
             if (processedSellers.has(sellerUsername)) {
                 await logger.log(`Skipping already processed seller: ${sellerUsername}`);
                 continue;
             }
+
             sellerCounter++;
-            await logger.log(`\n--- Processing Seller ${sellerCounter} of ${totalSellers}: ${sellerUsername} ---`);
-            await logger.log(`This seller has ${listings.length} listings in search results`);
-            processedSellers.add(sellerUsername);
+            await logger.log(`\n--- Processing Seller ${sellerCounter}/${totalSellers}: ${sellerUsername} ---`);
             
-            // Check feedback score
             const feedbackScore = listings[0].seller?.feedbackScore || 0;
-            await logger.log(`\nProcessing seller ${sellerUsername} (feedback: ${feedbackScore})`);
+            await logger.log(`Feedback score: ${feedbackScore}`);
             
             if (feedbackScore >= feedbackThreshold) {
-                await logger.log(`Skipping seller ${sellerUsername} due to high feedback score`);
+                await logger.log(`Skipping due to high feedback score (${feedbackScore} >= ${feedbackThreshold})`);
                 continue;
             }
 
-            // Get and analyze all of this seller's listings
+            processedSellers.add(sellerUsername);
+            
             const sellerAnalysis = await fetchSellerListings(sellerUsername, categoryIds);
-
+            
             if (!sellerAnalysis.error && !sellerAnalysis.shouldExclude) {
-                // If seller passes our criteria, add their listings
                 qualifiedSellerCounter++;
-                await logger.log(`Seller ${sellerUsername} has passed analysis`);
-                // Only add one listing per seller to avoid duplicates
+                await logger.log(`Seller qualified: ${sellerUsername}`);
+                
                 if (listings.length > 0) {
-                    filteredListings.push(listings[0]);
-                    await logger.log(`Found a qualified listing. Adding this listing: ${listings[0].title}`);
-                    await logger.log(`Current qualified listings: ${filteredListings}`);
+                    const addedListing = listings[0];
+                    filteredListings.push(addedListing);
+                    await logger.log(`Added listing: "${addedListing.title}" (${addedListing.itemId})`);
                 }
             } else {
-                await logger.log(`Excluded seller ${sellerUsername} based on analysis`);
+                await logger.log(`Seller excluded: ${sellerUsername}${sellerAnalysis.error ? ` (Error: ${sellerAnalysis.errorMessage})` : ''}`);
             }
         }
-        await logger.log(`\nFinished processing. Processed ${sellerCounter} sellers`);
-        await logger.log(`Found ${qualifiedSellerCounter} qualified sellers with unique listings`);
-        await logger.log(`\nFinished processing. Found ${filteredListings.length} qualified listings`);
+
+        await logger.log(`\n=== Phrase "${phrase}" Processing Complete ===`);
+        await logger.log(`- Total sellers processed: ${sellerCounter}`);
+        await logger.log(`- Qualified sellers: ${qualifiedSellerCounter}`);
+        await logger.log(`- Qualified listings found: ${filteredListings.length}`);
+
         return filteredListings;
 
     } catch (error) {
-        await logger.log(`Error processing ${searchPhrases}: ${error.message}`);
+        await logger.log(`Error processing phrase "${phrase}": ${error.message}`);
+        await logger.log(error.stack); // Log stack trace for debugging
         return [];
     }
 }
