@@ -325,7 +325,15 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
     }
 }
 
-
+function formatConditionsForQuery(conditions) {
+    // If no conditions provided, return empty string
+    if (!conditions || conditions.length === 0) {
+        return '';
+    }
+    
+    // Join conditions with commas for eBay API format
+    return conditions.join(',');
+}
 
 async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds,conditions) {
     await trackApiCall();
