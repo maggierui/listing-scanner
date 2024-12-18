@@ -126,7 +126,7 @@ app.post('/api/scan', async (req, res) => {
             });
 
         // Start the scan in the background without awaiting
-        startScan(searchPhrases, feedbackThreshold, categoryIds)
+        startScan(searchPhrases, feedbackThreshold, categoryIds,conditions)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
@@ -488,6 +488,11 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds,condition
         if (!feedbackThreshold) {
             await logger.log('Error: Missing feedback threshold');
             throw new Error('Missing feedback threshold');
+        }
+
+        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
+            await logger.log('Error: Invalid or missing category IDs');
+            throw new Error('Invalid category IDs provided');
         }
 
         if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
