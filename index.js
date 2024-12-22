@@ -105,6 +105,8 @@ app.post('/api/scan', async (req, res) => {
         await logger.log(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
         await logger.log(`- Feedback threshold: ${feedbackThreshold}`);
         await logger.log(`- Category IDs: ${JSON.stringify(categoryIds)}`);
+        await logger.log('Selected conditions received:', req.body.selectedConditions);
+
 
         // Validate after parsing
         if (searchPhrases.length === 0) {
@@ -337,6 +339,8 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
     await trackApiCall();
     
     try {
+        await logger.log('Conditions received by fetchListingsForPhrase:', conditions);
+
         // Add condition filter to URL if conditions are specified
         const conditionFilter = conditions && conditions.length > 0 
             ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
