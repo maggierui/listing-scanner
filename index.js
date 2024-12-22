@@ -333,8 +333,8 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
         await logger.log(`Condition IDs received: ${conditions}`);
         await logger.log(`Formatted condition filter: ${formatConditionsForQuery(conditions)}`);        // Add condition filter to URL if conditions are specified
         const conditionFilter = conditions && conditions.length > 0 
-            ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
-            : '';
+    ? `&filter=condition:${formatConditionsForQuery(conditions)}` // Remove the curly braces
+    : '';
         await logger.log(`\n=== Fetching listings for search phrase: "${phrase}" ===`);
         await logger.log(`Condition filter: ${conditionFilter}`);
 
