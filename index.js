@@ -376,9 +376,9 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
         await logger.log(`Found ${data.itemSummaries.length} total listings for phrase "${phrase}"`);
         // Print out all search results
-        data.itemSummaries.forEach(item => {
-            console.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
-        });
+        for (const item of data.itemSummaries) {
+            await logger.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
+        }
 
         // Filter out previously seen listings
         const newListings = [];
