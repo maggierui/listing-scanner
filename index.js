@@ -330,17 +330,12 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
     await trackApiCall();
     
     try {
-        await logger.log(`Condition IDs received: ${conditions}`);
-        await logger.log(`Formatted condition filter: ${formatConditionsForQuery(conditions)}`);        // Add condition filter to URL if conditions are specified
-        const conditionFilter = conditions && conditions.length > 0 
-    ? conditions.map(condition => `&filter=condition:${condition}`).join('') 
-    : '';
         await logger.log(`\n=== Fetching listings for search phrase: "${phrase}" ===`);
-        await logger.log(`Condition filter: ${conditionFilter}`);
 
+        // Remove condition filter from URL - we'll filter results after
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=${encodeURIComponent(phrase)}` +
-            `&limit=200${conditionFilter}`;   
+            `&limit=200`;   
         await logger.log(`API URL: ${url}`);
 
         const processedSellers = new Set();
@@ -374,9 +369,29 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             await logger.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
         }
 
+        // Filter listings using EBAY_CONDITIONS for mapping but user-selected conditions for filtering
+        const validListings = [];
+        for (const item of data.itemSummaries) {
+            // Find matching condition in EBAY_CONDITIONS by name
+            const matchingCondition = Object.values(EBAY_CONDITIONS).find(
+                condition => condition.name === item.condition
+            );
+            
+            // Check if the condition ID is in the user-selected conditions
+            const isValidCondition = matchingCondition && conditions.includes(matchingCondition.id);
+            
+            if (!isValidCondition) {
+                await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}`);
+            } else {
+                validListings.push(item);
+            }
+        }
+
+        await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
+
         // Filter out previously seen listings
         const newListings = [];
-        for (const item of data.itemSummaries) {
+        for (const item of validListings) {
             if (!(await previousListings.has(item.itemId))) {
                 newListings.push(item);
             }
