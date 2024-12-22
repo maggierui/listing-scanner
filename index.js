@@ -9,8 +9,7 @@ import { URLSearchParams } from 'url';
 import { generatePreviousListingsCSV, generateSearchResultsCSV } from './csv-handlers.js';
 import DatabaseListingsManager from './DatabaseListingsManager.js';
 import logger from './logger.js';
-import { getAllConditionOptions } from './conditions.js';
-
+import {getAllConditionOptions, formatConditionsForQuery } from './conditions.js';
 
 
 // Load environment variables
@@ -325,19 +324,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
     }
 }
 
-export function formatConditionsForQuery(conditionIds) {
-    // Map from condition IDs to their ENUM keys
-    const idToEnum = Object.entries(EBAY_CONDITIONS).reduce((map, [enumKey, condition]) => {
-        map[condition.id] = enumKey;
-        return map;
-    }, {});
-    
-    // Convert IDs to ENUM values and join with commas
-    return conditionIds
-        .map(id => idToEnum[id])
-        .filter(Boolean)  // Remove any undefined values
-        .join(',');
-}
+
 
 async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds, conditions) {
     await trackApiCall();

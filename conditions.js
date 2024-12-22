@@ -66,7 +66,17 @@ export function getConditionNameById(id) {
 
 // Helper function to format conditions for API query
 export function formatConditionsForQuery(conditionIds) {
-    return conditionIds.join('|');
+    // Map from condition IDs to their ENUM keys
+    const idToEnum = Object.entries(EBAY_CONDITIONS).reduce((map, [enumKey, condition]) => {
+        map[condition.id] = enumKey;
+        return map;
+    }, {});
+    
+    // Convert IDs to ENUM values and join with commas
+    return conditionIds
+        .map(id => idToEnum[id])
+        .filter(Boolean)  // Remove any undefined values
+        .join(',');
 }
 
 // Helper function to get all condition options for frontend
