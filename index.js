@@ -9,7 +9,7 @@ import { URLSearchParams } from 'url';
 import { generatePreviousListingsCSV, generateSearchResultsCSV } from './csv-handlers.js';
 import DatabaseListingsManager from './DatabaseListingsManager.js';
 import logger from './logger.js';
-import {getAllConditionOptions, formatConditionsForQuery } from './conditions.js';
+import {getAllConditionOptions, EBAY_CONDITIONS } from './conditions.js';
 
 
 // Load environment variables
