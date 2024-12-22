@@ -291,7 +291,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         
         // Analysis criteria
         const MINIMUM_RATIO = 20;
-        const shouldExclude = ratio > MINIMUM_RATIO;
+        const shouldExclude = ratio > MINIMUM_RATIO || !(ratio === 0);
         
         await logger.log(`Sample ratio: ${ratio.toFixed(2)}%`);
         await logger.log(shouldExclude
@@ -346,7 +346,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=${encodeURIComponent(phrase)}` +
-            `&limit=150${conditionFilter}`;   
+            `&limit=200${conditionFilter}`;   
         await logger.log(`API URL: ${url}`);
 
         const processedSellers = new Set();
