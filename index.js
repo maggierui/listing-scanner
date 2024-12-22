@@ -325,23 +325,26 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
     }
 }
 
-function formatConditionsForQuery(conditions) {
-    // If no conditions provided, return empty string
-    if (!conditions || conditions.length === 0) {
-        return '';
-    }
+export function formatConditionsForQuery(conditionIds) {
+    // Map from condition IDs to their ENUM keys
+    const idToEnum = Object.entries(EBAY_CONDITIONS).reduce((map, [enumKey, condition]) => {
+        map[condition.id] = enumKey;
+        return map;
+    }, {});
     
-    // Join conditions with commas for eBay API format
-    return conditions.join(',');
+    // Convert IDs to ENUM values and join with commas
+    return conditionIds
+        .map(id => idToEnum[id])
+        .filter(Boolean)  // Remove any undefined values
+        .join(',');
 }
 
 async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds, conditions) {
     await trackApiCall();
     
     try {
-        await logger.log('Conditions received by fetchListingsForPhrase:', conditions);
-
-        // Add condition filter to URL if conditions are specified
+        await logger.log(`Condition IDs received: ${conditions}`);
+        await logger.log(`Formatted condition filter: ${formatConditionsForQuery(conditions)}`);        // Add condition filter to URL if conditions are specified
         const conditionFilter = conditions && conditions.length > 0 
             ? `&filter=condition:{${formatConditionsForQuery(conditions)}}` 
             : '';
