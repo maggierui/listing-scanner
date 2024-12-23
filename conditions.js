@@ -2,59 +2,73 @@
 export const EBAY_CONDITIONS = {
     NEW: {
         id: '1000',
-        name: 'New'
+        name: 'New',
+        variants: ['New', 'New with tags']
     },
     NEW_OTHER: {
         id: '1500',
-        name: 'New other (see details)'
+        name: 'New other (see details)',
+        variants: ['New other (see details)', 'New without tags']
     },
     NEW_WITH_DEFECTS: {
         id: '1750',
-        name: 'New with defects'
+        name: 'New with defects',
+        variants: ['New with defects']
     },
     CERTIFIED_REFURBISHED: {
         id: '2000',
-        name: 'Certified - Refurbished'
+        name: 'Certified - Refurbished',
+        variants: ['Certified - Refurbished']
     },
     EXCELLENT_REFURBISHED: {
         id: '2010',
-        name: 'Excellent - Refurbished'
+        name: 'Excellent - Refurbished',
+        variants: ['Excellent - Refurbished']
     },
     VERY_GOOD_REFURBISHED: {
         id: '2020',
-        name: 'Very Good - Refurbished'
+        name: 'Very Good - Refurbished',
+        variants: ['Very Good - Refurbished']
     },
     GOOD_REFURBISHED: {
         id: '2030',
-        name: 'Good - Refurbished'
+        name: 'Good - Refurbished',
+        variants: ['Good - Refurbished']
     },
     SELLER_REFURBISHED: {
         id: '2500',
-        name: 'Seller refurbished'
+        name: 'Seller refurbished',
+        variants: ['Seller refurbished']
     },
     LIKE_NEW: {
         id: '2750',
-        name: 'Like New'
+        name: 'Like New',
+        variants: ['Like New']
     },
     USED: {
         id: '3000',
-        name: 'Used'
+        name: 'Used',
+        variants: ['Used', 'Pre-owned']
     },
     VERY_GOOD: {
         id: '4000',
-        name: 'Very Good'
+        name: 'Very Good',
+        variants: ['Very Good']
     },
     GOOD: {
         id: '5000',
-        name: 'Good'
+        name: 'Good',
+        variants: ['Good']
     },
     ACCEPTABLE: {
         id: '6000',
-        name: 'Acceptable'
+        name: 'Acceptable',
+        variants: ['Acceptable']
     },
     FOR_PARTS: {
         id: '7000',
-        name: 'For parts or not working'
+        name: 'For parts or not working',
+        variants: ['For parts or not working']
     }
 };
 
