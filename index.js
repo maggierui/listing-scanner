@@ -369,7 +369,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             await logger.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
         }
 
-        const validListingsPromises = data.itemSummaries.map(async (item) => {
+        const validListings = data.itemSummaries.map(async (item) => {
             await logger.log(`Checking item condition: "${item.condition}"`);
             await logger.log(`User selected conditions: ${conditions}`);  
         
@@ -378,6 +378,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
                 condition => condition.name === item.condition
             );
             const itemConditionId = matchingCondition?.id;
+            await logger.log(`Matching condition ID: ${itemConditionId}`);
             
             // Check if this condition ID is in the user-selected conditions array
             const isValidCondition = itemConditionId && conditions.includes(itemConditionId);
