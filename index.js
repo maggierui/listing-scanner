@@ -372,33 +372,17 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
         const validListings = data.itemSummaries.filter(async (item) => {  // Added 'async' here
             // Debug logging
             await logger.log(`Checking item condition: "${item.condition}"`);
+            await logger.log(`User selected conditions: ${conditions}`);  
             
-            const matchingCondition = Object.values(EBAY_CONDITIONS).find(
-                condition => condition.variants.includes(item.condition)
-            );
-            
-            // Debug logging for matching condition
-            if (matchingCondition) {
-                await logger.log(`Found matching condition: ${JSON.stringify(matchingCondition)}`);
-            } else {
-                await logger.log(`No matching condition found in EBAY_CONDITIONS for: ${item.condition}`);
-                for (const condition of Object.values(EBAY_CONDITIONS)) {
-                    await logger.log(`Checking against variants: ${JSON.stringify(condition.variants)}`);
-                }
-            }
-            
-            const isValidCondition = matchingCondition && conditions.includes(matchingCondition.id);
-            
-            // Debug logging for condition check
-            await logger.log(`Conditions we're looking for: ${conditions}`);
-            await logger.log(`Is valid condition: ${isValidCondition}`);
-            
+            // Simple check if item's condition maps to one of our selected condition IDs
+            const isValidCondition = conditions.includes(item.condition.id);
+    
             if (!isValidCondition) {
-                await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}`);
-            } else {
-                await logger.log(`Included - Title: "${item.title}", Condition: ${item.condition} mapped to ID: ${matchingCondition?.id}`);
-            }
-            
+                await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, Not in user selected conditions: ${conditions}`);
+        } else {
+            await logger.log(`Included - Title: "${item.title}", Condition: ${item.condition}, Matches user selected conditions`);
+        }
+    
             return isValidCondition;
         });
 
