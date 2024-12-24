@@ -371,25 +371,33 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
         const validListings = data.itemSummaries.map(async (item) => {
             await logger.log(`Checking item condition: "${item.condition}"`);
-            await logger.log(`User selected conditions: ${conditions}`);  
         
-            // Find the matching condition in EBAY_CONDITIONS by name and get its ID
+    
+            // Log EBAY_CONDITIONS names for comparison
+            await logger.log('Available condition names in EBAY_CONDITIONS:');
+            Object.values(EBAY_CONDITIONS).forEach(async condition => {
+            await logger.log(`- ${condition.name}`);
+            });
+
             const matchingCondition = Object.values(EBAY_CONDITIONS).find(
-                condition => condition.name === item.condition
+            condition => condition.name === item.condition
             );
+            if (matchingCondition) {
+                await logger.log(`Found matching condition: ${matchingCondition.name} with ID: ${matchingCondition.id}`);
+            } else {
+                await logger.log(`No match found for condition: ${item.condition}`);
+            }
+
             const itemConditionId = matchingCondition?.id;
             await logger.log(`Matching condition ID: ${itemConditionId}`);
-            
-            // Check if this condition ID is in the user-selected conditions array
+
+            // Log the comparison with user-selected conditions
+            await logger.log(`User selected conditions: ${conditions}`);
             const isValidCondition = itemConditionId && conditions.includes(itemConditionId);
-        
-            if (!isValidCondition) {
-                await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, Maps to ID: ${itemConditionId || 'none'}`);
-            } else {
-                await logger.log(`Included - Title: "${item.title}", Condition: ${item.condition}, Matches selected condition ID: ${itemConditionId}`);
-            }
-        
+            await logger.log(`Is valid condition: ${isValidCondition}`); 
+            
             return { item, isValid: isValidCondition };
+
         });
 
         await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
