@@ -370,34 +370,28 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
         }
 
         const validListings = data.itemSummaries.map(async (item) => {
-            await logger.log(`Checking item condition: "${item.condition}"`);
-        
-    
-            // Log EBAY_CONDITIONS names for comparison
-            await logger.log('Available condition names in EBAY_CONDITIONS:');
-            Object.values(EBAY_CONDITIONS).forEach(async condition => {
-            await logger.log(`- ${condition.name}`);
-            });
-
-            const matchingCondition = Object.values(EBAY_CONDITIONS).find(
-            condition => condition.name === item.condition
-            );
-            if (matchingCondition) {
-                await logger.log(`Found matching condition: ${matchingCondition.name} with ID: ${matchingCondition.id}`);
-            } else {
-                await logger.log(`No match found for condition: ${item.condition}`);
-            }
-
-            const itemConditionId = matchingCondition?.id;
-            await logger.log(`Matching condition ID: ${itemConditionId}`);
-
-            // Log the comparison with user-selected conditions
-            await logger.log(`User selected conditions: ${conditions}`);
-            const isValidCondition = itemConditionId && conditions.includes(itemConditionId);
-            await logger.log(`Is valid condition: ${isValidCondition}`); 
+            await logger.log(`\nTrying to match item condition: "${item.condition}"`);
             
+            const matchingCondition = Object.values(EBAY_CONDITIONS).find(conditionObject => {
+                return conditionObject.variants.includes(item.condition);
+            });
+        
+            if (matchingCondition) {
+                await logger.log(`Found match - Condition: "${item.condition}" matches variant in ${matchingCondition.name} (ID: ${matchingCondition.id})`);
+            } else {
+                await logger.log(`No match found for condition: "${item.condition}" in any variants`);
+            }
+            
+            const itemConditionId = matchingCondition?.id;
+            const isValidCondition = itemConditionId && conditions.includes(itemConditionId);
+        
+            if (!isValidCondition) {
+                await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
+            } else {
+                await logger.log(`Included - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
+            }
+        
             return { item, isValid: isValidCondition };
-
         });
 
         await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
