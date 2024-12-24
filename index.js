@@ -369,31 +369,26 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
             await logger.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
         }
 
-        const validListings = data.itemSummaries.map(async (item) => {
+        const validListings = data.itemSummaries.filter(async (item) => {
             await logger.log(`\nTrying to match item condition: "${item.condition}"`);
             
             const matchingCondition = Object.values(EBAY_CONDITIONS).find(conditionObject => {
                 return conditionObject.variants.includes(item.condition);
             });
-        
-            if (matchingCondition) {
-                await logger.log(`Found match - Condition: "${item.condition}" matches variant in ${matchingCondition.name} (ID: ${matchingCondition.id})`);
-            } else {
-                await logger.log(`No match found for condition: "${item.condition}" in any variants`);
-            }
+    
             
             const itemConditionId = matchingCondition?.id;
             const isValidCondition = itemConditionId && conditions.includes(itemConditionId);
         
             if (!isValidCondition) {
                 await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
+                return false;  // Remove item if condition doesn't match user selection
             } else {
                 await logger.log(`Included - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
+                return true;  // Keep item if everything matches
             }
-        
-            return { item, isValid: isValidCondition };
         });
-
+        
         await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
 
         // Filter out previously seen listings
