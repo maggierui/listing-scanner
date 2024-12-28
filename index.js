@@ -501,7 +501,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, c
         await logger.log('\n=== fetchAllListings received parameters ===');
         await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
     
-        await previousListings.cleanup(30); // Cleans up listings older than 30 days
+        //await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
         await logger.log('Access token obtained successfully');
         await logger.log(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
