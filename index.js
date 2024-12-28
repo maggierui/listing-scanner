@@ -292,7 +292,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         
         // Analysis criteria
         const MINIMUM_RATIO = 20;
-        const shouldExclude = ratio > MINIMUM_RATIO || !(ratio === 0);
+        const shouldExclude = ratio > MINIMUM_RATIO || (ratio === 0);
         
         await logger.log(`Sample ratio: ${ratio.toFixed(2)}%`);
         await logger.log(shouldExclude

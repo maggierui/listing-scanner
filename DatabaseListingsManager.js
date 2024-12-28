@@ -14,6 +14,7 @@ class DatabaseListingsManager {
 
     async init() {
         try {
+            // Create table for previous listings (existing listings)
             await this.pool.query(`
                 CREATE TABLE IF NOT EXISTS previous_listings (
                     item_id TEXT PRIMARY KEY,
