@@ -259,7 +259,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         };
 
         // Create a Set of category IDs for faster lookup
-        const categorySet = new Set(categoryIds);
+        const categorySet = new Set(categoryIds.map(id => id.toString().trim()));
         
         const queryString = new URLSearchParams(params).toString();
         const response = await fetch(`https://svcs.ebay.com/services/search/FindingService/v1?${queryString}`);
@@ -271,15 +271,21 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             const items = data.findItemsAdvancedResponse[0].searchResult[0].item;
             
             // Process items and count category matches
-            items.forEach(item => {
+            for (const item of items) {
                 sampleListings.push(item);
                 
                 // Check if item's category matches any of our target categories
-                const itemCategory = item.primaryCategory[0].categoryId[0];
+                const itemCategory = item.primaryCategory[0].categoryId[0].toString().trim();
+                // Add debug logging
+                await logger.log(`Comparing category ${itemCategory} with set ${[...categorySet]}`);
+
                 if (categorySet.has(itemCategory)) {
                     categoryListingsCount++;
+                    await logger.log(`Category match found: ${itemCategory}`);
+                } else {
+                    await logger.log(`Category not in set: ${itemCategory}`);
                 }
-            });
+            }
             
             await logger.log(`Analyzed ${items.length} sample listings for ${sellerUsername}`);
             await logger.log(`Found ${categoryListingsCount} listings in target categories`);
