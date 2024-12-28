@@ -401,26 +401,26 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
         await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
 
         // Filter out previously seen listings
-        const newListings = [];
-        for (const item of validListings) {
-            if (!(await previousListings.has(item.itemId))) {
-                newListings.push(item);
-            }
-        }
+        //const newListings = [];
+       // for (const item of validListings) {
+        //    if (!(await previousListings.has(item.itemId))) {
+        //        newListings.push(item);
+        //    }
+        //}
         
-        await logger.log(`Found ${newListings.length} new listings (not previously processed)`);
+        //await logger.log(`Found ${newListings.length} new listings (not previously processed)`);
 
         // Store new listing IDs
-        if (newListings.length > 0) {
-            await previousListings.addMany(newListings.map(item => item.itemId));
-            await logger.log(`Stored ${newListings.length} new listing IDs in database`);
-        }
+        // if (newListings.length > 0) {
+        //    await previousListings.addMany(newListings.map(item => item.itemId));
+        //    await logger.log(`Stored ${newListings.length} new listing IDs in database`);
+        //}
 
         // Group by seller with validation
         const sellerListings = new Map();
         let skippedListings = 0;
         
-        newListings.forEach(item => {
+        validListings.forEach(item => { //Since I commented out the newListings, I'm using validListings instead
             if (!item.seller?.username) {
                 skippedListings++;
                 return;
@@ -555,15 +555,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds,condition
         await fs.appendFile(logFileName, `========================================\n\n`);
         await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
 
-        // Add logging for database cleanup
-        try {
-            await logger.log('Starting database cleanup...');
-            await previousListings.cleanup();
-            await logger.log('Database cleanup completed');
-        } catch (cleanupError) {
-            await logger.log(`Database cleanup error: ${cleanupError.message}`);
-            // Continue with scan even if cleanup fails
-        }
+        
 
         // Add debug logging
         await logger.log('Scan parameters:');

@@ -13,7 +13,12 @@
         <label for="searchPhrases">Search Phrases (comma-separated):</label>
         <input type="text" id="searchPhrases" name="searchPhrases" required>
       </div>
-
+      <div class="form-group">
+        <label>Item Conditions:</label>
+        <div id="conditionCheckboxes" class="condition-options">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
       <div class="form-group category-group">
         <label for="categorySearch">Search Categories:</label>
         <input type="text" id="categorySearch" placeholder="Type to search categories...">
@@ -26,13 +31,6 @@
           Selected Category ID: <span id="selectedCategoryId">None</span>
         </div>
       </div>
-
-      <div class="form-group">
-        <label>Item Conditions:</label>
-        <div id="conditionCheckboxes" class="condition-options">
-            <!-- Will be populated by JavaScript -->
-        </div>
-    </div>
 
       <div class="form-group">
         <label for="feedbackThreshold">Feedback Threshold:</label>
