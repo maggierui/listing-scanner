@@ -276,10 +276,13 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
                 
                 // Check if item's category matches any of our target categories
                 const itemCategory = item.primaryCategory[0].categoryId[0].toString().trim();
-                // Add debug logging
-                await logger.log(`Comparing category ${itemCategory} with set ${[...categorySet]}`);
+                
+                // Debug logging for category comparison
+                await logger.log(`Item category: ${itemCategory} (${typeof itemCategory})`);
+                await logger.log(`Category set contents: ${[...categorySet].map(c => `${c} (${typeof c})`).join(', ')}`);
 
-                if (categorySet.has(itemCategory)) {
+                // Normalize both the item category and set categories to strings and trim
+                if (categorySet.has(itemCategory) || [...categorySet].some(catId => catId.toString().trim() === itemCategory)) {
                     categoryListingsCount++;
                     await logger.log(`Category match found: ${itemCategory}`);
                 } else {
