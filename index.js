@@ -71,8 +71,26 @@ app.post('/api/scan', async (req, res) => {
     const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
     const typicalPhrases = req.body.typicalPhrases.split(',').map(phrase => phrase.trim());
     const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-    const conditions = req.body.selectedConditions.split(',').map(condition => condition.trim());
+    // Handle conditions based on what we receive
+    let conditions;
+    if (typeof req.body.selectedConditions === 'string') {
+        conditions = req.body.selectedConditions.split(',').map(c => c.trim());
+    } else if (Array.isArray(req.body.selectedConditions)) {
+        conditions = req.body.selectedConditions;
+    } else if (req.body.selectedConditions) {
+        conditions = [req.body.selectedConditions];
+    } else {
+        return res.status(400).json({ error: 'No conditions provided' });
+    }
 
+    // Validate conditions
+    if (!Array.isArray(conditions) || conditions.length === 0 || conditions.some(c => !c)) {
+        console.log('Invalid conditions:', conditions);
+        return res.status(400).json({ error: 'Invalid conditions provided' });
+    }
+
+    console.log('Final processed conditions:', conditions);
+    
     if (!searchPhrases || !typicalPhrases) {
         return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
     }
