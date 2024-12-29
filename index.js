@@ -493,15 +493,15 @@ async function startScan(searchPhrases, typicalPhrases, feedbackThreshold, condi
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
             await logger.log('Error: Invalid or missing search phrases');
-            throw new Error('Invalid search phrases provided');
+            return; // Return instead of throwing error for automated rescans
         }
         if (!typicalPhrases || !Array.isArray(typicalPhrases)) {
             await logger.log('Error: Invalid or missing typical phrases');
-            throw new Error('Invalid typical phrases provided');
+            return; // Return instead of throwing error for automated rescans
         }
         if (!feedbackThreshold) {
             await logger.log('Error: Missing feedback threshold');
-            throw new Error('Missing feedback threshold');
+            return; // Return instead of throwing error for automated rescans
         }
 
 
@@ -543,7 +543,6 @@ async function startScan(searchPhrases, typicalPhrases, feedbackThreshold, condi
             logMessages: scanResults.logMessages
         };
         
-        setTimeout(startScan, 300000);
     } catch (error) {
         await logger.log(`Error during scan: ${error.message}`);
         scanResults = {
@@ -551,7 +550,6 @@ async function startScan(searchPhrases, typicalPhrases, feedbackThreshold, condi
             status: 'error',
             error: error.message
         };
-        setTimeout(startScan, 60000);
     }
 }
 
