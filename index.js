@@ -459,7 +459,7 @@ async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases,feedba
 
 
 
-async function fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases, conditions) {
+async function fetchAllListings(searchPhrases, typicalPhrases, feedbackThreshold,  conditions) {
     try {
         await logger.log('\n=== fetchAllListings received parameters ===');
         await logger.log(JSON.stringify({ searchPhrases,typicalPhrases, feedbackThreshold,  conditions}, null, 2));
