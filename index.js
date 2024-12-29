@@ -373,7 +373,9 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ty
             }
             
             const itemConditionId = matchingCondition.id;
-            const isValidCondition = conditions.includes(itemConditionId);
+            // Ensure conditions is an array
+            const conditionsArray = Array.isArray(conditions) ? conditions : [conditions];
+            const isValidCondition = conditionsArray.includes(itemConditionId);
 
             if (!isValidCondition) {
                 await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
