@@ -56,83 +56,44 @@ app.get('/', async (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/api/categories', async (req, res) => {
-    try {
-        // Using the already imported fs promises
-        const files = await fs.readdir('.');
-        const categoryFiles = files.filter(f => f.startsWith('ebay_categories_') && f.endsWith('.json'));
-        const mostRecentFile = categoryFiles.sort().reverse()[0];
-        
-        const categoriesData = await fs.readFile(mostRecentFile, 'utf8');
-        const categories = JSON.parse(categoriesData);
-        
-        res.json(categories);
-    } catch (error) {
-        console.error('Error serving categories:', error);
-        res.status(500).json({ error: 'Failed to load categories' });
-    }
-});
-
 app.get('/api/conditions', async (req, res) => {
     res.json(getAllConditionOptions());
     await logger.log('Conditions requested');
 });
 
 app.post('/api/scan', async (req, res) => {
-    // Cconsole.log('Received request body:', req.body);
-        console.log('Type of req.body:', typeof req.body);
-        console.log('Keys in req.body:', Object.keys(req.body));
-        //check if a scan is already in progress
-        if (scanInProgress) {
-            return res.status(409).json({ 
-                error: 'A scan is already in progress'
-            });
-        }
+    if (scanInProgress) {
+        return res.status(409).json({ 
+            error: 'A scan is already in progress'
+        });
+    }
 
-        // Check if req.body.searchPhrases exists first
-        if (!req.body.searchPhrases) {
-            return res.status(400).json({ error: 'Search phrases are required' });
-        }
+    const { searchPhrases, typicalPhrases,  feedbackThreshold } = req.body;
 
-        // Then parse the search phrases
-        const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
-        const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-        const categoryIds = req.body.categoryIds;
-        const conditions = req.body.selectedConditions;
+    if (!searchPhrases || !typicalPhrases) {
+        return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
+    }
 
-        await logger.log(`Received request with:`);
-        await logger.log(`- Search phrases: ${JSON.stringify(searchPhrases)}`);
-        await logger.log(`- Feedback threshold: ${feedbackThreshold}`);
-        await logger.log(`- Category IDs: ${JSON.stringify(categoryIds)}`);
-        await logger.log('Selected conditions received:', req.body.selectedConditions);
+    const searchPhrasesArray = searchPhrases.split(',').map(phrase => phrase.trim());
+    const typicalPhrasesArray = typicalPhrases.split(',').map(phrase => phrase.trim());
+    const conditions = req.body.selectedConditions;
+       
+    await logger.log(`Received request with:`);
+    await logger.log(`- Search phrases: ${JSON.stringify(searchPhrasesArray)}`);
+    await logger.log(`- Typical phrases: ${JSON.stringify(typicalPhrasesArray)}`);
+    await logger.log(`- Feedback threshold: ${feedbackThreshold}`);
 
+    scanInProgress = true;
+    scanResults.status = 'processing';
+    scanResults.error = null;
 
-        // Validate after parsing
-        if (searchPhrases.length === 0) {
-            return res.status(400).json({ error: 'At least one search phrase is required' });
-        }
+    try {
+        res.json({ 
+            status: 'started',
+            message: 'Scan started successfully'
+        });
 
-        if (isNaN(feedbackThreshold)) {
-            return res.status(400).json({ error: 'Valid feedback threshold is required' });
-        }
-
-        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
-            return res.status(400).json({ error: 'Category IDs are required' });
-        }
-        
-        scanInProgress = true;
-        scanResults.status = 'processing';
-        scanResults.error = null;
-
-        // Send immediate response to client
-        try {
-            res.json({ 
-                status: 'started',
-                message: 'Scan started successfully'
-            });
-
-        // Start the scan in the background without awaiting
-        startScan(searchPhrases, feedbackThreshold, categoryIds,conditions)
+        startScan(searchPhrasesArray, typicalPhrasesArray, conditions, feedbackThreshold)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
@@ -143,7 +104,6 @@ app.post('/api/scan', async (req, res) => {
             });
             
     } catch (error) {
-        // Only send error response if we haven't sent a response yet
         if (!res.headersSent) {
             scanInProgress = false;
             scanResults.status = 'error';
@@ -225,12 +185,11 @@ async function getSellerTotalListings(sellerUsername) {
 }
 
 
-async function fetchSellerListings(sellerUsername, categoryIds) {
+async function fetchSellerListings(sellerUsername, typicalPhrases) {
     try {
-        // Initialize data structures to track listings and counts
-        let totalListings = 0;        // Total listings across all categories
-        let categoryListingsCount = 0; // Listings in target categories
-        let sampleListings = [];  // Define the array here
+        let totalListings = 0;
+        let matchingListingsCount = 0;
+        let sampleListings = [];
         
         // First, get the seller's total listings across ALL categories
         totalListings = await getSellerTotalListings(sellerUsername);
@@ -242,7 +201,6 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
         if (totalListings > 100) 
             totalListings = 100;
-        
 
         await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
@@ -257,9 +215,6 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             'paginationInput.entriesPerPage': 100,
             'outputSelector': 'SellerInfo'
         };
-
-        // Create a Set of category IDs for faster lookup
-        const categorySet = new Set(categoryIds.map(id => id.toString().trim()));
         
         const queryString = new URLSearchParams(params).toString();
         const response = await fetch(`https://svcs.ebay.com/services/search/FindingService/v1?${queryString}`);
@@ -270,33 +225,28 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             
             const items = data.findItemsAdvancedResponse[0].searchResult[0].item;
             
-            // Process items and count category matches
             for (const item of items) {
                 sampleListings.push(item);
                 
-                // Check if item's category matches any of our target categories
-                const itemCategory = item.primaryCategory[0].categoryId[0].toString().trim();
-                
-                // Debug logging for category comparison
-                await logger.log(`Item category: ${itemCategory} (${typeof itemCategory})`);
-                await logger.log(`Category set contents: ${[...categorySet].map(c => `${c} (${typeof c})`).join(', ')}`);
+                // Check if item title contains any of the search phrases
+                const itemTitle = item.title[0].toLowerCase();
+                const matchesPhrase = typicalPhrases.some(phrase => 
+                    itemTitle.includes(phrase.toLowerCase())
+                );
 
-                // Normalize both the item category and set categories to strings and trim
-                if (categorySet.has(itemCategory) || [...categorySet].some(catId => catId.toString().trim() === itemCategory)) {
-                    categoryListingsCount++;
-                    await logger.log(`Category match found: ${itemCategory}`);
-                } else {
-                    await logger.log(`Category not in set: ${itemCategory}`);
+                if (matchesPhrase) {
+                    matchingListingsCount++;
+                    await logger.log(`Matching title found: ${item.title[0]}`);
                 }
             }
             
             await logger.log(`Analyzed ${items.length} sample listings for ${sellerUsername}`);
-            await logger.log(`Found ${categoryListingsCount} listings in target categories`);
+            await logger.log(`Found ${matchingListingsCount} listings matching typical phrases`);
         }
         
         // Calculate the ratio based on the sample
         const sampleSize = sampleListings.length;
-        const categoryRatio = sampleSize > 0 ? (categoryListingsCount / sampleSize) : 0;
+        const categoryRatio = sampleSize > 0 ? (matchingListingsCount / sampleSize) : 0;
         const ratio = categoryRatio * 100; // Convert to percentage
         
         // Analysis criteria
@@ -305,8 +255,8 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
         
         await logger.log(`Sample ratio: ${ratio.toFixed(2)}%`);
         await logger.log(shouldExclude
-            ? `DECISION: EXCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% in target categories`
-            : `DECISION: INCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% in target categories`);
+            ? `DECISION: EXCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% matching phrases`
+            : `DECISION: INCLUDING ${sellerUsername} - ${ratio.toFixed(2)}% matching phrases`);
         
         return {
             shouldExclude,
@@ -316,7 +266,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
             total: totalListings,
             sampleData: {
                 sampleSize,
-                categoryCount: categoryListingsCount
+                matchCount: matchingListingsCount
             }
         };
         
@@ -335,7 +285,7 @@ async function fetchSellerListings(sellerUsername, categoryIds) {
 
 
 
-async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, categoryIds, conditions) {
+async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases) {
     await trackApiCall();
     
     try {
@@ -473,7 +423,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
             processedSellers.add(sellerUsername);
             
-            const sellerAnalysis = await fetchSellerListings(sellerUsername, categoryIds);
+            const sellerAnalysis = await fetchSellerListings(sellerUsername, typicalPhrases);
             
             if (!sellerAnalysis.error && !sellerAnalysis.shouldExclude) {
                 qualifiedSellerCounter++;
@@ -505,10 +455,10 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ca
 
 
 
-async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, conditions) {
+async function fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases, conditions) {
     try {
         await logger.log('\n=== fetchAllListings received parameters ===');
-        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds}, null, 2));
+        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, typicalPhrases, conditions}, null, 2));
     
         //await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
@@ -517,9 +467,9 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, c
         const allListings = [];
         
         for (const phrase of searchPhrases) {
-            console.log('Searching for phrase:', phrase); // Debug log
-            const listings = await fetchListingsForPhrase(accessToken,phrase, feedbackThreshold, categoryIds,conditions);
-            console.log(`Found ${listings.length} listings for phrase: ${phrase}`); // Debug log
+            console.log('Searching for phrase:', phrase);
+            const listings = await fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases, conditions);
+            console.log(`Found ${listings.length} listings for phrase: ${phrase}`);
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
             }
@@ -534,7 +484,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, categoryIds, c
     }
 }
 
-async function startScan(searchPhrases, feedbackThreshold, categoryIds,conditions) {
+async function startScan(searchPhrases, feedbackThreshold, typicalPhrases, conditions) {
     try {
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
@@ -546,15 +496,17 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds,condition
             throw new Error('Missing feedback threshold');
         }
 
-        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
+        if (!typicalPhrases || !Array.isArray(typicalPhrases) || typicalPhrases.length === 0) {
             await logger.log('Error: Invalid or missing category IDs');
             throw new Error('Invalid category IDs provided');
         }
 
-        if (!categoryIds || !Array.isArray(categoryIds) || categoryIds.length === 0) {
-            await logger.log('Error: Invalid or missing category IDs');
-            throw new Error('Invalid category IDs provided');
+        if (!conditions || !Array.isArray(conditions) || conditions.length === 0) {
+            await logger.log('Error: Invalid or missing conditions');
+            throw new Error('Invalid conditions provided');
         }
+
+
 
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
@@ -562,7 +514,7 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds,condition
         await fs.appendFile(logFileName, `\n\n========================================\n`);
         await fs.appendFile(logFileName, `startScan function - New Scan Started at ${new Date().toLocaleString()}\n`);
         await fs.appendFile(logFileName, `========================================\n\n`);
-        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, categoryIds }, null, 2));
+        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, typicalPhrases, conditions }, null, 2));
 
         
 
@@ -570,14 +522,14 @@ async function startScan(searchPhrases, feedbackThreshold, categoryIds,condition
         await logger.log('Scan parameters:');
         await logger.log(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
         await logger.log(`- Feedback Threshold: ${feedbackThreshold}`);
-        await logger.log(`- Category IDs: ${JSON.stringify(categoryIds)}`);
-
+        await logger.log(`- Typical Phrases: ${JSON.stringify(typicalPhrases)}`);
+        await logger.log(`- Conditions: ${JSON.stringify(conditions)}`);
         scanResults.status = 'processing';
         scanResults.error = null;
         scanResults.logMessages = [];
 
         await logger.log('Calling fetchAllListings...');
-        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, categoryIds,conditions);
+        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases, conditions);
         await logger.log(`fetchAllListings completed. Found ${listings.length} listings`);
 
         

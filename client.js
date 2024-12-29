@@ -1,49 +1,3 @@
-// Category handling functions
-async function loadCategories() {
-  try {
-      const response = await fetch('/api/categories');
-      const categories = await response.json();
-      
-      const select = document.getElementById('categorySelect');
-      const search = document.getElementById('categorySearch');
-      
-      function updateCategories(searchTerm = '') {
-          select.innerHTML = '';
-          const filteredCategories = categories.filter(cat => 
-              cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-          
-          filteredCategories.forEach(category => {
-              const option = document.createElement('option');
-              option.value = category.categoryId;
-              option.textContent = `${category.categoryName} (${category.categoryId})`;
-              select.appendChild(option);
-          });
-      }
-
-      // Initial load of all categories
-      updateCategories();
-
-      // Add search functionality
-      search.addEventListener('input', (e) => {
-          updateCategories(e.target.value);
-      });
-
-      // Update selected category ID when selection changes
-      select.addEventListener('change', (e) => {
-          const selectedOptions = Array.from(e.target.selectedOptions);
-          const categoryIds = selectedOptions.map(option => option.value);
-          document.getElementById('selectedCategoryId').textContent = 
-              categoryIds.length ? categoryIds.join(', ') : 'None';
-      });
-
-  } catch (error) {
-      console.error('Error loading categories:', error);
-      const select = document.getElementById('categorySelect');
-      select.innerHTML = '<option value="">Error loading categories</option>';
-  }
-}
-
 async function loadConditions() {
   const conditionContainer = document.getElementById('conditionCheckboxes');
     const conditions = await fetch('/api/conditions').then(res => res.json());
@@ -85,18 +39,17 @@ async function handleScanSubmit(e) {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-              categoryIds: Array.from(document.getElementById('categorySelect').selectedOptions)
-                  .map(option => option.value),
+              searchPhrases: document.getElementById('searchPhrases').value,
+              typicalPhrases: document.getElementById('typicalPhrases').value,
               feedbackThreshold: document.getElementById('feedbackThreshold').value,
               selectedConditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
-        .map(checkbox => checkbox.value),
-              searchPhrases: document.getElementById('searchPhrases').value
+                  .map(checkbox => checkbox.value)
           })
       });
 
       console.log('Scan response status:', response.status);
-        const responseData = await response.json();
-        console.log('Scan response data:', responseData);
+      const responseData = await response.json();
+      console.log('Scan response data:', responseData);
 
       if (!response.ok) {
           throw new Error('Failed to initiate scan');

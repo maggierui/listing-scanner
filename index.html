@@ -19,17 +19,15 @@
             <!-- Will be populated by JavaScript -->
         </div>
     </div>
-      <div class="form-group category-group">
-        <label for="categorySearch">Search Categories:</label>
-        <input type="text" id="categorySearch" placeholder="Type to search categories...">
-        
-        <label for="categorySelect">Select Category:</label>
-        <select id="categorySelect" name="categorySelect" multiple size="10" required>
-          <option value="" disabled>Loading categories...</option>
-        </select>
-        <div class="category-info">
-          Selected Category ID: <span id="selectedCategoryId">None</span>
-        </div>
+      <div class="form-group">
+        <label for="typicalPhrases">Typical Phrases in Target Category:</label>
+        <textarea 
+            id="typicalPhrases" 
+            class="form-control" 
+            rows="3" 
+            placeholder="Enter phrases commonly found in your target category listings, separated by commas. Example: 14k gold, sterling silver, diamond ring"
+        ></textarea>
+        <small class="form-text text-muted">These phrases help identify sellers who specialize in your target category</small>
       </div>
 
       <div class="form-group">
