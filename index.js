@@ -71,38 +71,15 @@ app.post('/api/scan', async (req, res) => {
     const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
     const typicalPhrases = req.body.typicalPhrases.split(',').map(phrase => phrase.trim());
     const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-    // Handle conditions based on what we receive
-    let conditions;
-    if (typeof req.body.selectedConditions === 'string') {
-        conditions = req.body.selectedConditions.split(',').map(c => c.trim());
-    } else if (Array.isArray(req.body.selectedConditions)) {
-        conditions = req.body.selectedConditions;
-    } else if (req.body.selectedConditions) {
-        conditions = [req.body.selectedConditions];
-    } else {
-        return res.status(400).json({ error: 'No conditions provided' });
-    }
-    // Log conditions after processing
-    console.log('Processed conditions:', conditions);
-    console.log('Conditions type after processing:', typeof conditions);
-    console.log('Is conditions an array?', Array.isArray(conditions));
-    console.log('Conditions length:', conditions.length);
-    console.log('Individual condition values:', conditions.map(c => ({value: c, type: typeof c})));
-
-    // Validate conditions
-    if (!Array.isArray(conditions) || conditions.length === 0 || conditions.some(c => !c)) {
-        console.log('Failed validation with conditions:', conditions);
-        return res.status(400).json({ error: 'Invalid conditions provided' });
+    const conditions = req.body.selectedConditions;
+    
+    // Validate after parsing
+    if (searchPhrases.length === 0) {
+        return res.status(400).json({ error: 'At least one search phrase is required' });
     }
 
-    // If we get here, conditions are valid
-    console.log('Validation passed. Final conditions:', conditions);
-
-
-    console.log('Final processed conditions:', conditions);
-
-    if (!searchPhrases || !typicalPhrases) {
-        return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
+    if (isNaN(feedbackThreshold)) {
+        return res.status(400).json({ error: 'Valid feedback threshold is required' });
     }
 
     await logger.log(`Received request with:`);
@@ -120,7 +97,7 @@ app.post('/api/scan', async (req, res) => {
             message: 'Scan started successfully'
         });
 
-        startScan(searchPhrases, typicalPhrases, conditions, feedbackThreshold)
+        startScan(searchPhrases, typicalPhrases, feedbackThreshold,conditions)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
@@ -312,7 +289,7 @@ async function fetchSellerListings(sellerUsername, typicalPhrases) {
 
 
 
-async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases,conditions) {
+async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases,feedbackThreshold, conditions) {
     await trackApiCall();
     
     try {
@@ -366,16 +343,14 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ty
             });
 
             if (matchingCondition) {
-                await logger.log(`Found match - Condition: "${item.condition}" matches variant in ${matchingCondition.name} (ID: ${matchingCondition.id})`);
+                await logger.log(`Item's condition: "${item.condition}" is called ${matchingCondition.name} (ID: ${matchingCondition.id}) in the eBay API`);
             } else {
                 await logger.log(`No match found for condition: "${item.condition}" in any variants`);
                 continue;  // Skip to next item
             }
             
             const itemConditionId = matchingCondition.id;
-            // Ensure conditions is an array
-            const conditionsArray = Array.isArray(conditions) ? conditions : [conditions];
-            const isValidCondition = conditionsArray.includes(itemConditionId);
+            const isValidCondition = conditions.includes(itemConditionId);
 
             if (!isValidCondition) {
                 await logger.log(`Filtered out - Title: "${item.title}", Condition: ${item.condition}, ID: ${itemConditionId}`);
@@ -487,7 +462,7 @@ async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, ty
 async function fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases, conditions) {
     try {
         await logger.log('\n=== fetchAllListings received parameters ===');
-        await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, typicalPhrases, conditions}, null, 2));
+        await logger.log(JSON.stringify({ searchPhrases,typicalPhrases, feedbackThreshold,  conditions}, null, 2));
     
         //await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
@@ -497,7 +472,7 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases
         
         for (const phrase of searchPhrases) {
             console.log('Searching for phrase:', phrase);
-            const listings = await fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases, conditions);
+            const listings = await fetchListingsForPhrase(accessToken, phrase, typicalPhrases,feedbackThreshold, conditions);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`);
             if (listings && listings.length > 0) {
                 allListings.push(...listings);
@@ -513,22 +488,22 @@ async function fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases
     }
 }
 
-async function startScan(searchPhrases, feedbackThreshold, typicalPhrases, conditions) {
+async function startScan(searchPhrases, typicalPhrases, feedbackThreshold, conditions) {
     try {
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
             await logger.log('Error: Invalid or missing search phrases');
             throw new Error('Invalid search phrases provided');
         }
+        if (!typicalPhrases || !Array.isArray(typicalPhrases)) {
+            await logger.log('Error: Invalid or missing typical phrases');
+            throw new Error('Invalid typical phrases provided');
+        }
         if (!feedbackThreshold) {
             await logger.log('Error: Missing feedback threshold');
             throw new Error('Missing feedback threshold');
         }
 
-        if (!typicalPhrases || !Array.isArray(typicalPhrases) || typicalPhrases.length === 0) {
-            await logger.log('Error: Invalid or missing category IDs');
-            throw new Error('Invalid category IDs provided');
-        }
 
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
@@ -551,7 +526,7 @@ async function startScan(searchPhrases, feedbackThreshold, typicalPhrases, condi
         scanResults.logMessages = [];
 
         await logger.log('Calling fetchAllListings...');
-        const listings = await fetchAllListings(searchPhrases, feedbackThreshold, typicalPhrases, conditions);
+        const listings = await fetchAllListings(searchPhrases, typicalPhrases, feedbackThreshold, conditions);
         await logger.log(`fetchAllListings completed. Found ${listings.length} listings`);
 
         

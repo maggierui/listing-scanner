@@ -39,13 +39,12 @@ async function handleScanSubmit(e) {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-              
-              feedbackThreshold: document.getElementById('feedbackThreshold').value,
-              selectedConditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
-        .map(checkbox => checkbox.value),
-              searchPhrases: document.getElementById('searchPhrases').value,
-              typicalPhrases: document.getElementById('typicalPhrases').value
-          })
+            searchPhrases: document.getElementById('searchPhrases').value,
+            typicalPhrases: document.getElementById('typicalPhrases').value,
+            feedbackThreshold: document.getElementById('feedbackThreshold').value,
+            selectedConditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
+                .map(checkbox => checkbox.value)
+        })
       });
 
       console.log('Scan response status:', response.status);
