@@ -82,15 +82,25 @@ app.post('/api/scan', async (req, res) => {
     } else {
         return res.status(400).json({ error: 'No conditions provided' });
     }
+    // Log conditions after processing
+    console.log('Processed conditions:', conditions);
+    console.log('Conditions type after processing:', typeof conditions);
+    console.log('Is conditions an array?', Array.isArray(conditions));
+    console.log('Conditions length:', conditions.length);
+    console.log('Individual condition values:', conditions.map(c => ({value: c, type: typeof c})));
 
     // Validate conditions
     if (!Array.isArray(conditions) || conditions.length === 0 || conditions.some(c => !c)) {
-        console.log('Invalid conditions:', conditions);
+        console.log('Failed validation with conditions:', conditions);
         return res.status(400).json({ error: 'Invalid conditions provided' });
     }
 
+    // If we get here, conditions are valid
+    console.log('Validation passed. Final conditions:', conditions);
+
+
     console.log('Final processed conditions:', conditions);
-    
+
     if (!searchPhrases || !typicalPhrases) {
         return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
     }
