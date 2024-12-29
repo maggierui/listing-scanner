@@ -71,7 +71,7 @@ app.post('/api/scan', async (req, res) => {
     const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
     const typicalPhrases = req.body.typicalPhrases.split(',').map(phrase => phrase.trim());
     const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-    const conditions = req.body.selectedConditions;
+    const conditions = req.body.selectedConditions.split(',').map(condition => condition.trim());
 
     if (!searchPhrases || !typicalPhrases) {
         return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
