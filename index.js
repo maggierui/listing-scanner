@@ -68,7 +68,7 @@ app.post('/api/scan', async (req, res) => {
         });
     }
 
-    const { searchPhrases, typicalPhrases,  feedbackThreshold } = req.body;
+    const { searchPhrases, typicalPhrases,  feedbackThreshold, conditions } = req.body;
 
     if (!searchPhrases || !typicalPhrases) {
         return res.status(400).json({ error: 'Search phrases and typical phrases are required' });
@@ -76,8 +76,8 @@ app.post('/api/scan', async (req, res) => {
 
     const searchPhrasesArray = searchPhrases.split(',').map(phrase => phrase.trim());
     const typicalPhrasesArray = typicalPhrases.split(',').map(phrase => phrase.trim());
-    const conditions = req.body.selectedConditions;
-       
+    const conditionsArray = conditions.split(',').map(condition => condition.trim());
+    
     await logger.log(`Received request with:`);
     await logger.log(`- Search phrases: ${JSON.stringify(searchPhrasesArray)}`);
     await logger.log(`- Typical phrases: ${JSON.stringify(typicalPhrasesArray)}`);
@@ -93,7 +93,7 @@ app.post('/api/scan', async (req, res) => {
             message: 'Scan started successfully'
         });
 
-        startScan(searchPhrasesArray, typicalPhrasesArray, conditions, feedbackThreshold)
+        startScan(searchPhrasesArray, typicalPhrasesArray, conditionsArray, feedbackThreshold)
             .catch(error => {
                 console.error('Scan error:', error);
                 scanResults.status = 'error';
