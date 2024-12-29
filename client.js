@@ -1,3 +1,5 @@
+
+
 async function loadConditions() {
   const conditionContainer = document.getElementById('conditionCheckboxes');
     const conditions = await fetch('/api/conditions').then(res => res.json());
@@ -39,17 +41,18 @@ async function handleScanSubmit(e) {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-              searchPhrases: document.getElementById('searchPhrases').value,
-              typicalPhrases: document.getElementById('typicalPhrases').value,
+              
               feedbackThreshold: document.getElementById('feedbackThreshold').value,
               selectedConditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
-                  .map(checkbox => checkbox.value)
+        .map(checkbox => checkbox.value),
+              searchPhrases: document.getElementById('searchPhrases').value,
+              typicalPhrases: document.getElementById('typicalPhrases').value
           })
       });
 
       console.log('Scan response status:', response.status);
-      const responseData = await response.json();
-      console.log('Scan response data:', responseData);
+        const responseData = await response.json();
+        console.log('Scan response data:', responseData);
 
       if (!response.ok) {
           throw new Error('Failed to initiate scan');
@@ -216,3 +219,58 @@ async function downloadPreviousListings() {
       alert('Failed to download previous listings');
   }
 }
+
+// Update the scan function
+async function startScan() {
+    const form = document.getElementById('scanForm');
+    const searchPhrases = document.getElementById('searchPhrases').value;
+    const typicalPhrases = document.getElementById('typicalPhrases').value;
+    const feedbackThreshold = document.getElementById('feedbackThreshold').value;
+    
+    // Get selected conditions
+    const selectedConditions = Array.from(document.querySelectorAll('input[name="condition"]:checked'))
+        .map(checkbox => checkbox.value);
+
+    if (!searchPhrases || !typicalPhrases || !feedbackThreshold || selectedConditions.length === 0) {
+        showError('Please fill in all required fields and select at least one condition');
+        return;
+    }
+
+    try {
+        showLoading();
+        clearError();
+        
+        const response = await fetch('/api/scan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                searchPhrases,
+                typicalPhrases,
+                feedbackThreshold: parseInt(feedbackThreshold),
+                selectedConditions
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to start scan');
+        }
+
+        // Start polling for results
+        startPolling();
+    } catch (error) {
+        showError(error.message);
+        hideLoading();
+    }
+}
+
+// When the page loads, only load conditions
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await loadConditions();
+    } catch (error) {
+        showError('Failed to load initial data: ' + error.message);
+    }
+});
