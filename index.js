@@ -528,13 +528,6 @@ async function startScan(searchPhrases, feedbackThreshold, typicalPhrases, condi
             throw new Error('Invalid category IDs provided');
         }
 
-        if (!conditions || !Array.isArray(conditions) || conditions.length === 0) {
-            await logger.log('Error: Invalid or missing conditions');
-            throw new Error('Invalid conditions provided');
-        }
-
-
-
         const scanStartTime = new Date().toISOString().split('T')[0];
         const logFileName = `ebay-scanner-${scanStartTime}.txt`;
         
