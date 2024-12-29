@@ -312,7 +312,7 @@ async function fetchSellerListings(sellerUsername, typicalPhrases) {
 
 
 
-async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases) {
+async function fetchListingsForPhrase(accessToken, phrase, feedbackThreshold, typicalPhrases,conditions) {
     await trackApiCall();
     
     try {
