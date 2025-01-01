@@ -60,6 +60,20 @@ async function handleScanSubmit(e) {
     let searchName = null;
     
     if (saveSearch) {
+        // Check for duplicate searches before saving
+        const existingSearches = await fetch('/api/saves/searches').then(r => r.json());
+        const isDuplicate = existingSearches.some(search => 
+            search.name === searchName &&
+            arraysEqual(search.search_phrases, searchPhrases) &&
+            arraysEqual(search.typical_phrases, typicalPhrases) &&
+            search.feedback_threshold === feedbackThreshold &&
+            arraysEqual(search.conditions, conditions)
+        );
+
+        if (isDuplicate) {
+            const proceed = confirm('A search with identical criteria already exists. Save anyway?');
+            if (!proceed) return;
+        }
         searchName = document.getElementById('searchName').value.trim();
         if (!searchName) {
             alert('Please enter a name for your search');
