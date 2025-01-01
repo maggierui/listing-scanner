@@ -22,8 +22,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
-const previousListings = new DatabaseListingsManager();
-await previousListings.init();
+
+// Wrap the initialization in an async function
+const initializeServer = async () => {
+    try {
+        await dbManager.init();
+        
+        app.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to initialize server:', error);
+    }
+};
 
 // Middleware
 app.use(express.json());
@@ -638,6 +649,97 @@ app.get('/api/results', (req, res) => {
             status: 'error',
             error: 'Internal server error'
         });
+    }
+});
+
+
+// 2. Create an instance of the manager
+const dbManager = new DatabaseListingsManager();
+
+// 3. Initialize the database when your server starts
+// This should be called when your server starts up
+await dbManager.init();
+
+// 4. Create the endpoint for saving searches
+app.post('/api/saves/search', async (req, res) => {
+    try {
+        // 5. Extract the data from the request body
+        const { 
+            name,           // Name of the search
+            searchPhrases,  // Array of search terms
+            typicalPhrases, // Array of category phrases
+            feedbackThreshold, // Number
+            conditions     // Array of conditions
+        } = req.body;
+
+        // 6. Validate the input data
+        if (!name || !searchPhrases || !typicalPhrases || !feedbackThreshold || !conditions) {
+            return res.status(400).json({ 
+                error: 'Missing required fields' 
+            });
+        }
+
+        // 7. Save the search using the database manager
+        const searchId = await dbManager.saveSearch(
+            name,
+            searchPhrases,
+            typicalPhrases,
+            feedbackThreshold,
+            conditions
+        );
+
+        // 8. Send success response
+        res.status(201).json({
+            message: 'Search saved successfully',
+            id: searchId
+        });
+
+    } catch (error) {
+        // 9. Handle any errors
+        console.error('Error saving search:', error);
+        res.status(500).json({ 
+            error: 'Failed to save search',
+            details: error.message 
+        });
+    }
+});
+
+// 10. Create endpoint to get all saved searches
+app.get('/api/saves/searches', async (req, res) => {
+    try {
+        // 11. Use the database manager to get all searches
+        const searches = await dbManager.getSavedSearches();
+        res.json(searches);
+    } catch (error) {
+        console.error('Error fetching searches:', error);
+        res.status(500).json({ error: 'Failed to fetch searches' });
+    }
+});
+
+// 12. Create endpoint to get a specific saved search
+app.get('/api/saves/search/:id', async (req, res) => {
+    try {
+        // 13. Get the ID from the URL parameters
+        const searchId = parseInt(req.params.id);
+        
+        // 14. Validate the ID
+        if (isNaN(searchId)) {
+            return res.status(400).json({ error: 'Invalid search ID' });
+        }
+
+        // 15. Use the database manager to get the specific search
+        const search = await dbManager.getSavedSearchById(searchId);
+        
+        // 16. Handle case where search isn't found
+        if (!search) {
+            return res.status(404).json({ error: 'Search not found' });
+        }
+
+        // 17. Return the search data
+        res.json(search);
+    } catch (error) {
+        console.error('Error fetching search:', error);
+        res.status(500).json({ error: 'Failed to fetch search' });
     }
 });
 

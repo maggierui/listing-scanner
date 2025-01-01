@@ -34,7 +34,25 @@
         <label for="feedbackThreshold">Feedback Threshold:</label>
         <input type="number" id="feedbackThreshold" name="feedbackThreshold" required>
       </div>
-
+      <div class="form-group save-search-section">
+        <div class="save-search-option">
+          <label>
+            <input type="checkbox" id="saveSearchCheckbox"> Save this search for future use
+          </label>
+        </div>
+        <div id="searchNameInput" style="display: none;">
+          <label for="searchName">Search Name:</label>
+          <input 
+            type="text" 
+            id="searchName" 
+            class="form-control"
+            placeholder="Enter a name for this search"
+          >
+          <small class="form-text text-muted">
+            This name will help you identify this search later
+          </small>
+        </div>
+      </div>
       <button type="submit">Start Scan</button>
     </form>
 

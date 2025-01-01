@@ -47,6 +47,47 @@ async function handleScanSubmit(e) {
         })
       });
 
+      // Check if user wants to save this search
+    const saveSearch = document.getElementById('saveSearchCheckbox').checked;
+    let searchName = null;
+    
+    if (saveSearch) {
+        searchName = document.getElementById('searchName').value.trim();
+        if (!searchName) {
+            alert('Please enter a name for your search');
+            return;
+        }
+        
+        // Save the search to database
+        try {
+            const searchData = {
+                name: searchName,
+                searchPhrases: searchPhrases,
+                typicalPhrases: typicalPhrases,
+                feedbackThreshold: feedbackThreshold,
+                conditions: conditions
+            };
+            
+            const response = await fetch('/api/saves/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(searchData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save search');
+            }
+            
+            console.log('Search saved successfully');
+        } catch (error) {
+            console.error('Error saving search:', error);
+            alert('Failed to save search. Please try again.');
+            return;
+        }
+    }
+
       console.log('Scan response status:', response.status);
         const responseData = await response.json();
         console.log('Scan response data:', responseData);
@@ -159,6 +200,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         showError('Failed to load initial data: ' + error.message);
     }
+});
+
+// Add this near your other event listeners
+document.getElementById('saveSearchCheckbox').addEventListener('change', function(e) {
+    const searchNameInput = document.getElementById('searchNameInput');
+    searchNameInput.style.display = e.target.checked ? 'block' : 'none';
 });
 
 // Download logs function
