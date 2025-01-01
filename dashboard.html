@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>eBay Scanner Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="dashboard-nav">
+            <div class="nav-header">
+                <h2>eBay Scanner</h2>
+            </div>
+            <ul class="nav-items">
+                <li data-page="search">
+                    <i class="icon-search"></i>
+                    New Search
+                </li>
+                <li data-page="results">
+                    <i class="icon-results"></i>
+                    Search Results
+                </li>
+                <li data-page="saved">
+                    <i class="icon-saved"></i>
+                    Saved Searches
+                </li>
+                <li data-page="analytics">
+                    <i class="icon-chart"></i>
+                    Analytics
+                </li>
+                <li data-page="settings">
+                    <i class="icon-settings"></i>
+                    Settings
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-content">
+            <!-- Dynamic content loaded here -->
+            <div id="pageContent"></div>
+        </main>
+    </div>
+    
+    <script src="/js/dashboard/main.js" type="module"></script>
+</body>
+</html>
