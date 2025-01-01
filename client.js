@@ -42,7 +42,7 @@ async function handleScanSubmit(e) {
             searchPhrases: document.getElementById('searchPhrases').value,
             typicalPhrases: document.getElementById('typicalPhrases').value,
             feedbackThreshold: document.getElementById('feedbackThreshold').value,
-            selectedConditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
+            conditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
                 .map(checkbox => checkbox.value)
         })
       });
