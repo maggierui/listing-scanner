@@ -184,61 +184,7 @@ async function handleSavedSearchSelect(event) {
         console.error('Error loading search details:', error);
     }
 }
-// Results polling function with retry logic
-async function pollResults(retryCount = 0, maxRetries = 3) {
-  try {
-      const response = await fetch('/api/results', {
-          method: 'GET',
-          headers: {
-              'Cache-Control': 'no-cache'
-          }
-      });
-      
-      if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('Poll response:', data);
 
-      // Update log area if available
-      if (data.logMessages && data.logMessages.length > 0) {
-          const logArea = document.getElementById('logArea');
-          logArea.innerHTML = data.logMessages.join('<br>');
-      }
-
-      if (data.status === 'complete') {
-          displayResults(data.listings);
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('results').style.display = 'block';
-      } else if (data.status === 'error') {
-          if (retryCount < maxRetries) {
-              console.log(`Retrying poll... Attempt ${retryCount + 1} of ${maxRetries}`);
-              await new Promise(resolve => setTimeout(resolve, 2000));
-              return pollResults(retryCount + 1, maxRetries);
-          }
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('error').textContent = 'Scan failed: ' + data.error;
-          document.getElementById('error').style.display = 'block';
-      } else {
-          // Continue polling if still processing
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          return pollResults(0, maxRetries); // Reset retry count for new polling cycle
-      }
-  } catch (error) {
-      console.error('Polling error:', error);
-      
-      if (retryCount < maxRetries) {
-          console.log(`Retrying poll... Attempt ${retryCount + 1} of ${maxRetries}`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          return pollResults(retryCount + 1, maxRetries);
-      }
-      
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').textContent = 'Error checking results: ' + error.message;
-      document.getElementById('error').style.display = 'block';
-  }
-}
 
 // Make sure form is connected to handler
 document.getElementById('scanForm').addEventListener('submit', handleScanSubmit);
@@ -300,46 +246,7 @@ async function downloadLogs() {
       alert('Failed to download logs');
   }
 }
-// Add these functions to client.js
-async function downloadSearchResults() {
-  try {
-      const response = await fetch('/api/download/search-results');
-      if (!response.ok) throw new Error('Download failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `search-results-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-  } catch (error) {
-      console.error('Error downloading search results:', error);
-      alert('Failed to download search results');
-  }
-}
 
-async function downloadPreviousListings() {
-  try {
-      const response = await fetch('/api/download/previous-listings');
-      if (!response.ok) throw new Error('Download failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `previous-listings-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-  } catch (error) {
-      console.error('Error downloading previous listings:', error);
-      alert('Failed to download previous listings');
-  }
-}
 
 // Function to load saved searches into dropdown
 async function loadSavedSearches() {
