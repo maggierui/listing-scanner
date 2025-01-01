@@ -25,6 +25,12 @@ async function loadConditions() {
 // Form submission handler
 async function handleScanSubmit(e) {
   e.preventDefault();
+  // Define all form values at the start
+  const searchPhrases = document.getElementById('searchPhrases').value.split(',').map(p => p.trim());
+  const typicalPhrases = document.getElementById('typicalPhrases').value.split(',').map(p => p.trim());
+  const feedbackThreshold = parseInt(document.getElementById('feedbackThreshold').value);
+  const conditions = Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
+      .map(checkbox => checkbox.value);
   
   try {
       // Show loading state
@@ -33,19 +39,19 @@ async function handleScanSubmit(e) {
       document.getElementById('results').style.display = 'none';
       console.log('Submitting scan request...');
 
-      const response = await fetch('/api/scan', {  // This is a POST request
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            searchPhrases: document.getElementById('searchPhrases').value,
-            typicalPhrases: document.getElementById('typicalPhrases').value,
-            feedbackThreshold: document.getElementById('feedbackThreshold').value,
-            conditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
-                .map(checkbox => checkbox.value)
+      // Use these variables in both the scan request
+      const response = await fetch('/api/scan', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            searchPhrases,
+            typicalPhrases,
+            feedbackThreshold,
+            conditions
         })
-      });
+    });
 
       // Check if user wants to save this search
     const saveSearch = document.getElementById('saveSearchCheckbox').checked;
