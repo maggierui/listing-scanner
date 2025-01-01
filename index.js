@@ -378,21 +378,7 @@ async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases,feedba
         
         await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
 
-        // Filter out previously seen listings
-        //const newListings = [];
-       // for (const item of validListings) {
-        //    if (!(await previousListings.has(item.itemId))) {
-        //        newListings.push(item);
-        //    }
-        //}
         
-        //await logger.log(`Found ${newListings.length} new listings (not previously processed)`);
-
-        // Store new listing IDs
-        // if (newListings.length > 0) {
-        //    await previousListings.addMany(newListings.map(item => item.itemId));
-        //    await logger.log(`Stored ${newListings.length} new listing IDs in database`);
-        //}
 
         // Group by seller with validation
         const sellerListings = new Map();
