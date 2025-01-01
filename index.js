@@ -663,7 +663,14 @@ await dbManager.init();
 // 4. Create the endpoint for saving searches
 app.post('/api/saves/search', async (req, res) => {
     try {
-        // 5. Extract the data from the request body
+        // Log the entire request body
+        console.log('Received request body:', req.body);
+        // Log each field individually
+        console.log('name:', req.body.name);
+        console.log('searchPhrases:', req.body.searchPhrases);
+        console.log('typicalPhrases:', req.body.typicalPhrases);
+        console.log('feedbackThreshold:', req.body.feedbackThreshold);
+        console.log('conditions:', req.body.conditions);
         const { 
             name,           // Name of the search
             searchPhrases,  // Array of search terms
@@ -671,7 +678,14 @@ app.post('/api/saves/search', async (req, res) => {
             feedbackThreshold, // Number
             conditions     // Array of conditions
         } = req.body;
-
+        // Log after destructuring
+        console.log('After destructuring:', {
+            name,
+            searchPhrases,
+            typicalPhrases,
+            feedbackThreshold,
+            conditions
+        });
         // 6. Validate the input data
         if (!name || !searchPhrases || !typicalPhrases || !feedbackThreshold || !conditions) {
             return res.status(400).json({ 
