@@ -25,14 +25,17 @@ async function loadConditions() {
 // Form submission handler
 async function handleScanSubmit(e) {
   e.preventDefault();
-  // Define all form values at the start
-  const searchPhrases = document.getElementById('searchPhrases').value.split(',').map(p => p.trim());
-  const typicalPhrases = document.getElementById('typicalPhrases').value.split(',').map(p => p.trim());
-  const feedbackThreshold = parseInt(document.getElementById('feedbackThreshold').value);
-  const conditions = Array.from(document.querySelectorAll('input[name="conditions"]:checked'))
-      .map(checkbox => checkbox.value);
   
   try {
+    // Get form data
+    const formData = {
+        searchPhrases: document.getElementById('searchPhrases').value.split(',').map(s => s.trim()),
+        typicalPhrases: document.getElementById('typicalPhrases').value.split(',').map(s => s.trim()),
+        feedbackThreshold: parseInt(document.getElementById('feedbackThreshold').value),
+        conditions: Array.from(document.querySelectorAll('input[name="conditions"]:checked')).map(cb => cb.value),
+        // Include searchId if we're using a saved search
+        searchId: document.getElementById('savedSearches').value || null
+    };
       // Show loading state
       document.getElementById('loading').style.display = 'block';
       document.getElementById('error').style.display = 'none';
@@ -45,12 +48,7 @@ async function handleScanSubmit(e) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            searchPhrases,
-            typicalPhrases,
-            feedbackThreshold,
-            conditions
-        })
+        body: JSON.stringify(formData)
     });
     // Log the response status
     console.log('Response status:', response.status);
@@ -123,8 +121,13 @@ async function handleScanSubmit(e) {
         console.log('Scan response:', data);
 
       // Start polling for results
-      console.log('Starting results polling...');
-      pollResults();
+     // console.log('Starting results polling...');
+      //pollResults();
+      // Display results with status indicators
+      displayCurrentSearchResults({
+        ...data.results,
+        isNew: true // Mark new results
+    });
 
   } catch (error) {
       document.getElementById('loading').style.display = 'none';
@@ -133,7 +136,54 @@ async function handleScanSubmit(e) {
   }
 }
 
-// Results polling function
+// Load saved search results (only when viewing saved searches)
+async function loadSavedSearchResults(searchId) {
+    try {
+        const response = await fetch(`/api/saves/search/${searchId}/results`);
+        if (!response.ok) throw new Error('Failed to fetch saved results');
+        
+        const results = await response.json();
+        displayCurrentSearchResults(results.map(r => ({
+            ...r,
+            isNew: false // Mark as previously found
+        })), false); // Don't clear existing results
+    } catch (error) {
+        console.error('Error loading saved results:', error);
+    }
+}
+
+// Handle saved search selection
+async function handleSavedSearchSelect(event) {
+    const searchId = event.target.value;
+    if (!searchId) return;
+    
+    try {
+        // Load search criteria
+        const response = await fetch(`/api/saves/search/${searchId}`);
+        if (!response.ok) throw new Error('Failed to fetch search details');
+        
+        const search = await response.json();
+        
+        // Populate form
+        document.getElementById('searchPhrases').value = search.search_phrases.join(', ');
+        document.getElementById('typicalPhrases').value = search.typical_phrases.join(', ');
+        document.getElementById('feedbackThreshold').value = search.feedback_threshold;
+        
+        document.querySelectorAll('input[name="conditions"]').forEach(checkbox => {
+            checkbox.checked = search.conditions.includes(checkbox.value);
+        });
+        
+        // Clear results container
+        document.getElementById('resultsContainer').innerHTML = '';
+        
+        // Optionally load saved results
+        if (confirm('Would you like to see previously found items for this search?')) {
+            await loadSavedSearchResults(searchId);
+        }
+    } catch (error) {
+        console.error('Error loading search details:', error);
+    }
+}
 // Results polling function with retry logic
 async function pollResults(retryCount = 0, maxRetries = 3) {
   try {
@@ -193,29 +243,27 @@ async function pollResults(retryCount = 0, maxRetries = 3) {
 // Make sure form is connected to handler
 document.getElementById('scanForm').addEventListener('submit', handleScanSubmit);
 
-// Results display function
-function displayResults(results) {
-  const resultsDiv = document.getElementById('results');
-  const tbody = document.getElementById('resultTable');
-  const totalSpan = document.getElementById('totalListings');
-  
-  tbody.innerHTML = '';
-  totalSpan.textContent = results.length;
-  
-  results.forEach(item => {
-      const row = tbody.insertRow();
-      row.innerHTML = `
-          <td>${item.title}</td>
-          <td>${item.price}</td>
-          <td>${item.currency}</td>
-          <td>${item.seller}</td>
-          <td>${item.feedbackScore}</td>
-          <td><a href="${item.link}" target="_blank">View</a></td>
-      `;
-  });
-  
-  resultsDiv.style.display = 'block';
-  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+// Function to display results from current search
+async function displayCurrentSearchResults(results, isNewSearch = true) {
+    const container = document.getElementById('resultsContainer');
+    
+    // Clear previous results if this is a new search
+    if (isNewSearch) {
+        container.innerHTML = '';
+    }
+
+    // Add results to container
+    const resultsHTML = results.map(item => `
+        <div class="result-item ${item.isNew ? 'new-item' : ''}">
+            <h3>${item.title}</h3>
+            <p>Price: $${item.price}</p>
+            <p>Status: ${item.isNew ? 'New' : 'Previously Found'}</p>
+            <p>Found: ${new Date(item.first_found_at || Date.now()).toLocaleString()}</p>
+            <a href="${item.url}" target="_blank">View on eBay</a>
+        </div>
+    `).join('');
+
+    container.innerHTML += resultsHTML;
 }
 
 // Initialize event listeners when the page loads

@@ -23,18 +23,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Wrap the initialization in an async function
-const initializeServer = async () => {
+// Initialize the server
+const initServer = async () => {
     try {
         await dbManager.init();
-        
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
     } catch (error) {
         console.error('Failed to initialize server:', error);
+        process.exit(1);
     }
 };
+
+// Call the initialization function
+initServer();
 
 // Middleware
 app.use(express.json());
@@ -646,9 +649,7 @@ app.get('/api/results', (req, res) => {
 // 2. Create an instance of the manager
 const dbManager = new DatabaseListingsManager();
 
-// 3. Initialize the database when your server starts
-// This should be called when your server starts up
-await dbManager.init();
+
 
 // 4. Create the endpoint for saving searches
 app.post('/api/saves/search', async (req, res) => {
@@ -747,10 +748,16 @@ app.get('/api/saves/search/:id', async (req, res) => {
     }
 });
 
+// Get results for a specific saved search
+app.get('/api/saves/search/:id/results', async (req, res) => {
+    try {
+        const results = await dbManager.getSearchResults(req.params.id);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching search results:', error);
+        res.status(500).json({ error: 'Failed to fetch search results' });
+    }
+});
+
 // Start the background scanning process
 //startScan();
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
