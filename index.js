@@ -79,15 +79,19 @@ app.post('/api/scan', async (req, res) => {
         });
     }
 
-    const searchPhrases = req.body.searchPhrases.split(',').map(phrase => phrase.trim());
-    const typicalPhrases = req.body.typicalPhrases.split(',').map(phrase => phrase.trim());
-    const feedbackThreshold = parseInt(req.body.feedbackThreshold, 10);
-    const conditions = req.body.selectedConditions;
+    // Log the incoming request
+    console.log('Scan request body:', req.body);
+
+    // Don't split searchPhrases since it's already an array
+    const { searchPhrases, typicalPhrases, feedbackThreshold, conditions } = req.body;
     
-    // Validate after parsing
-    if (searchPhrases.length === 0) {
-        return res.status(400).json({ error: 'At least one search phrase is required' });
+    // Validate that we received arrays
+    if (!Array.isArray(searchPhrases) || !Array.isArray(typicalPhrases)) {
+        return res.status(400).json({
+            error: 'searchPhrases and typicalPhrases must be arrays'
+        });
     }
+    
 
     if (isNaN(feedbackThreshold)) {
         return res.status(400).json({ error: 'Valid feedback threshold is required' });
