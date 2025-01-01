@@ -52,6 +52,8 @@ async function handleScanSubmit(e) {
             conditions
         })
     });
+    // Log the response status
+    console.log('Response status:', response.status);
 
       // Check if user wants to save this search
     const saveSearch = document.getElementById('saveSearchCheckbox').checked;
@@ -95,12 +97,16 @@ async function handleScanSubmit(e) {
     }
 
       console.log('Scan response status:', response.status);
-        const responseData = await response.json();
-        console.log('Scan response data:', responseData);
+        
 
       if (!response.ok) {
-          throw new Error('Failed to initiate scan');
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Scan failed: ${response.status} ${response.statusText}`);
       }
+
+      const data = await response.json();
+        console.log('Scan response:', data);
 
       // Start polling for results
       console.log('Starting results polling...');
