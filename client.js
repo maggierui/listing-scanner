@@ -278,3 +278,80 @@ async function downloadPreviousListings() {
       alert('Failed to download previous listings');
   }
 }
+
+// Function to load saved searches into dropdown
+async function loadSavedSearches() {
+    try {
+        const response = await fetch('/api/saves/searches');
+        if (!response.ok) {
+            throw new Error('Failed to fetch saved searches');
+        }
+        
+        const searches = await response.json();
+        const dropdown = document.getElementById('savedSearches');
+        
+        // Clear existing options (except the first one)
+        while (dropdown.options.length > 1) {
+            dropdown.remove(1);
+        }
+         // Check if there are any saved searches
+         if (!searches || searches.length === 0) {
+            // Add a disabled option indicating no searches
+            const noSearchesOption = new Option('No saved searches available', '');
+            noSearchesOption.disabled = true;
+            dropdown.add(noSearchesOption);
+            
+            // Disable the dropdown
+            dropdown.disabled = true;
+            return;
+        }
+        // Enable the dropdown if we have searches
+        dropdown.disabled = false;
+        // Add saved searches to dropdown
+        searches.forEach(search => {
+            const option = new Option(search.name, search.id);
+            dropdown.add(option);
+        });
+    } catch (error) {
+        console.error('Error loading saved searches:', error);
+        // Show error in dropdown
+        const dropdown = document.getElementById('savedSearches');
+        dropdown.innerHTML = '<option value="" disabled>Error loading saved searches</option>';
+        dropdown.disabled = true;
+    }
+}
+
+// Function to handle selection of a saved search
+async function handleSavedSearchSelect(event) {
+    const searchId = event.target.value;
+    if (!searchId) return; // User selected the default option
+    
+    try {
+        const response = await fetch(`/api/saves/search/${searchId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch search details');
+        }
+        
+        const search = await response.json();
+        
+        // Populate form fields with saved search data
+        document.getElementById('searchPhrases').value = search.search_phrases.join(', ');
+        document.getElementById('typicalPhrases').value = search.typical_phrases.join(', ');
+        document.getElementById('feedbackThreshold').value = search.feedback_threshold;
+        
+        // Handle conditions checkboxes
+        document.querySelectorAll('input[name="conditions"]').forEach(checkbox => {
+            checkbox.checked = search.conditions.includes(checkbox.value);
+        });
+        
+    } catch (error) {
+        console.error('Error loading search details:', error);
+        alert('Failed to load saved search details');
+    }
+}
+
+// Add event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    loadSavedSearches(); // Load saved searches when page loads
+    document.getElementById('savedSearches').addEventListener('change', handleSavedSearchSelect);
+});
