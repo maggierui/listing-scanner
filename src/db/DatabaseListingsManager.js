@@ -1,6 +1,6 @@
 import pkg from 'pg';
 const { Pool } = pkg;
-import logger from './logger.js';
+import logger from '../utils/logger.js';
 
 /**
  * Database Schema Documentation
@@ -64,12 +64,23 @@ class DatabaseListingsManager {
      * Constructor initializes the PostgreSQL database connection using Heroku's DATABASE_URL
      */
     constructor() {
-        this.pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: {
-                rejectUnauthorized: false
-            }
-        });
+        const isHeroku = process.env.DATABASE_URL?.includes('amazonaws.com');
+    // Log the connection attempt
+    console.log('Attempting to connect with URL:', process.env.DATABASE_URL);
+    const connectionConfig = {
+        host: 'localhost',
+        port: 5432,
+        database: 'test_db',  // Explicitly set database name
+        ssl: isHeroku ? {
+            rejectUnauthorized: false
+        } : false
+    };
+    this.pool = new Pool(process.env.DATABASE_URL ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: isHeroku ? {
+            rejectUnauthorized: false
+        } : false
+    } : connectionConfig);
     }
 
     /**
@@ -78,7 +89,19 @@ class DatabaseListingsManager {
      */
     async init() {
         try {
-            // Create the main results table
+        // 1. First create saved_searches table (because other tables reference it)
+        await this.pool.query(`
+            CREATE TABLE IF NOT EXISTS saved_searches (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                search_phrases TEXT[] NOT NULL,
+                typical_phrases TEXT[] NOT NULL,
+                feedback_threshold INTEGER NOT NULL,
+                conditions TEXT[] NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        // 2. Then create all_search_results table
         await this.pool.query(`
             CREATE TABLE IF NOT EXISTS all_search_results (
                 id SERIAL PRIMARY KEY,
@@ -92,7 +115,7 @@ class DatabaseListingsManager {
                 is_active BOOLEAN DEFAULT true
             )
             `);
-        // Create the mapping table
+        // 3. Finally create search_result_mappings table (which references both tables above)
         await this.pool.query(`
             CREATE TABLE IF NOT EXISTS search_result_mappings (
                 search_id INTEGER REFERENCES saved_searches(id),
@@ -106,23 +129,7 @@ class DatabaseListingsManager {
         await this.pool.query(`
             CREATE INDEX IF NOT EXISTS idx_results_item_id ON all_search_results(item_id);
             CREATE INDEX IF NOT EXISTS idx_results_last_seen ON all_search_results(last_seen_at);
-        `);
-
-         // Creates 'saved_searches' table if it doesn't exist
-        // This table stores user's search configurations
-        await this.pool.query(`
-                CREATE TABLE IF NOT EXISTS saved_searches (
-                    id SERIAL PRIMARY KEY,           -- Auto-incrementing unique ID
-                    name VARCHAR(255) NOT NULL,      -- User-given name for the search
-                    search_phrases TEXT[] NOT NULL,  -- Array of search terms
-                    typical_phrases TEXT[] NOT NULL, -- Array of category-specific phrases
-                    feedback_threshold INTEGER NOT NULL,  -- Seller rating threshold
-                    conditions TEXT[] NOT NULL,      -- Array of acceptable item conditions
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- When search was created
-                )
-            `);
-        
-            
+        `);  
             console.log('Database initialized');
         } catch (error) {
             console.error('Database initialization error:', error);
@@ -274,4 +281,9 @@ class DatabaseListingsManager {
     }
 }
 
-export default DatabaseListingsManager;
+// Create a singleton instance
+const dbManager = new DatabaseListingsManager();
+
+// Export both the class and the singleton instance
+export { DatabaseListingsManager };
+export default dbManager;  // Default export for the instance

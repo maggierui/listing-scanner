@@ -5,7 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node tests/run-tests.js",
+    "test:db": "node tests/test-db.js",
+    "test:api": "node tests/test-api.js",
+    "test:ebay": "node tests/test-ebay.js"
   },
   "engines": {
     "node": ">=18.0.0"

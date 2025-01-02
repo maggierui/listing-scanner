@@ -79,14 +79,14 @@ export function getConditionNameById(id) {
 }
 
 // Helper function to format conditions for API query
-export function formatConditionsForQuery(conditionIds) {
-    return conditionIds.join('|');
-}
+//export function formatConditionsForQuery(conditionIds) {
+//    return conditionIds.join('|');
+//}
 
 // Helper function to get all condition options for frontend
-export function getAllConditionOptions() {
-    return Object.values(EBAY_CONDITIONS).map(condition => ({
-        id: condition.id,
-        name: condition.name
-    }));
-}
+//export function getAllConditionOptions() {
+//    return Object.values(EBAY_CONDITIONS).map(condition => ({
+//        id: condition.id,
+//        name: condition.name
+//    }));
+//}
