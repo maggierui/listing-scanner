@@ -110,8 +110,9 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
 
     try {
         // Add debug logging
-        console.log('Fetching listings with parameters:', {
-            searchPhrase,
+        await logger.log('\n=== Starting fetchListingsForPhrase ===');
+        await logger.log('Parameters:', {
+            phrase,
             typicalPhrases,
             feedbackThreshold,
             conditions
@@ -119,7 +120,7 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=${encodeURIComponent(phrase)}` +
             `&limit=200`;   
-            console.log('Making eBay API request to:', url);
+        await logger.log('Making eBay API request to:', url);
 
         const processedSellers = new Set();
         const filteredListings = [];
@@ -135,7 +136,7 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         });
 
         // Log the response status
-        console.log('eBay API response status:', response.status);
+        await logger.log('eBay API response status:', response.status);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -144,7 +145,7 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         }
 
         const data = await response.json();
-        console.log('eBay API response data:', JSON.stringify(data, null, 2));
+        await logger.log(`Initial API response: Found ${data.itemSummaries?.length || 0} items`);
 
         
         // Check for empty results
@@ -160,23 +161,27 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         }
         // Create array to store valid items
         let validListings = [];
+        await logger.log('\n=== Processing Conditions ===');
 
         // Process items one by one
-        for (const item of data.itemSummaries) {
-            await logger.log(`\nTrying to match item condition: "${item.condition}"`);
-            
+        for (const item of data.itemSummaries) {            
             const matchingCondition = Object.values(EBAY_CONDITIONS).find(conditionObject => {
                 return conditionObject.variants.includes(item.condition);
             });
 
+            console.log(`Checking condition for item: "${item.title}"`);
+            console.log(`Item condition: "${item.condition}"`);
+
             if (matchingCondition) {
-                await logger.log(`Item's condition: "${item.condition}" is called ${matchingCondition.name} (ID: ${matchingCondition.id}) in the eBay API`);
+                console.log(`Item's condition: "${item.condition}" is called ${matchingCondition.name} (ID: ${matchingCondition.id}) in the eBay API`);
             } else {
-                await logger.log(`No match found for condition: "${item.condition}" in any variants`);
+                console.log(`Item's condition: "${item.condition}" is not in any ebay conditionvariants`);
                 continue;  // Skip to next item
             }
-            
+
             const itemConditionId = matchingCondition.id;
+            console.log(`Mapped condition ID: ${itemConditionId}`);
+            console.log(`Allowed conditions: ${conditions}`);
             const isValidCondition = conditions.includes(itemConditionId);
 
             if (!isValidCondition) {
@@ -222,6 +227,8 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
 
         // Process each seller
         for (const [sellerUsername, listings] of sellerListings) {
+            await logger.log(`\nProcessing seller: ${sellerUsername}`);
+
             if (processedSellers.has(sellerUsername)) {
                 await logger.log(`Skipping already processed seller: ${sellerUsername}`);
                 continue;
@@ -241,7 +248,8 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
             processedSellers.add(sellerUsername);
             
             const sellerAnalysis = await fetchSellerListings(sellerUsername, typicalPhrases);
-            
+            await logger.log(`Seller analysis ratio: ${sellerAnalysis.ratio}%`);
+
             if (!sellerAnalysis.error && !sellerAnalysis.shouldExclude) {
                 qualifiedSellerCounter++;
                 await logger.log(`Seller qualified: ${sellerUsername}`);
@@ -339,9 +347,9 @@ async function getSellerTotalListings(sellerUsername) {
         };
 
         const queryString = new URLSearchParams(params).toString();
-        await log(`Seller listings request for ${sellerUsername}: ${queryString}`);
+        await logger.log(`Seller listings request for ${sellerUsername}: ${queryString}`);
         const fullUrl = `${url}?${queryString}`;
-        await log(`Full URL: ${fullUrl}`);
+        await logger.log(`Full URL: ${fullUrl}`);
 
         const response = await fetch(fullUrl);
         if (!response.ok) {
@@ -366,11 +374,11 @@ async function getSellerTotalListings(sellerUsername) {
         
         // Now try to get the total
         const total = parseInt(totalEntries);
-        await log(`Total listings for ${sellerUsername}: ${total}`);
+        await logger.log(`Total listings for ${sellerUsername}: ${total}`);
         
         return parseInt(total);
     } catch (error) {
-        await log(`Error getting total listings for ${sellerUsername}: ${error.message}`);
+        await logger.log(`Error getting total listings for ${sellerUsername}: ${error.message}`);
         return 0;
     }
 }

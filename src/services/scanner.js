@@ -4,6 +4,7 @@ import logger from '../utils/logger.js';
 import fs from 'fs/promises';
 
 // Scan state
+export let scanInProgress = false;
 export let scanResults = {
     status: 'idle',
     listings: [],
@@ -12,13 +13,29 @@ export let scanResults = {
     logMessages: []
 };
 
-export let scanInProgress = false;
+
 
 export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold, conditions) {
     if (scanInProgress) {
         throw new Error('A scan is already in progress');
     }
     try {
+        // Reset and start scan
+        scanInProgress = true;
+        scanResults.status = 'scanning';
+        scanResults.error = null;
+        scanResults.logMessages = [];
+        scanResults.listings = [];
+
+        // Debug log the parameters
+        await logger.log('\n=== Starting new scan ===');
+        await logger.log('Parameters:', JSON.stringify({
+            searchPhrases,
+            typicalPhrases,
+            feedbackThreshold,
+            conditions
+        }));
+
         // Add validation at the start of the function
         if (!searchPhrases || !Array.isArray(searchPhrases)) {
             await logger.log('Error: Invalid or missing search phrases');
@@ -42,63 +59,41 @@ export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold
         await fs.appendFile(logFileName, `========================================\n\n`);
         await logger.log(JSON.stringify({ searchPhrases, feedbackThreshold, typicalPhrases, conditions }, null, 2));
 
-        
-
-        // Add debug logging
-        await logger.log('Scan parameters:');
-        await logger.log(`- Search Phrases: ${JSON.stringify(searchPhrases)}`);
-        await logger.log(`- Feedback Threshold: ${feedbackThreshold}`);
-        await logger.log(`- Typical Phrases: ${JSON.stringify(typicalPhrases)}`);
-        await logger.log(`- Conditions: ${JSON.stringify(conditions)}`);
-        // Reset and start scan
-        scanInProgress = true;
-        scanResults.status = 'scanning';
-        scanResults.error = null;
-        scanResults.logMessages = [];
-        scanResults.listings = [];  // Clear previous listings
-
-        console.log('Starting scan with parameters:', {
-            searchPhrases,
-            typicalPhrases,
-            feedbackThreshold,
-            conditions
-        });
+    
 
         // Get eBay access token
-        console.log('Getting eBay access token...');
+        await logger.log('Getting eBay access token...');
         const accessToken = await fetchAccessToken();
-        console.log('Access token obtained');
+        await logger.log('Access token obtained');
 
         // Fetch listings for each search phrase
         const allListings = [];
         for (const phrase of searchPhrases) {
-            console.log(`Searching for phrase: "${phrase}"`);
-            const phraseListings = await fetchListingsForPhrase(  // Changed variable name to phraseListings
-                accessToken,
-                phrase,
-                typicalPhrases,
-                feedbackThreshold,
-                conditions
-            );
-            console.log(`Found ${phraseListings.length} listings for "${phrase}"`);
-            allListings.push(...phraseListings);
-            
-            // Add to log messages
-            scanResults.logMessages.push(`Found ${phraseListings.length} listings for "${phrase}"`);
+            await logger.log(`\nProcessing search phrase: "${phrase}"`);
+            try {
+                const listings = await fetchListingsForPhrase(
+                    accessToken,
+                    phrase,
+                    typicalPhrases,
+                    feedbackThreshold,
+                    conditions
+                );
+                await logger.log(`Found ${listings.length} listings for "${phrase}"`);
+                allListings.push(...listings);
+            } catch (error) {
+                await logger.log(`Error processing phrase "${phrase}": ${error.message}`);
+            }
         }
-        
             // Update results
-        console.log(`Total listings found: ${allListings.length}`);
+        await logger.log(`\nScan completed. Total listings found: ${allListings.length}`);
         scanResults.listings = allListings;
         scanResults.lastUpdated = new Date();
-        scanResults.status = 'complete';
-        scanResults.logMessages.push(`Scan completed. Total listings: ${allListings.length}`);
+        scanResults.status = 'completed';
 
     } catch (error) {
-        console.error('Scan error:', error);
+        await logger.log('Scan error:', error.message);
         scanResults.error = error.message;
         scanResults.status = 'error';
-        scanResults.logMessages.push(`Error: ${error.message}`);
         throw error;
     } finally {
         scanInProgress = false;

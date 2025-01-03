@@ -14238,3 +14238,123 @@ startScan function - New Scan Started at 1/1/2025, 10:07:00 PM
     at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
     at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
     at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+
+
+========================================
+startScan function - New Scan Started at 1/2/2025, 6:20:33 PM
+========================================
+
+6:20:33 PM: {
+  "searchPhrases": [
+    "iphone",
+    "macbook"
+  ],
+  "feedbackThreshold": 50,
+  "typicalPhrases": [
+    "apple",
+    "electronics"
+  ],
+  "conditions": [
+    "NEW",
+    "USED"
+  ]
+}
+6:20:33 PM: Scan parameters:
+6:20:33 PM: - Search Phrases: ["iphone","macbook"]
+6:20:33 PM: - Feedback Threshold: 50
+6:20:33 PM: - Typical Phrases: ["apple","electronics"]
+6:20:33 PM: - Conditions: ["NEW","USED"]
+6:20:34 PM: API Calls made today: 1/5000
+6:20:35 PM: Error processing phrase "iphone": searchPhrase is not defined
+6:20:35 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+6:20:35 PM: API Calls made today: 1/5000
+6:20:36 PM: Error processing phrase "macbook": searchPhrase is not defined
+6:20:36 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+
+
+========================================
+startScan function - New Scan Started at 1/2/2025, 6:23:54 PM
+========================================
+
+6:23:54 PM: {
+  "searchPhrases": [
+    "coral lot",
+    "coral necklace lot"
+  ],
+  "feedbackThreshold": 500,
+  "typicalPhrases": [
+    "necklace",
+    "brooch",
+    "bracelet",
+    "rings",
+    "earrings",
+    "jewelry"
+  ],
+  "conditions": [
+    "USED"
+  ]
+}
+6:23:54 PM: Scan parameters:
+6:23:54 PM: - Search Phrases: ["coral lot","coral necklace lot"]
+6:23:54 PM: - Feedback Threshold: 500
+6:23:54 PM: - Typical Phrases: ["necklace","brooch","bracelet","rings","earrings","jewelry"]
+6:23:54 PM: - Conditions: ["USED"]
+6:23:54 PM: API Calls made today: 1/5000
+6:23:55 PM: Error processing phrase "coral lot": searchPhrase is not defined
+6:23:55 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+6:23:55 PM: API Calls made today: 1/5000
+6:23:56 PM: Error processing phrase "coral necklace lot": searchPhrase is not defined
+6:23:56 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+
+
+========================================
+startScan function - New Scan Started at 1/2/2025, 6:59:07 PM
+========================================
+
+6:59:07 PM: {
+  "searchPhrases": [
+    "coral lot",
+    "coral necklace lot"
+  ],
+  "feedbackThreshold": 500,
+  "typicalPhrases": [
+    "necklace",
+    "brooch",
+    "bracelet",
+    "rings",
+    "earrings",
+    "jewelry"
+  ],
+  "conditions": [
+    "USED"
+  ]
+}
+6:59:07 PM: Scan parameters:
+6:59:07 PM: - Search Phrases: ["coral lot","coral necklace lot"]
+6:59:07 PM: - Feedback Threshold: 500
+6:59:07 PM: - Typical Phrases: ["necklace","brooch","bracelet","rings","earrings","jewelry"]
+6:59:07 PM: - Conditions: ["USED"]
+6:59:07 PM: API Calls made today: 1/5000
+6:59:08 PM: Error processing phrase "coral lot": searchPhrase is not defined
+6:59:08 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13
+6:59:08 PM: API Calls made today: 1/5000
+6:59:09 PM: Error processing phrase "coral necklace lot": searchPhrase is not defined
+6:59:09 PM: ReferenceError: searchPhrase is not defined
+    at fetchListingsForPhrase (file:///Users/ruihu/Documents/listing-scanner/src/services/ebay.js:114:13)
+    at async startScan (file:///Users/ruihu/Documents/listing-scanner/src/services/scanner.js:76:36)
+    at async file:///Users/ruihu/Documents/listing-scanner/src/routes/api.js:85:13

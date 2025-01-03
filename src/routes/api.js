@@ -47,10 +47,11 @@ router.get('/results', (req, res) => {
 router.post('/scan', async (req, res) => {
     try {
         // Debug logging
-        console.log('=== Starting new scan ===');
+        console.log('\n=== Starting new scan ===');
         console.log('Current scan status:', scanResults.status);
         console.log('Scan in progress:', scanInProgress);
         console.log('Request body:', JSON.stringify(req.body, null, 2));
+        
         if (scanInProgress) {
             return res.status(409).json({ 
                 error: 'A scan is already in progress'
@@ -58,16 +59,11 @@ router.post('/scan', async (req, res) => {
         }
     
         // Log the incoming request
-        console.log('Scan request body:', req.body);
+        await logger.log('Scan request body:', JSON.stringify(req.body));
         const { searchPhrases, typicalPhrases, feedbackThreshold, conditions } = req.body;
         // Validate input with detailed logging
-        console.log('Validating input parameters:');
-        console.log('- searchPhrases:', searchPhrases);
-        console.log('- typicalPhrases:', typicalPhrases);
-        console.log('- feedbackThreshold:', feedbackThreshold);
-        console.log('- conditions:', conditions);
         if (!searchPhrases || !typicalPhrases || !feedbackThreshold || !conditions) {
-            console.log('Missing required parameters');
+            await logger.log('Missing required parameters');
             return res.status(400).json({ 
                 error: 'Missing required parameters',
                 details: {
@@ -81,13 +77,13 @@ router.post('/scan', async (req, res) => {
 
         // Start scan with try-catch
         try {
-            console.log('Starting scan with validated parameters...');
+            await logger.log('Starting scan with validated parameters...');
             await startScan(searchPhrases, typicalPhrases, feedbackThreshold, conditions);
-            console.log('Scan started successfully');
+            await logger.log('Scan started successfully');
             res.json({ message: 'Scan started successfully' });
         } catch (scanError) {
-            console.error('Error in startScan:', scanError);
-            console.error('Full error details:', scanError.stack);
+            await logger.log('Error in startScan:', scanError.message);
+            await logger.log('Full error details:', scanError.stack);
             res.status(500).json({ 
                 error: 'Failed to start scan',
                 details: scanError.message,
@@ -95,8 +91,8 @@ router.post('/scan', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error in /scan route:', error);
-        console.error('Full error details:', error.stack);
+        await logger.log('Error in /scan route:', error);
+        await logger.log('Full error details:', error.stack);
         res.status(500).json({ 
             error: 'Failed to start scan',
             details: error.message,
