@@ -4,16 +4,14 @@ import { EBAY_CONDITIONS } from '../constants/conditions.js';
 import { URLSearchParams } from 'url';
 import { delay } from '../utils/helpers.js';
 
-
-
 export async function fetchSellerListings(sellerUsername, typicalPhrases) {
     try {
         let totalListings = 0;
         let matchingListingsCount = 0;
         let sampleListings = [];
         
-        // First, get the seller's total listings across ALL categories
-        totalListings = await getSellerTotalListings(sellerUsername);
+        // First, get the seller's total listings across ALL categories using Browse API
+        totalListings = await getSellerTotalListingsBrowseAPI(sellerUsername);
 
         // If we can't get total listings, we should still continue but log a warning
         if (totalListings === 0) {
@@ -25,43 +23,25 @@ export async function fetchSellerListings(sellerUsername, typicalPhrases) {
 
         await logger.log(`Total listings for seller ${sellerUsername}: ${totalListings}`);
 
-        // Set up base parameters for Finding API
-        const params = {
-            'OPERATION-NAME': 'findItemsAdvanced',
-            'SERVICE-VERSION': '1.0.0',
-            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
-            'RESPONSE-DATA-FORMAT': 'JSON',
-            'itemFilter(0).name': 'Seller',
-            'itemFilter(0).value': sellerUsername,
-            'paginationInput.entriesPerPage': 100,
-            'outputSelector': 'SellerInfo'
-        };
+        // Get sample inventory using Browse API
+        const maxItems = Math.min(totalListings, 100);
+        sampleListings = await getSellerInventoryBrowseAPI(sellerUsername, maxItems);
         
-        const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`https://svcs.ebay.com/services/search/FindingService/v1?${queryString}`);
-        const data = await response.json();
-
-        if (data.findItemsAdvancedResponse[0].ack[0] === "Success" && 
-            data.findItemsAdvancedResponse[0].searchResult[0].item) {
-            
-            const items = data.findItemsAdvancedResponse[0].searchResult[0].item;
-            
-            for (const item of items) {
-                sampleListings.push(item);
-                
+        if (sampleListings.length > 0) {
+            for (const item of sampleListings) {
                 // Check if item title contains any of the search phrases
-                const itemTitle = item.title[0].toLowerCase();
+                const itemTitle = item.title.toLowerCase();
                 const matchesPhrase = typicalPhrases.some(phrase => 
                     itemTitle.includes(phrase.toLowerCase())
                 );
 
                 if (matchesPhrase) {
                     matchingListingsCount++;
-                    await logger.log(`Matching title found: ${item.title[0]}`);
+                    await logger.log(`Matching title found: ${item.title}`);
                 }
             }
             
-            await logger.log(`Analyzed ${items.length} sample listings for ${sellerUsername}`);
+            await logger.log(`Analyzed ${sampleListings.length} sample listings for ${sellerUsername}`);
             await logger.log(`Found ${matchingListingsCount} listings matching typical phrases`);
         }
         
@@ -316,6 +296,7 @@ async function trackApiCall() {
         await logger.log('WARNING: Approaching daily API limit (5000)');
     }
 }
+
 async function fetchWithTimeout(url, options, timeout = 5000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -333,52 +314,107 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
     }
 }
 
-async function getSellerTotalListings(sellerUsername) {
+// Modern eBay Browse API implementation to replace old Finding API
+async function getSellerTotalListingsBrowseAPI(sellerUsername) {
     try {
-        const url = 'https://svcs.ebay.com/services/search/FindingService/v1';
-        const params = {
-            'OPERATION-NAME': 'findItemsAdvanced',
-            'SERVICE-VERSION': '1.0.0',
-            'SECURITY-APPNAME': process.env.EBAY_CLIENT_ID,
-            'RESPONSE-DATA-FORMAT': 'JSON',
-            'itemFilter(0).name': 'Seller',
-            'itemFilter(0).value': sellerUsername,
-            'paginationInput.entriesPerPage': '1'
-        };
+        const accessToken = await fetchAccessToken();
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `seller=${encodeURIComponent(sellerUsername)}` +
+            `&limit=1`; // Just get 1 item to check if seller exists
+        
+        await logger.log(`Seller listings request for ${sellerUsername}: ${url}`);
 
-        const queryString = new URLSearchParams(params).toString();
-        await logger.log(`Seller listings request for ${sellerUsername}: ${queryString}`);
-        const fullUrl = `${url}?${queryString}`;
-        await logger.log(`Full URL: ${fullUrl}`);
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            },
+        });
 
-        const response = await fetch(fullUrl);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            await logger.log(`HTTP error! status: ${response.status}, error: ${errorText}`);
+            return 0;
         }
+
         const data = await response.json();
-
-        // Debug each step
-        const advancedResponse = data.findItemsAdvancedResponse[0];
-        console.log('Advanced response:', advancedResponse);
-
-        const paginationOutput = advancedResponse.paginationOutput[0];
-        console.log('Pagination output:', paginationOutput);
-
-        const totalEntries = paginationOutput.totalEntries[0];
-        console.log('Total entries:', totalEntries);
-
-
-        if (data.findItemsAdvancedResponse[0].ack[0] === "Failure") {
-            throw new Error(data.findItemsAdvancedResponse[0].errorMessage[0].error[0].message[0]);
+        
+        // Check if we have any results
+        if (!data.itemSummaries || data.itemSummaries.length === 0) {
+            await logger.log(`No listings found for seller ${sellerUsername}`);
+            return 0;
         }
+
+        // For a more accurate count, we'd need to make additional calls with pagination
+        // For now, we'll estimate based on the first page results
+        // In a production environment, you might want to implement proper pagination counting
+        const estimatedTotal = Math.min(data.total || 0, 1000); // Cap at reasonable number
         
-        // Now try to get the total
-        const total = parseInt(totalEntries);
-        await logger.log(`Total listings for ${sellerUsername}: ${total}`);
+        await logger.log(`Estimated total listings for ${sellerUsername}: ${estimatedTotal}`);
+        return estimatedTotal;
         
-        return parseInt(total);
     } catch (error) {
         await logger.log(`Error getting total listings for ${sellerUsername}: ${error.message}`);
         return 0;
     }
+}
+
+// Modern eBay Browse API implementation to get seller inventory
+async function getSellerInventoryBrowseAPI(sellerUsername, maxItems) {
+    try {
+        const accessToken = await fetchAccessToken();
+        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+            `seller=${encodeURIComponent(sellerUsername)}` +
+            `&limit=${Math.min(maxItems, 200)}`; // eBay Browse API max is 200
+        
+        await logger.log(`Fetching inventory for ${sellerUsername}, max items: ${maxItems}`);
+
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+            },
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            await logger.log(`HTTP error! status: ${response.status}, error: ${errorText}`);
+            return [];
+        }
+
+        const data = await response.json();
+        
+        if (!data.itemSummaries || data.itemSummaries.length === 0) {
+            await logger.log(`No inventory found for seller ${sellerUsername}`);
+            return [];
+        }
+
+        const listings = data.itemSummaries.map(item => ({
+            title: item.title,
+            itemId: item.itemId,
+            price: item.price,
+            condition: item.condition,
+            seller: {
+                username: item.seller?.username || sellerUsername,
+                feedbackScore: item.seller?.feedbackScore || 0
+            }
+        }));
+
+        await logger.log(`Retrieved ${listings.length} listings for seller ${sellerUsername}`);
+        return listings;
+        
+    } catch (error) {
+        await logger.log(`Error getting inventory for ${sellerUsername}: ${error.message}`);
+        return [];
+    }
+}
+
+// Legacy function - keeping for backward compatibility but marking as deprecated
+async function getSellerTotalListings(sellerUsername) {
+    await logger.log(`WARNING: Using deprecated Finding API for ${sellerUsername}. Please use getSellerTotalListingsBrowseAPI instead.`);
+    return await getSellerTotalListingsBrowseAPI(sellerUsername);
 }
