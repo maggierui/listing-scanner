@@ -575,12 +575,14 @@ const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
     `filter=seller:${encodeURIComponent(sellerUsername)}` + // ❌ Missing required 'q' parameter
     `&limit=200`;
 
-// After (WORKS)
+// After (WORKS - Updated 2026-02-01)
 const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
     `q=vintage` + // ✓ Generic cross-category term
-    `&filter=seller:${encodeURIComponent(sellerUsername)}` +
+    `&filter=sellers:{${encodeURIComponent(sellerUsername)}}` + // ✓ Correct syntax: sellers:{username}
     `&limit=200`;
 ```
+
+**Critical Bug Fix (2026-02-01):** Initially used incorrect filter syntax `filter=seller:username` which caused eBay to ignore the seller filter and return generic search results. Corrected to `filter=sellers:{username}` (plural "sellers" with curly braces) per eBay Browse API documentation.
 
 Also added validation to filter empty strings from search phrases:
 ```javascript

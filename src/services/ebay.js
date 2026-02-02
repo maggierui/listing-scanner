@@ -355,9 +355,10 @@ async function getSellerTotalListingsBrowseAPI(sellerUsername) {
         const accessToken = await fetchAccessToken();
         // Get seller's total listings across all categories using filter parameter
         // Note: eBay requires 'q' parameter, using generic "vintage" term to sample across categories
+        // Filter syntax: sellers:{username} (note: plural "sellers" with curly braces)
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=vintage` +
-            `&filter=seller:${encodeURIComponent(sellerUsername)}` +
+            `&filter=sellers:{${encodeURIComponent(sellerUsername)}}` +
             `&limit=1`; // Just get 1 item to check total count
 
         await logger.log(`Seller listings request for ${sellerUsername}: ${url}`);
@@ -406,9 +407,10 @@ async function getSellerInventoryBrowseAPI(sellerUsername, maxItems) {
         // Get seller's listings using generic "vintage" search term to sample across categories
         // Goal: Get a representative sample to determine if they specialize in jewelry
         // Note: eBay API requires a search term, using "vintage" as it's common across many categories
+        // Filter syntax: sellers:{username} (note: plural "sellers" with curly braces)
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=vintage` +
-            `&filter=seller:${encodeURIComponent(sellerUsername)}` +
+            `&filter=sellers:{${encodeURIComponent(sellerUsername)}}` +
             `&limit=${Math.min(maxItems, 200)}`; // eBay Browse API max is 200
 
         await logger.log(`Fetching inventory for ${sellerUsername}, max items: ${maxItems}`);
