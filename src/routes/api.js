@@ -1,7 +1,9 @@
 import express from 'express';
+import { readFile } from 'fs/promises';
 import dbManager from '../db/DatabaseListingsManager.js';
 import logger from '../utils/logger.js';
 import { scanResults, startScan, scanInProgress } from '../services/scanner.js';
+import { EBAY_CONDITIONS } from '../constants/conditions.js';
 const router = express.Router();
 
 
@@ -12,12 +14,12 @@ router.get('/results', (req, res) => {
             listingCount: scanResults.listings?.length,
             hasError: !!scanResults.error
         });
-        
+
         const transformedListings = scanResults.listings?.map(item => {
             return {
                 title: item.title || 'N/A',
-                price: item.price?.value 
-                    ? parseFloat(item.price.value).toFixed(2) 
+                price: item.price?.value
+                    ? parseFloat(item.price.value).toFixed(2)
                     : 'N/A',
                 currency: item.price?.currency || 'USD',
                 seller: item.seller?.username || 'N/A',
@@ -25,14 +27,18 @@ router.get('/results', (req, res) => {
                 link: item.itemWebUrl || '#'
             };
         }) || [];
-        
+
+        // Get live logs from logger
+        const liveLogMessages = logger.getLogMessages();
+
         res.json({
             status: scanResults.status,
             lastUpdated: scanResults.lastUpdated,
             totalListings: scanResults.listings?.length || 0,
             listings: transformedListings,
             error: scanResults.error,
-            logMessages: scanResults.logMessages
+            logMessages: liveLogMessages,  // Use live logs from logger
+            progress: scanResults.progress  // Include progress information
         });
     } catch (error) {
         console.error('Error in /api/results:', error);
@@ -104,9 +110,9 @@ router.post('/scan', async (req, res) => {
 
 
 // Get all saved searches
-router.get('/saves/searches', async (req, res) => {
+router.get('/saves/searches', (req, res) => {
     try {
-        const searches = await dbManager.getSavedSearches();
+        const searches = dbManager.getSavedSearches();
         res.json(searches);
     } catch (error) {
         console.error('Error fetching saved searches:', error);
@@ -115,9 +121,9 @@ router.get('/saves/searches', async (req, res) => {
 });
 
 // Get results for a specific saved search
-router.get('/saves/search/:id/results', async (req, res) => {
+router.get('/saves/search/:id/results', (req, res) => {
     try {
-        const results = await dbManager.getSearchResults(req.params.id);
+        const results = dbManager.getSearchResults(req.params.id);
         res.json(results);
     } catch (error) {
         console.error('Error fetching search results:', error);
@@ -125,26 +131,26 @@ router.get('/saves/search/:id/results', async (req, res) => {
     }
 });
 
-// Get a specific saved search  
-router.get('/saves/search/:id', async (req, res) => {
+// Get a specific saved search
+router.get('/saves/search/:id', (req, res) => {
     try {
-        // 13. Get the ID from the URL parameters
+        // Get the ID from the URL parameters
         const searchId = parseInt(req.params.id);
-        
-        // 14. Validate the ID
+
+        // Validate the ID
         if (isNaN(searchId)) {
             return res.status(400).json({ error: 'Invalid search ID' });
         }
 
-        // 15. Use the database manager to get the specific search
-        const search = await dbManager.getSavedSearchById(searchId);
-        
-        // 16. Handle case where search isn't found
+        // Use the database manager to get the specific search
+        const search = dbManager.getSavedSearchById(searchId);
+
+        // Handle case where search isn't found
         if (!search) {
             return res.status(404).json({ error: 'Search not found' });
         }
 
-        // 17. Return the search data
+        // Return the search data
         res.json(search);
     } catch (error) {
         console.error('Error fetching search:', error);
@@ -153,17 +159,17 @@ router.get('/saves/search/:id', async (req, res) => {
 });
 
 // Save a new search
-router.post('/saves/search', async (req, res) => {
+router.post('/saves/search', (req, res) => {
     try {
-        const { 
-            name, 
-            searchPhrases, 
-            typicalPhrases, 
-            feedbackThreshold, 
-            conditions 
+        const {
+            name,
+            searchPhrases,
+            typicalPhrases,
+            feedbackThreshold,
+            conditions
         } = req.body;
 
-        const searchId = await dbManager.saveSearch(
+        const searchId = dbManager.saveSearch(
             name,
             searchPhrases,
             typicalPhrases,
@@ -189,9 +195,9 @@ router.post('/saves/search', async (req, res) => {
 router.get('/logs', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const logFileName = `ebay-scanner-${today}.txt`;
-    
+
     try {
-        const logContent = await fs.readFile(logFileName, 'utf8');
+        const logContent = await readFile(logFileName, 'utf8');
         res.setHeader('Content-Type', 'text/plain');
         res.setHeader('Content-Disposition', `attachment; filename=${logFileName}`);
         res.send(logContent);
@@ -201,9 +207,10 @@ router.get('/logs', async (req, res) => {
 });
 
 // Get conditions
-router.get('/conditions', async (req, res) => {
-    res.json(EBAY_CONDITIONS);
-    await logger.log('Conditions requested');
+router.get('/conditions', (req, res) => {
+    // Convert EBAY_CONDITIONS object to array for frontend
+    const conditionsArray = Object.values(EBAY_CONDITIONS);
+    res.json(conditionsArray);
 });
 
 

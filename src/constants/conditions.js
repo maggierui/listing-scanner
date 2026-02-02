@@ -3,7 +3,12 @@ export const EBAY_CONDITIONS = {
     NEW: {
         id: '1000',
         name: 'New',
-        variants: ['New', 'New with tags']
+        variants: [
+            'New',
+            'New with tags',
+            'New with packaging',
+            'New without packaging'
+        ]
     },
     NEW_OTHER: {
         id: '1500',
@@ -13,7 +18,10 @@ export const EBAY_CONDITIONS = {
     NEW_WITH_DEFECTS: {
         id: '1750',
         name: 'New with defects',
-        variants: ['New with defects']
+        variants: [
+            'New with defects',
+            'New with imperfections'
+        ]
     },
     CERTIFIED_REFURBISHED: {
         id: '2000',
@@ -48,7 +56,13 @@ export const EBAY_CONDITIONS = {
     USED: {
         id: '3000',
         name: 'Used',
-        variants: ['Used', 'Pre-owned']
+        variants: [
+            'Used',
+            'Pre-owned',
+            'Pre-owned - Excellent',
+            'Pre-owned - Good',
+            'Pre-owned - Fair'
+        ]
     },
     VERY_GOOD: {
         id: '4000',
@@ -69,6 +83,11 @@ export const EBAY_CONDITIONS = {
         id: '7000',
         name: 'For parts or not working',
         variants: ['For parts or not working']
+    },
+    UNSPECIFIED: {
+        id: '3000',  // Map to USED since unspecified is typically pre-owned
+        name: 'Unspecified',
+        variants: ['Unspecified']
     }
 };
 

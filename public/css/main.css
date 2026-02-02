@@ -170,3 +170,33 @@
     width: 100%;
     max-width: 400px;
 }
+
+/* Progress Area Styles */
+#progressArea {
+    background-color: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.progress-info {
+    font-family: monospace;
+    line-height: 1.8;
+}
+
+.progress-info strong {
+    color: #1976d2;
+}
+
+#logArea {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    margin-top: 10px;
+}

@@ -3,6 +3,8 @@ import fetchAccessToken from '../services/auth.js';
 import { EBAY_CONDITIONS } from '../constants/conditions.js';
 import { URLSearchParams } from 'url';
 import { delay } from '../utils/helpers.js';
+import dbManager from '../db/DatabaseListingsManager.js';
+import { updateSellerProgress } from './progress.js';
 
 export async function fetchSellerListings(sellerUsername, typicalPhrases) {
     try {
@@ -97,9 +99,14 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
             feedbackThreshold,
             conditions
         });
+
+        // Get recent item IDs for deduplication (skip items seen in last 7 days)
+        const recentItemIds = dbManager.getRecentItemIds(7);
+        await logger.log(`Loaded ${recentItemIds.size} recent items for deduplication`);
+
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
             `q=${encodeURIComponent(phrase)}` +
-            `&limit=200`;   
+            `&limit=200`;
         await logger.log('Making eBay API request to:', url);
 
         const processedSellers = new Set();
@@ -135,16 +142,26 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         }
 
         await logger.log(`Found ${data.itemSummaries.length} total listings for phrase "${phrase}"`);
+
+        // Filter out items we've seen recently (deduplication)
+        const newItems = data.itemSummaries.filter(item => !recentItemIds.has(item.itemId));
+        const duplicateCount = data.itemSummaries.length - newItems.length;
+
+        if (duplicateCount > 0) {
+            await logger.log(`Skipped ${duplicateCount} items seen in last 7 days (deduplication)`);
+        }
+        await logger.log(`Processing ${newItems.length} new items`);
+
         // Print out all search results
-        for (const item of data.itemSummaries) {
+        for (const item of newItems) {
             await logger.log(`Initial search results for this run: Title: ${item.title}, Seller: ${item.seller.username}, Condition: ${item.condition}`);
         }
         // Create array to store valid items
         let validListings = [];
         await logger.log('\n=== Processing Conditions ===');
 
-        // Process items one by one
-        for (const item of data.itemSummaries) {            
+        // Process items one by one (only new items after deduplication)
+        for (const item of newItems) {
             const matchingCondition = Object.values(EBAY_CONDITIONS).find(conditionObject => {
                 return conditionObject.variants.includes(item.condition);
             });
@@ -205,6 +222,9 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         let sellerCounter = 0;
         let qualifiedSellerCounter = 0;
 
+        // Initialize progress with total sellers
+        updateSellerProgress(0, totalSellers, 0);
+
         // Process each seller
         for (const [sellerUsername, listings] of sellerListings) {
             await logger.log(`\nProcessing seller: ${sellerUsername}`);
@@ -216,6 +236,9 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
 
             sellerCounter++;
             await logger.log(`\n--- Processing Seller ${sellerCounter}/${totalSellers}: ${sellerUsername} ---`);
+
+            // Update progress
+            updateSellerProgress(sellerCounter, totalSellers, qualifiedSellerCounter);
             
             const feedbackScore = listings[0].seller?.feedbackScore || 0;
             await logger.log(`Feedback score: ${feedbackScore}`);
@@ -233,6 +256,9 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
             if (!sellerAnalysis.error && !sellerAnalysis.shouldExclude) {
                 qualifiedSellerCounter++;
                 await logger.log(`Seller qualified: ${sellerUsername}`);
+
+                // Update progress with qualified sellers count
+                updateSellerProgress(sellerCounter, totalSellers, qualifiedSellerCounter);
                 
                 if (listings.length > 0) {
                     const addedListing = listings[0];
@@ -262,14 +288,23 @@ export async function fetchAllListings(searchPhrases, typicalPhrases, feedbackTh
     try {
         await logger.log('\n=== fetchAllListings received parameters ===');
         await logger.log(JSON.stringify({ searchPhrases,typicalPhrases, feedbackThreshold,  conditions}, null, 2));
-    
+
+        // Filter out empty strings from search phrases
+        const validSearchPhrases = searchPhrases.filter(phrase => phrase && phrase.trim() !== '');
+        await logger.log(`Filtered search phrases: ${JSON.stringify(validSearchPhrases)}`);
+
+        if (validSearchPhrases.length === 0) {
+            await logger.log('ERROR: No valid search phrases provided');
+            return [];
+        }
+
         //await previousListings.cleanup(30); // Cleans up listings older than 30 days
         const accessToken = await fetchAccessToken();
         await logger.log('Access token obtained successfully');
-        await logger.log(`Starting scan with searchPhrases: ${JSON.stringify(searchPhrases)}`);
+        await logger.log(`Starting scan with searchPhrases: ${JSON.stringify(validSearchPhrases)}`);
         const allListings = [];
-        
-        for (const phrase of searchPhrases) {
+
+        for (const phrase of validSearchPhrases) {
             console.log('Searching for phrase:', phrase);
             const listings = await fetchListingsForPhrase(accessToken, phrase, typicalPhrases,feedbackThreshold, conditions);
             console.log(`Found ${listings.length} listings for phrase: ${phrase}`);
@@ -318,10 +353,13 @@ async function fetchWithTimeout(url, options, timeout = 5000) {
 async function getSellerTotalListingsBrowseAPI(sellerUsername) {
     try {
         const accessToken = await fetchAccessToken();
+        // Get seller's total listings across all categories using filter parameter
+        // Note: eBay requires 'q' parameter, using generic "vintage" term to sample across categories
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `seller=${encodeURIComponent(sellerUsername)}` +
-            `&limit=1`; // Just get 1 item to check if seller exists
-        
+            `q=vintage` +
+            `&filter=seller:${encodeURIComponent(sellerUsername)}` +
+            `&limit=1`; // Just get 1 item to check total count
+
         await logger.log(`Seller listings request for ${sellerUsername}: ${url}`);
 
         const response = await fetchWithTimeout(url, {
@@ -365,10 +403,14 @@ async function getSellerTotalListingsBrowseAPI(sellerUsername) {
 async function getSellerInventoryBrowseAPI(sellerUsername, maxItems) {
     try {
         const accessToken = await fetchAccessToken();
+        // Get seller's listings using generic "vintage" search term to sample across categories
+        // Goal: Get a representative sample to determine if they specialize in jewelry
+        // Note: eBay API requires a search term, using "vintage" as it's common across many categories
         const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `seller=${encodeURIComponent(sellerUsername)}` +
+            `q=vintage` +
+            `&filter=seller:${encodeURIComponent(sellerUsername)}` +
             `&limit=${Math.min(maxItems, 200)}`; // eBay Browse API max is 200
-        
+
         await logger.log(`Fetching inventory for ${sellerUsername}, max items: ${maxItems}`);
 
         const response = await fetchWithTimeout(url, {

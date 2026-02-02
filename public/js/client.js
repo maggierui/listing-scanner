@@ -55,37 +55,38 @@ async function handleScanSubmit(e) {
 
       // Check if user wants to save this search
     const saveSearch = document.getElementById('saveSearchCheckbox').checked;
-    let searchName = null;
-    
+
     if (saveSearch) {
+        // Get search name first
+        const searchName = document.getElementById('searchName').value.trim();
+        if (!searchName) {
+            alert('Please enter a name for your search');
+            return;
+        }
+
         // Check for duplicate searches before saving
         const existingSearches = await fetch('/api/saves/searches').then(r => r.json());
-        const isDuplicate = existingSearches.some(search => 
+        const isDuplicate = existingSearches.some(search =>
             search.name === searchName &&
-            arraysEqual(search.search_phrases, searchPhrases) &&
-            arraysEqual(search.typical_phrases, typicalPhrases) &&
-            search.feedback_threshold === feedbackThreshold &&
-            arraysEqual(search.conditions, conditions)
+            arraysEqual(search.search_phrases, formData.searchPhrases) &&
+            arraysEqual(search.typical_phrases, formData.typicalPhrases) &&
+            search.feedback_threshold === formData.feedbackThreshold &&
+            arraysEqual(search.conditions, formData.conditions)
         );
 
         if (isDuplicate) {
             const proceed = confirm('A search with identical criteria already exists. Save anyway?');
             if (!proceed) return;
         }
-        searchName = document.getElementById('searchName').value.trim();
-        if (!searchName) {
-            alert('Please enter a name for your search');
-            return;
-        }
-        
+
         // Save the search to database
         try {
             const searchData = {
                 name: searchName,
-                searchPhrases: searchPhrases,
-                typicalPhrases: typicalPhrases,
-                feedbackThreshold: feedbackThreshold,
-                conditions: conditions
+                searchPhrases: formData.searchPhrases,
+                typicalPhrases: formData.typicalPhrases,
+                feedbackThreshold: formData.feedbackThreshold,
+                conditions: formData.conditions
             };
             
             const response = await fetch('/api/saves/search', {
@@ -121,19 +122,100 @@ async function handleScanSubmit(e) {
         console.log('Scan response:', data);
 
       // Start polling for results
-     // console.log('Starting results polling...');
-      //pollResults();
-      // Display results with status indicators
-      displayCurrentSearchResults({
-        ...data.results,
-        isNew: true // Mark new results
-    });
+      console.log('Starting results polling...');
+      pollResults();
 
   } catch (error) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error').textContent = 'Scan failed: ' + error.message;
       document.getElementById('error').style.display = 'block';
   }
+}
+
+// Poll for scan results
+async function pollResults() {
+    const logArea = document.getElementById('logArea');
+    const progressArea = document.getElementById('progressArea');
+
+    console.log('pollResults started - checking for updates every 2 seconds');
+
+    const pollInterval = setInterval(async () => {
+        try {
+            const response = await fetch('/api/results');
+            const data = await response.json();
+            console.log('Poll response:', { status: data.status, logCount: data.logMessages?.length, hasProgress: !!data.progress });
+
+            // Update progress information
+            if (data.progress && data.status === 'scanning') {
+                const progress = data.progress;
+                const phraseProgress = `${progress.currentPhraseIndex} / ${progress.totalPhrases}`;
+                const sellerProgress = progress.totalSellers > 0
+                    ? `${progress.sellersProcessed} / ${progress.totalSellers}`
+                    : 'Loading...';
+
+                progressArea.innerHTML = `
+                    <div class="progress-info">
+                        <strong>Search Phrase:</strong> "${progress.currentPhrase}" (${phraseProgress})<br>
+                        <strong>Sellers Analyzed:</strong> ${sellerProgress}<br>
+                        <strong>Qualified Sellers Found:</strong> ${progress.qualifiedSellers}
+                    </div>
+                `;
+                progressArea.style.display = 'block';
+            } else {
+                progressArea.style.display = 'none';
+            }
+
+            // Update log messages
+            if (data.logMessages && data.logMessages.length > 0) {
+                logArea.innerHTML = data.logMessages.slice(-20).map(msg =>
+                    `<div>${msg}</div>`
+                ).join('');
+                logArea.scrollTop = logArea.scrollHeight; // Auto-scroll to bottom
+            }
+
+            // Check if scan is complete
+            if (data.status === 'completed' || data.status === 'error') {
+                clearInterval(pollInterval);
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.status === 'error') {
+                    document.getElementById('error').textContent = data.error || 'Scan failed';
+                    document.getElementById('error').style.display = 'block';
+                } else {
+                    // Display results
+                    displayResults(data);
+                }
+            }
+        } catch (error) {
+            console.error('Polling error:', error);
+            clearInterval(pollInterval);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = 'Error checking scan status';
+            document.getElementById('error').style.display = 'block';
+        }
+    }, 2000); // Poll every 2 seconds
+}
+
+// Display scan results
+function displayResults(data) {
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('totalListings').textContent = data.totalListings;
+    document.getElementById('lastUpdated').textContent = new Date(data.lastUpdated).toLocaleString();
+
+    const tableBody = document.getElementById('resultTable');
+    tableBody.innerHTML = '';
+
+    data.listings.forEach(item => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${item.title}</td>
+            <td>${item.price}</td>
+            <td>${item.currency}</td>
+            <td>${item.seller}</td>
+            <td>${item.feedbackScore}</td>
+            <td><a href="${item.link}" target="_blank">View</a></td>
+        `;
+    });
 }
 
 // Load saved search results (only when viewing saved searches)
@@ -186,9 +268,6 @@ async function handleSavedSearchSelect(event) {
 }
 
 
-// Make sure form is connected to handler
-document.getElementById('scanForm').addEventListener('submit', handleScanSubmit);
-
 // Function to display results from current search
 async function displayCurrentSearchResults(results, isNewSearch = true) {
     const container = document.getElementById('resultsContainer');
@@ -217,6 +296,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await loadConditions();
         document.getElementById('scanForm').addEventListener('submit', handleScanSubmit);
+
+        // Check if there's already a scan in progress and start polling if so
+        const response = await fetch('/api/results');
+        const data = await response.json();
+        if (data.status === 'scanning') {
+            console.log('Scan already in progress, starting polling...');
+            document.getElementById('loading').style.display = 'block';
+            pollResults();
+        }
     } catch (error) {
         showError('Failed to load initial data: ' + error.message);
     }

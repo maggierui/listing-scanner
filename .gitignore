@@ -19,7 +19,19 @@ node_modules/
 *.log
 .DS_Store
 
-# Heroku-specific
+# Scanner log files
+ebay-scanner-*.txt
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+scanner.db
+
+# CSV exports
+exports/
+
+# IDE files
 npm-debug.log
 .idea/
 .vscode/

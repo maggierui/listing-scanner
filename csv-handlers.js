@@ -1,33 +1,40 @@
-import pkg from 'pg';
-const { Pool } = pkg;
 import { stringify } from 'csv-stringify/sync';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import dbManager from './src/db/DatabaseListingsManager.js';
 
-// CSV download handlers for server
-async function generatePreviousListingsCSV() {
-    const pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-        }
-    });
-
+// Ensure exports directory exists
+async function ensureExportsDir() {
     try {
-        const result = await pool.query(
-            'SELECT item_id, created_at FROM previous_listings ORDER BY created_at DESC'
-        );
-        
+        await mkdir('exports', { recursive: true });
+    } catch (error) {
+        // Directory might already exist, that's fine
+    }
+}
+
+// Get all items from database and export to CSV
+async function generatePreviousListingsCSV() {
+    try {
+        // Get all active items from database
+        const query = `
+            SELECT item_id, title, price, seller_id, first_found_at, last_seen_at
+            FROM all_search_results
+            WHERE is_active = 1
+            ORDER BY last_seen_at DESC
+        `;
+
+        const results = dbManager.db.prepare(query).all();
+
         // Convert to CSV format
-        const csvData = stringify(result.rows, {
+        const csvData = stringify(results, {
             header: true,
-            columns: ['item_id', 'created_at']
+            columns: ['item_id', 'title', 'price', 'seller_id', 'first_found_at', 'last_seen_at']
         });
-        
+
         return csvData;
     } catch (error) {
         console.error('Error generating previous listings CSV:', error);
         throw error;
-    } finally {
-        await pool.end();
     }
 }
 
@@ -44,8 +51,44 @@ function generateSearchResultsCSV(results) {
         header: true,
         columns: ['title', 'price', 'currency', 'seller', 'feedbackScore', 'link']
     });
-    
+
     return csvData;
 }
 
-export { generatePreviousListingsCSV, generateSearchResultsCSV };
+// Auto-export scan results to file
+async function autoExportScanResults(results, searchName = 'scan') {
+    try {
+        await ensureExportsDir();
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const filename = `${searchName.replace(/[^a-z0-9]/gi, '_')}_${timestamp}.csv`;
+        const filepath = join('exports', filename);
+
+        // Transform results to simple format
+        const simplifiedResults = results.map(item => ({
+            title: item.title || 'N/A',
+            price: item.price?.value || 'N/A',
+            currency: item.price?.currency || 'USD',
+            seller: item.seller?.username || 'N/A',
+            feedbackScore: item.seller?.feedbackScore || 'N/A',
+            link: item.itemWebUrl || '#',
+            itemId: item.itemId || 'N/A'
+        }));
+
+        const csvData = stringify(simplifiedResults, {
+            header: true,
+            columns: ['title', 'price', 'currency', 'seller', 'feedbackScore', 'itemId', 'link']
+        });
+
+        await writeFile(filepath, csvData, 'utf8');
+
+        console.log(`Auto-exported scan results to: ${filepath}`);
+        return filepath;
+    } catch (error) {
+        console.error('Error auto-exporting scan results:', error);
+        // Don't throw - export failure shouldn't break the scan
+        return null;
+    }
+}
+
+export { generatePreviousListingsCSV, generateSearchResultsCSV, autoExportScanResults };

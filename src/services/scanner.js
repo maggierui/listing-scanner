@@ -1,7 +1,10 @@
 import { fetchAllListings,fetchListingsForPhrase} from './ebay.js';
 import fetchAccessToken from './auth.js';
 import logger from '../utils/logger.js';
+import dbManager from '../db/DatabaseListingsManager.js';
+import { autoExportScanResults } from '../../csv-handlers.js';
 import fs from 'fs/promises';
+import { progressState, resetProgress, updatePhraseProgress } from './progress.js';
 
 // Scan state
 export let scanInProgress = false;
@@ -10,7 +13,10 @@ export let scanResults = {
     listings: [],
     lastUpdated: null,
     error: null,
-    logMessages: []
+    logMessages: [],
+    get progress() {
+        return progressState;  // Reference the shared progress state
+    }
 };
 
 
@@ -26,6 +32,13 @@ export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold
         scanResults.error = null;
         scanResults.logMessages = [];
         scanResults.listings = [];
+
+        // Reset progress using the shared module
+        resetProgress();
+        progressState.totalPhrases = searchPhrases.length;
+
+        // Clear old log messages from logger
+        logger.clearMessages();
 
         // Debug log the parameters
         await logger.log('\n=== Starting new scan ===');
@@ -61,6 +74,9 @@ export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold
 
     
 
+        // Clean up old items (not seen in 90 days)
+        dbManager.cleanupOldItems();
+
         // Get eBay access token
         await logger.log('Getting eBay access token...');
         const accessToken = await fetchAccessToken();
@@ -68,7 +84,12 @@ export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold
 
         // Fetch listings for each search phrase
         const allListings = [];
-        for (const phrase of searchPhrases) {
+        for (let i = 0; i < searchPhrases.length; i++) {
+            const phrase = searchPhrases[i];
+
+            // Update progress using the shared module
+            updatePhraseProgress(phrase, i + 1, searchPhrases.length);
+
             await logger.log(`\nProcessing search phrase: "${phrase}"`);
             try {
                 const listings = await fetchListingsForPhrase(
@@ -89,6 +110,14 @@ export async function startScan(searchPhrases, typicalPhrases, feedbackThreshold
         scanResults.listings = allListings;
         scanResults.lastUpdated = new Date();
         scanResults.status = 'completed';
+
+        // Auto-export results to CSV
+        if (allListings.length > 0) {
+            const exportPath = await autoExportScanResults(allListings, 'scan');
+            if (exportPath) {
+                await logger.log(`Results exported to: ${exportPath}`);
+            }
+        }
 
     } catch (error) {
         await logger.log('Scan error:', error.message);
