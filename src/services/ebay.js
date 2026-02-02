@@ -54,7 +54,9 @@ export async function fetchSellerListings(sellerUsername, typicalPhrases) {
         
         // Analysis criteria
         const MINIMUM_RATIO = 20;
-        const shouldExclude = ratio > MINIMUM_RATIO || (ratio === 0);
+        // Include sellers with 0% - they're casual sellers with one-off jewelry items
+        // Only exclude if ratio > 20% (specialists)
+        const shouldExclude = ratio > MINIMUM_RATIO;
         
         await logger.log(`Sample ratio: ${ratio.toFixed(2)}%`);
         await logger.log(shouldExclude

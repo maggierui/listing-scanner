@@ -265,9 +265,11 @@ Optional (defaults provided):
 
 ### Core Algorithm
 The **20% threshold** for seller specialization is carefully tuned:
-- 0% match → Exclude (irrelevant seller)
-- 0.1-20% match → Include (casual seller)
-- >20% match → Exclude (specialist)
+- 0% match → **Include** (casual seller with one-off jewelry item)
+- 0.1-20% match → **Include** (casual seller with some jewelry)
+- >20% match → **Exclude** (specialist)
+
+**Logic Update (2026-02-01):** Originally 0% sellers were excluded. However, if a seller has a jewelry lot listing but 0% of their "vintage" inventory is jewelry, it means they're a casual/estate sale seller who occasionally has jewelry - exactly our target audience. These sellers are now included.
 
 **DO NOT** change this without understanding the business logic.
 
