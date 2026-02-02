@@ -106,48 +106,67 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         const recentItemIds = dbManager.getRecentItemIds(7);
         await logger.log(`Loaded ${recentItemIds.size} recent items for deduplication`);
 
-        const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
-            `q=${encodeURIComponent(phrase)}` +
-            `&limit=200`;
-        await logger.log('Making eBay API request to:', url);
-
         const processedSellers = new Set();
         const filteredListings = [];
 
-        // Fetch listings from eBay API
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-            },
-        });
+        // Fetch multiple pages of results (pagination)
+        const PAGES_TO_FETCH = 3; // Fetch 3 pages = 600 items
+        const ITEMS_PER_PAGE = 200; // eBay max
+        let allItems = [];
 
-        // Log the response status
-        await logger.log('eBay API response status:', response.status);
+        for (let page = 0; page < PAGES_TO_FETCH; page++) {
+            const offset = page * ITEMS_PER_PAGE;
+            const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?` +
+                `q=${encodeURIComponent(phrase)}` +
+                `&limit=${ITEMS_PER_PAGE}` +
+                `&offset=${offset}`;
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('eBay API error:', errorText);
-            throw new Error(`eBay API error: ${response.status} - ${errorText}`);
+            await logger.log(`Fetching page ${page + 1}/${PAGES_TO_FETCH} (offset: ${offset})...`);
+
+            // Fetch listings from eBay API
+            const response = await fetchWithTimeout(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
+                },
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                await logger.log(`Error on page ${page + 1}: ${response.status} - ${errorText}`);
+                break; // Stop pagination on error
+            }
+
+            const data = await response.json();
+
+            // Check if we have results
+            if (!data.itemSummaries || data.itemSummaries.length === 0) {
+                await logger.log(`Page ${page + 1}: No more results`);
+                break; // No more results, stop pagination
+            }
+
+            await logger.log(`Page ${page + 1}: Found ${data.itemSummaries.length} items`);
+            allItems.push(...data.itemSummaries);
+
+            // Add delay between pages to avoid rate limiting (except after last page)
+            if (page < PAGES_TO_FETCH - 1) {
+                await delay(1000);
+            }
         }
 
-        const data = await response.json();
-        await logger.log(`Initial API response: Found ${data.itemSummaries?.length || 0} items`);
-
-        
         // Check for empty results
-        if (!data.itemSummaries || data.itemSummaries.length === 0) {
+        if (allItems.length === 0) {
             await logger.log(`No listings found for phrase "${phrase}"`);
             return [];
         }
 
-        await logger.log(`Found ${data.itemSummaries.length} total listings for phrase "${phrase}"`);
+        await logger.log(`Found ${allItems.length} total listings across all pages for phrase "${phrase}"`);
 
         // Filter out items we've seen recently (deduplication)
-        const newItems = data.itemSummaries.filter(item => !recentItemIds.has(item.itemId));
-        const duplicateCount = data.itemSummaries.length - newItems.length;
+        const newItems = allItems.filter(item => !recentItemIds.has(item.itemId));
+        const duplicateCount = allItems.length - newItems.length;
 
         if (duplicateCount > 0) {
             await logger.log(`Skipped ${duplicateCount} items seen in last 7 days (deduplication)`);
@@ -192,7 +211,7 @@ export async function fetchListingsForPhrase(accessToken, phrase, typicalPhrases
         }
 
         
-        await logger.log(`Found ${validListings.length} listings with matching conditions out of ${data.itemSummaries.length} total`);
+        await logger.log(`Found ${validListings.length} listings with matching conditions out of ${allItems.length} total`);
 
         
 
